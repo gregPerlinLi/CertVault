@@ -1,5 +1,0 @@
-spring:
-  application:
-    name: CertVault
-  profiles:
-    active: dev
