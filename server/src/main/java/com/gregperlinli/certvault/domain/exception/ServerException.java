@@ -1,0 +1,40 @@
+package com.gregperlinli.certvault.domain.exception;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serial;
+
+/**
+ * 系统异常
+ *
+ * @author gregPerlinLi
+ * @version 1.0.0
+ * @className ServerException
+ * @date 2024/1/31 17:08
+ */
+@Setter
+@Getter
+@NoArgsConstructor
+public class ServerException extends RuntimeException {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private int code;
+
+    private String msg;
+
+    public ServerException(int code, String msg) {
+        super(msg);
+        this.code = code;
+        this.msg = msg;
+    }
+
+    public ServerException(int code, String msg, Throwable cause) {
+        super(msg, cause);
+        this.code = code;
+        this.msg = msg;
+    }
+}

@@ -1,0 +1,62 @@
+server:
+  port: 1888
+
+spring:
+  application:
+    name: teaching-evaluation-system
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/cert_vault?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: root
+    password: root
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 8
+      timeout: 30000
+      client-type: lettuce
+      lettuce:
+        pool:
+          max-active: 10
+          min-idle: 5
+  cache:
+    type: redis
+    redis:
+      cache-null-values: true
+      key-prefix: "cache:"
+      use-key-prefix: true
+      time-to-live: 5m
+
+logging:
+  level:
+    com.gregperlinli.certvault: debug
+    org.springframework: warn
+
+management:
+  server:
+    port: 1999
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    prometheus:
+      enabled: true
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    tags:
+      application: "${spring.application.name}"
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.gregperlinli.certvault.domain.entity
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:

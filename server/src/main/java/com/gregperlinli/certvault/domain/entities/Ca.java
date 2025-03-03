@@ -1,0 +1,87 @@
+package com.gregperlinli.certvault.domain.entities;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+/**
+ * <p>
+ * CA列表
+ * </p>
+ *
+ * @author gregPerlinLi
+ * @since 2025-03-03
+ */
+@Getter
+@Setter
+@ToString
+@TableName("ca")
+public class Ca implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * CA ID
+     */
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
+    /**
+     * CA UUID
+     */
+    @TableField("uuid")
+    private Integer uuid;
+
+    /**
+     * CA 私钥
+     */
+    @TableField("privkey")
+    private String privkey;
+
+    /**
+     * CA 证书
+     */
+    @TableField("cert")
+    private String cert;
+
+    /**
+     * 拥有者 ID
+     */
+    @TableField("owner")
+    private Integer owner;
+
+    /**
+     * CA 别名
+     */
+    @TableField("comment")
+    private String comment;
+
+    /**
+     * 可用性
+     */
+    @TableField("avaliable")
+    private Boolean avaliable;
+
+    /**
+     * 创建时间
+     */
+    @TableField("created_at")
+    private LocalDateTime createdAt;
+
+    /**
+     * 修改时间
+     */
+    @TableField("modified_at")
+    private LocalDateTime modifiedAt;
+
+    /**
+     * 是否被删除
+     */
+    @TableField("deleted")
+    private Boolean deleted;
+}
