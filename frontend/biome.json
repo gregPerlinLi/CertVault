@@ -25,6 +25,7 @@
     "enabled": true,
     "rules": {
       "recommended": true
-    }
+    },
+    "ignore": ["components.d.ts"]
   }
 }

@@ -1,5 +1,9 @@
 import { createApp } from 'vue';
 
+// Vue plugins
+import PrimeVue from 'primevue/config';
+import Aura from '@primeuix/themes/aura';
+
 // Global stylesheets
 import '@/index.css';
 
@@ -7,4 +11,6 @@ import '@/index.css';
 import App from '@/App.vue';
 
 // Create application
-createApp(App).mount('#root');
+createApp(App)
+  .use(PrimeVue, { theme: { preset: Aura } })
+  .mount('#root');
