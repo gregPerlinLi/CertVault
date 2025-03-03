@@ -32,4 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 
-src/main/java/com/gregperlinli/certvault/generator
+src/main/java/com/gregperlinli/certvault/generator/
