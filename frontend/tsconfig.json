@@ -27,5 +27,5 @@
       "@views/*": ["src/views/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "./*.d.ts"]
 }

@@ -11,6 +11,9 @@ importers:
       '@primeuix/themes':
         specifier: ^1.0.0
         version: 1.0.0
+      '@vueuse/core':
+        specifier: ^12.7.0
+        version: 12.7.0(typescript@5.8.2)
       primevue:
         specifier: ^4.3.1
         version: 4.3.1(vue@3.5.13(typescript@5.8.2))
@@ -50,7 +53,7 @@ importers:
         version: 5.8.2
       unplugin-auto-import:
         specifier: ^19.1.1
-        version: 19.1.1
+        version: 19.1.1(@vueuse/core@12.7.0(typescript@5.8.2))
       unplugin-vue-components:
         specifier: ^28.4.1
         version: 28.4.1(@babel/parser@7.26.9)(vue@3.5.13(typescript@5.8.2))
@@ -367,6 +370,9 @@ packages:
   '@types/node@22.13.8':
     resolution: {integrity: sha512-G3EfaZS+iOGYWLLRCEAXdWK9my08oHNZ+FHluRiggIYJPOXzhOiDgpVCUHaUvyIC5/fj7C/p637jdzC666AOKQ==}
 
+  '@types/web-bluetooth@0.0.20':
+    resolution: {integrity: sha512-g9gZnnXVq7gM7v3tJCWV/qw7w+KeOlSHAhgF9RytFyifW6AF61hdT2ucrYhPq9hLs5JIryeupHV3qGk95dH9ow==}
+
   '@vue/compiler-core@3.5.13':
     resolution: {integrity: sha512-oOdAkwqUfW1WqpwSYJce06wvt6HljgY3fGeM9NcVA1HaYOij3mZG9Rkysn0OHuyUAGMbEbARIpsG+LPVlBJ5/Q==}
 
@@ -398,6 +404,15 @@ packages:
 
   '@vue/shared@3.5.13':
     resolution: {integrity: sha512-/hnE/qP5ZoGpol0a5mDi45bOd7t3tjYJBjsgCsivow7D48cJeV5l05RD82lPqi7gRiphZM37rnhW1l6ZoCNNnQ==}
+
+  '@vueuse/core@12.7.0':
+    resolution: {integrity: sha512-jtK5B7YjZXmkGNHjviyGO4s3ZtEhbzSgrbX+s5o+Lr8i2nYqNyHuPVOeTdM1/hZ5Tkxg/KktAuAVDDiHMraMVA==}
+
+  '@vueuse/metadata@12.7.0':
+    resolution: {integrity: sha512-4VvTH9mrjXqFN5LYa5YfqHVRI6j7R00Vy4995Rw7PQxyCL3z0Lli86iN4UemWqixxEvYfRjG+hF9wL8oLOn+3g==}
+
+  '@vueuse/shared@12.7.0':
+    resolution: {integrity: sha512-coLlUw2HHKsm7rPN6WqHJQr18WymN4wkA/3ThFaJ4v4gWGWAQQGK+MJxLuJTBs4mojQiazlVWAKNJNpUWGRkNw==}
 
   '@webassemblyjs/ast@1.14.1':
     resolution: {integrity: sha512-nuBEDgQfm1ccRp/8bCQrx1frohyufl4JlbMMZ4P1wpeOfDhF6FQkxZJ1b/e+PLwr6X1Nhw6OLme5usuBWYBvuQ==}
@@ -1300,6 +1315,8 @@ snapshots:
     dependencies:
       undici-types: 6.20.0
 
+  '@types/web-bluetooth@0.0.20': {}
+
   '@vue/compiler-core@3.5.13':
     dependencies:
       '@babel/parser': 7.26.9
@@ -1355,6 +1372,23 @@ snapshots:
       vue: 3.5.13(typescript@5.8.2)
 
   '@vue/shared@3.5.13': {}
+
+  '@vueuse/core@12.7.0(typescript@5.8.2)':
+    dependencies:
+      '@types/web-bluetooth': 0.0.20
+      '@vueuse/metadata': 12.7.0
+      '@vueuse/shared': 12.7.0(typescript@5.8.2)
+      vue: 3.5.13(typescript@5.8.2)
+    transitivePeerDependencies:
+      - typescript
+
+  '@vueuse/metadata@12.7.0': {}
+
+  '@vueuse/shared@12.7.0(typescript@5.8.2)':
+    dependencies:
+      vue: 3.5.13(typescript@5.8.2)
+    transitivePeerDependencies:
+      - typescript
 
   '@webassemblyjs/ast@1.14.1':
     dependencies:
@@ -1837,7 +1871,7 @@ snapshots:
       unplugin: 2.2.0
       unplugin-utils: 0.2.4
 
-  unplugin-auto-import@19.1.1:
+  unplugin-auto-import@19.1.1(@vueuse/core@12.7.0(typescript@5.8.2)):
     dependencies:
       local-pkg: 1.1.0
       magic-string: 0.30.17
@@ -1845,6 +1879,8 @@ snapshots:
       unimport: 4.1.2
       unplugin: 2.2.0
       unplugin-utils: 0.2.4
+    optionalDependencies:
+      '@vueuse/core': 12.7.0(typescript@5.8.2)
 
   unplugin-utils@0.2.4:
     dependencies:

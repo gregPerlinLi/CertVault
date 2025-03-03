@@ -1,7 +1,10 @@
 import { defineConfig } from '@rsbuild/core';
 
-// Plugins
+// Rsbuild plugins
 import { pluginVue } from '@rsbuild/plugin-vue';
+
+// Rspack plugins
+import pluginAutoImport from 'unplugin-auto-import/rspack';
 import pluginVueComponents from 'unplugin-vue-components/rspack';
 
 // Resources
@@ -16,6 +19,10 @@ export default defineConfig({
   tools: {
     rspack: {
       plugins: [
+        pluginAutoImport({
+          dts: true,
+          imports: ['vue', 'vue-router', '@vueuse/core'],
+        }),
         pluginVueComponents({ dts: true, resolvers: [PrimeVueResolver()] }),
       ],
     },

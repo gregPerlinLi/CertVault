@@ -1,3 +1,7 @@
+<script setup lang="ts">
+const test = ref("Login");
+</script>
+
 <template>
-    Login
+    <Button>{{ test }}</Button>
 </template>
