@@ -618,6 +618,9 @@ packages:
   confbox@0.1.8:
     resolution: {integrity: sha512-RMtmw0iFkeR4YV+fUOSucriAQNb9g8zFR52MWCtl+cCZOFRNL6zeB395vPzFhEjjn4fMxXudmELnl/KF/WrK6w==}
 
+  confbox@0.2.1:
+    resolution: {integrity: sha512-hkT3yDPFbs95mNCy1+7qNKC6Pro+/ibzYxtM2iqEigpf0sVw+bg4Zh9/snjsBcf990vfIsg5+1U7VyiyBb3etg==}
+
   csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
 
@@ -849,8 +852,8 @@ packages:
   pkg-types@1.3.1:
     resolution: {integrity: sha512-/Jm5M4RvtBFVkKWRu2BLUTNP8/M2a+UwuAX+ae4770q1qVGtfjG+WTCupoZixokjmHiry8uI+dlY8KXYV5HVVQ==}
 
-  pkg-types@2.0.1:
-    resolution: {integrity: sha512-LdDk/hlFeVBoEZqlkJ2bsxwq5fjKQg7i422zu78IC16CSR2XBe7kYxxBx0mkU8kLX6nh50Zp80lZHveKnsHTpQ==}
+  pkg-types@2.1.0:
+    resolution: {integrity: sha512-wmJwA+8ihJixSoHKxZJRBQG1oY8Yr9pGLzRmSsNms0iNWyHHAlZCa7mmKiFR10YPZuz/2k169JiS/inOjBCZ2A==}
 
   postcss@8.5.3:
     resolution: {integrity: sha512-dle9A3yYxlBSrt8Fu+IpjGT8SY8hN0mlaA6GY8t0P5PjIOZemULz/E2Bnm/2dcUOena75OTNkHI76uZBNUUq3A==}
@@ -1561,6 +1564,8 @@ snapshots:
 
   confbox@0.1.8: {}
 
+  confbox@0.2.1: {}
+
   csstype@3.1.3: {}
 
   de-indent@1.0.2: {}
@@ -1707,7 +1712,7 @@ snapshots:
   local-pkg@1.1.1:
     dependencies:
       mlly: 1.7.4
-      pkg-types: 2.0.1
+      pkg-types: 2.1.0
       quansync: 0.2.8
 
   loupe@3.1.3: {}
@@ -1753,9 +1758,9 @@ snapshots:
       mlly: 1.7.4
       pathe: 2.0.3
 
-  pkg-types@2.0.1:
+  pkg-types@2.1.0:
     dependencies:
-      confbox: 0.1.8
+      confbox: 0.2.1
       exsolve: 1.0.1
       pathe: 2.0.3
 
