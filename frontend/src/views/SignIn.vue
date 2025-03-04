@@ -36,8 +36,9 @@ async function trySignIn(ev: Event): Promise<void> {
 </script>
 
 <template>
-  <div class="fixed flex flex-col inset-0 items-center">
-    <h1 class="mb-6 mt-40 text-center text-xl">Sign In to CertVault</h1>
+  <div class="fixed flex flex-col inset-0 items-center pt-40">
+    <img class="h-12 mb-4 w-12" draggable="false" src="/favicon.svg" />
+    <h1 class="mb-6 text-center text-xl">Sign In to CertVault</h1>
     <Card class="bg-neutral-50! border border-neutral-200">
       <template #content>
         <form class="flex flex-col gap-4" @submit.prevent="trySignIn">
