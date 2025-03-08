@@ -7,6 +7,10 @@ export default createRouter({
     {
       path: "/",
       component: () => import("@views/SignIn.vue")
+    },
+    {
+      path: "/dashboard",
+      component: () => import("@views/Dashboard.vue")
     }
   ]
 });
