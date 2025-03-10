@@ -1,7 +1,7 @@
 package com.gregperlinli.certvault.service.impl;
 
 import com.gregperlinli.certvault.domain.entities.CaBinding;
-import com.gregperlinli.certvault.mappers.CaBindingMapper;
+import com.gregperlinli.certvault.mapper.CaBindingMapper;
 import com.gregperlinli.certvault.service.interfaces.ICaBindingService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;

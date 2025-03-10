@@ -1,7 +1,7 @@
 package com.gregperlinli.certvault.service.impl;
 
 import com.gregperlinli.certvault.domain.entities.Ca;
-import com.gregperlinli.certvault.mappers.CaMapper;
+import com.gregperlinli.certvault.mapper.CaMapper;
 import com.gregperlinli.certvault.service.interfaces.ICaService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
