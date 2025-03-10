@@ -20,7 +20,7 @@ export default defineConfig({
       imports: ["vue", "vue-router", "@vueuse/core"]
     }),
     tailwindcss(),
-    tsconfigPaths(),
+    tsconfigPaths({ loose: true, projects: ["tsconfig.app.json"] }),
     vue(),
     vueComponents.vite({ dts: true, resolvers: [PrimeVueResolver()] })
   ]

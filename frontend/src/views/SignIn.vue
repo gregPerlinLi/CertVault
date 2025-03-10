@@ -1,44 +1,72 @@
 <script setup lang="ts">
-import { notify } from "@kyvg/vue3-notification";
+import { delay } from "@/utils";
+import { useToast } from "primevue/usetoast";
 
 // Reactive
+const toast = useToast();
 const errIdx = ref<number | null>(null);
 
 // Actions
 async function trySignIn(ev: Event): Promise<void> {
+  // Parse form data
   const formData = new FormData(ev.target as HTMLFormElement);
 
+  // Clear error index
   errIdx.value = null;
 
+  // Validate username
   const username = formData.get("username")!.toString().trim();
   if (username.length === 0) {
     errIdx.value = 0;
-    notify({ text: "Username is required", type: "error" });
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Username is required",
+      life: 3000
+    });
     return;
   }
 
+  // Validate password
   const passowrd = formData.get("password")!.toString().trim();
   if (passowrd.length === 0) {
     errIdx.value = 1;
-    notify({ text: "Password is required", type: "error" });
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Password is required",
+      life: 3000
+    });
     return;
   }
 
+  // Sign in
   ((ev as SubmitEvent).submitter! as HTMLButtonElement).disabled = true;
-  notify({ text: "Signing in" });
+  toast.add({
+    severity: "info",
+    summary: "Info",
+    detail: "Signing in",
+    life: 3000
+  });
 
   // TODO: Call RESTful API to sign in
-  await new Promise((res) => setTimeout(res, 1000));
-  notify({ text: "TODO", type: "error" });
+  await delay(1000);
+  toast.add({
+    severity: "error",
+    summary: "Error",
+    detail: "TODO",
+    life: 3000
+  });
   ((ev as SubmitEvent).submitter! as HTMLButtonElement).disabled = false;
   // end TODO
 }
 </script>
 
 <template>
-  <div class="fixed flex flex-col inset-0 items-center">
-    <h1 class="mb-6 mt-40 text-center text-xl">Sign In to CertVault</h1>
-    <Card class="bg-neutral-50! border border-neutral-200">
+  <div class="fixed flex flex-col inset-0 items-center pt-40">
+    <img class="h-12 mb-4 w-12" draggable="false" src="/favicon.svg" />
+    <h1 class="mb-6 text-center text-xl">Sign In to CertVault</h1>
+    <Card class="bg-neutral-50 border border-neutral-200">
       <template #content>
         <form class="flex flex-col gap-4" @submit.prevent="trySignIn">
           <InputText

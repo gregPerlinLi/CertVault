@@ -14,6 +14,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
+      "@comps/*": ["src/components/*"],
       "@views/*": ["src/views/*"]
     }
   },
