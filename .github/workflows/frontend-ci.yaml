@@ -5,17 +5,19 @@ on:
     branches:
       - dev
     paths:
+      - .github/workflows/frontend-*
       - frontend/**
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Move to frontend folder
-        run: cd frontend
       - name: Setup PNPM
         uses: pnpm/action-setup@v4
       - name: Setup Node
