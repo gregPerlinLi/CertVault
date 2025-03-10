@@ -1,6 +1,5 @@
 package com.gregperlinli.certvault.service.interfaces;
 
-import com.gregperlinli.certvault.domain.dto.LoginResultDTO;
 import com.gregperlinli.certvault.domain.dto.UpdateUserProfileDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import com.gregperlinli.certvault.domain.entities.User;
@@ -24,7 +23,7 @@ public interface IUserService extends IService<User> {
      * @param sessionId sessionId
      * @return login result
      */
-    LoginResultDTO login(String username, String password, String sessionId);
+    UserProfileDTO login(String username, String password, String sessionId);
 
     /**
      * 登录校验
