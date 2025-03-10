@@ -67,8 +67,8 @@ const roleName = computed((): string => {
   <aside>
     <div class="flex flex-col gap-4 p-4 sticky top-[65px]">
       <PanelMenu :model="menuModel" />
-      <hr class="border-gray-100 border-t-2" />
-      <p class="leading-none select-none text-center text-gray-300 text-sm">
+      <hr class="border-gray-500 border-t-2" />
+      <p class="leading-none select-none text-center text-gray-500 text-sm">
         {{ roleName }}
       </p>
     </div>

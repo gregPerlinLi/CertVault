@@ -18,19 +18,19 @@ export default createRouter({
         },
         {
           path: "profile",
-          component: () => import("@views/dashboard/Index.vue")
+          component: () => import("@views/dashboard/Profile.vue")
         },
         {
           path: "users",
-          component: () => import("@views/dashboard/Index.vue")
+          component: () => import("@views/dashboard/Users.vue")
         },
         {
           path: "certificates",
-          component: () => import("@views/dashboard/Index.vue")
+          component: () => import("@views/dashboard/Certificates.vue")
         },
         {
           path: "settings",
-          component: () => import("@views/dashboard/Index.vue")
+          component: () => import("@views/dashboard/Settings.vue")
         }
       ]
     }
