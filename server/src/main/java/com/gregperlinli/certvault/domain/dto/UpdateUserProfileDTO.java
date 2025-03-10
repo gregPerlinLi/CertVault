@@ -23,6 +23,11 @@ public class UpdateUserProfileDTO {
     private String displayName;
 
     /**
+     * Email
+     */
+    private String email;
+
+    /**
      * Old password
      */
     private String oldPassword;
