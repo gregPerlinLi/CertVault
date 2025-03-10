@@ -20,7 +20,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@TableName("users")
+@TableName("user")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -42,6 +42,18 @@ public class User implements Serializable {
      */
     @TableField("password")
     private String password;
+
+    /**
+     * 显示名称
+     */
+    @TableField("display_name")
+    private String displayName;
+
+    /**
+     * 角色
+     */
+    @TableField("role")
+    private Integer role;
 
     /**
      * 创建时间
