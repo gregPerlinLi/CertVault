@@ -1,38 +1,44 @@
 package com.gregperlinli.certvault.domain.dto;
 
-import com.gregperlinli.certvault.domain.entities.Role;
 import com.gregperlinli.certvault.domain.entities.User;
 import lombok.*;
 
 import java.util.List;
 
 /**
- * Login data transfer object
+ * User Profile DTO
  *
  * @author gregPerlinLi
  * @version 1.0.0
- * @className {@code LoginDTO}
- * @date 2025/3/3 20:40
+ * @className {@code UserProfileDTO}
+ * @date 2025/3/10 20:22
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Data
-public class UserDTO {
+public class UserProfileDTO {
 
     /**
-     * Username
+     * username
      */
     private String username;
 
     /**
-     * Password
+     * display name
      */
-    private List<String> roles;
+    private String displayName;
 
-    public UserDTO(User user, List<Role> roles) {
+    /**
+     * roles
+     */
+    private Integer role;
+
+    public UserProfileDTO(User user) {
         this.username = user.getUsername();
-        this.roles = roles.stream().map(Role::getRoleName).toList();
+        this.displayName = user.getDisplayName();
+        this.role = user.getRole();
     }
+
 }

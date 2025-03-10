@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  * @className {@code MyBatisConfig}
  * @date 2025/3/3 15:58
  */
-@MapperScan("com.gregperlinli.certvault.mappers")
+@MapperScan("com.gregperlinli.certvault.mapper")
 @Configuration
 public class MyBatisConfig {
     @Bean

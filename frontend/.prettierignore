@@ -1,2 +1,6 @@
 # Lock files
 pnpm-lock.yaml
+
+# Auto generated files
+auto-imports.d.ts
+components.d.ts

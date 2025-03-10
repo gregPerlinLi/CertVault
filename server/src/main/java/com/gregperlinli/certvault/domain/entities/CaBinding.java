@@ -19,7 +19,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@TableName("ca_bindings")
+@TableName("ca_binding")
 public class CaBinding implements Serializable {
 
     private static final long serialVersionUID = 1L;

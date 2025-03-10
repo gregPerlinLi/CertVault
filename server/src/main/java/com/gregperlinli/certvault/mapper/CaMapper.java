@@ -1,4 +1,4 @@
-package com.gregperlinli.certvault.mappers;
+package com.gregperlinli.certvault.mapper;
 
 import com.gregperlinli.certvault.domain.entities.Ca;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

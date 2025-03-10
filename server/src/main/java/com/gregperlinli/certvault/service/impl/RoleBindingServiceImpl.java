@@ -1,7 +1,7 @@
 package com.gregperlinli.certvault.service.impl;
 
 import com.gregperlinli.certvault.domain.entities.RoleBinding;
-import com.gregperlinli.certvault.mappers.RoleBindingMapper;
+import com.gregperlinli.certvault.mapper.RoleBindingMapper;
 import com.gregperlinli.certvault.service.interfaces.IRoleBindingService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;

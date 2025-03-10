@@ -3,15 +3,14 @@ package com.gregperlinli.certvault.controller;
 import com.gregperlinli.certvault.constant.GeneralConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.LoginDTO;
-import com.gregperlinli.certvault.domain.dto.UserDTO;
+import com.gregperlinli.certvault.domain.dto.LoginResultDTO;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Authorization Controller
@@ -21,24 +20,52 @@ import org.springframework.web.bind.annotation.RestController;
  * @className {@code AuthController}
  * @date 2025/3/3 20:37
  */
-@RestController("/api/auth")
+@RequestMapping("/api/auth")
+@RestController
+@Slf4j
 public class AuthController {
 
     @Resource
     IUserService userService;
 
+    /**
+     * Login
+     *
+     * @param loginDTO {@link LoginDTO}
+     * @param request {@link HttpServletRequest}
+     * @param response {@link HttpServletResponse}
+     * @return {@link ResultVO}
+     */
     @PostMapping(value =  "/login")
-    public ResultVO<UserDTO> login(@RequestBody LoginDTO loginDTO,
-                             HttpServletRequest request,
-                             HttpServletResponse response) {
-        UserDTO loginResult = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), request.getSession().getId());
+    public ResultVO<LoginResultDTO> login(@RequestBody LoginDTO loginDTO,
+                                          HttpServletRequest request,
+                                          HttpServletResponse response) {
+        LoginResultDTO loginResult = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), request.getSession().getId());
         if ( loginResult != null ) {
             request.getSession().setAttribute("username", loginDTO.getUsername());
-            request.getSession().setAttribute("account_type", loginResult.getRoles());
+            request.getSession().setAttribute("account_type", loginResult.getRole());
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Login Success!", loginResult);
         }
         response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.FAILED.getResultCode()));
         return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Login failed, username or password error");
+    }
+
+    /**
+     * Logout
+     *
+     * @param request {@link HttpServletRequest}
+     * @return {@link ResultVO}
+     */
+    @GetMapping(value = "/logout")
+    public ResultVO<Void> logout(HttpServletRequest request) {
+        if ( request.getSession().getAttribute("username") != null ) {
+            log.info("User {} logout", request.getSession().getAttribute("username").toString());
+            userService.logout(request.getSession().getId());
+            request.getSession().invalidate();
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Logout Success!");
+        }
+        log.warn("User logout failed, please login first!");
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Logout failed, please login first!");
     }
 
 }

@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @className {@code CertVaultApplication}
  * @date 2025/3/3 15:50
  */
-@MapperScan("com.gregperlinli.certvault.mappers")
+@MapperScan("com.gregperlinli.certvault.mapper")
 @SpringBootApplication
 public class CertVaultApplication {
     public static void main(String[] args) {

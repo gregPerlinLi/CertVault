@@ -1,7 +1,7 @@
 package com.gregperlinli.certvault.service.impl;
 
 import com.gregperlinli.certvault.domain.entities.Role;
-import com.gregperlinli.certvault.mappers.RoleMapper;
+import com.gregperlinli.certvault.mapper.RoleMapper;
 import com.gregperlinli.certvault.service.interfaces.IRoleService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;

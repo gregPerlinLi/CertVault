@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
  * Universal Result Object
  *
@@ -35,13 +38,29 @@ public class ResultVO<T> {
     private T data;
 
     /**
+     * 时间戳
+     */
+    private String timestamp;
+
+    /**
      * 返回错误结果方法
      *
      * @param code 错误代码
      * @param message 错误信息
      */
     public ResultVO(Integer code, String message) {
-        this(code, message, null);
+        this(code, message, null, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+    }
+
+    /**
+     * 返回正确结果方法
+     *
+     * @param code 状态码
+     * @param message 信息
+     * @param data 返回数据
+     */
+    public ResultVO(Integer code, String message, T data) {
+        this(code, message, data, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
     }
 
 }

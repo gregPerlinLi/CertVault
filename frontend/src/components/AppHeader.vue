@@ -41,7 +41,7 @@ const signOut = (): void => {
 
 <template>
   <header
-    class="bg-white border-b border-neutral-200 flex items-center justify-between px-8 py-4 sticky top-0 z-50">
+    class="bg-white border-b border-neutral-200 flex items-center justify-between px-8 py-4 sticky top-0 z-50 dark:bg-neutral-800 dark:border-neutral-500">
     <RouterLink class="flex gap-2 items-center" to="/dashboard">
       <img class="h-8 w-8" draggable="false" src="/favicon.svg" />
       <h1 class="font-bold select-none text-2xl">CertVault</h1>
