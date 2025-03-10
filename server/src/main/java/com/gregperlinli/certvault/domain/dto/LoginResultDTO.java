@@ -1,6 +1,5 @@
 package com.gregperlinli.certvault.domain.dto;
 
-import com.gregperlinli.certvault.domain.entities.Role;
 import com.gregperlinli.certvault.domain.entities.User;
 import lombok.*;
 
@@ -19,7 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 @Data
-public class UserDTO {
+public class LoginResultDTO {
 
     /**
      * Username
@@ -27,12 +26,18 @@ public class UserDTO {
     private String username;
 
     /**
-     * Password
+     * Display name
      */
-    private List<String> roles;
+    private String displayName;
 
-    public UserDTO(User user, List<Role> roles) {
+    /**
+     * roles
+     */
+    private Integer role;
+
+    public LoginResultDTO(User user) {
         this.username = user.getUsername();
-        this.roles = roles.stream().map(Role::getRoleName).toList();
+        this.displayName = user.getDisplayName();
+        this.role = user.getRole();
     }
 }
