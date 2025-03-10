@@ -1,9 +1,9 @@
-<script setup lang="ts">
-// Components
-import { Notifications } from "@kyvg/vue3-notification";
-</script>
-
 <template>
-  <Notifications position="top center" />
+  <Toast
+    :pt="{
+      summary: { class: 'leading-none' },
+      detail: { class: 'leading-none' }
+    }" />
+  <ConfirmDialog />
   <RouterView />
 </template>

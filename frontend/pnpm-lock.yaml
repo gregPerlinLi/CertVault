@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@kyvg/vue3-notification':
-        specifier: ^3.4.1
-        version: 3.4.1(vue@3.5.13(typescript@5.7.3))
       '@vueuse/core':
         specifier: ^12.8.2
         version: 12.8.2(typescript@5.7.3)
@@ -244,11 +241,6 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.0':
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
-
-  '@kyvg/vue3-notification@3.4.1':
-    resolution: {integrity: sha512-WhTWCbF36JHLJR5UdKmJF7KXGOGVy4tLeaJuKTHZhwttZWnbF9w1/c2d32tvCSwY9CdeX/n9uoaKWLMKK3vOyg==}
-    peerDependencies:
-      vue: ^3.0.0
 
   '@primeuix/styled@0.5.0':
     resolution: {integrity: sha512-k5CTQ+10cXIXxZTep7sktmYe8lJkjmUaFVDAc1OCsWTJR+bhBy/s6zWIatGljVtuf3RmTSxtlrHQeFLjPmdUNQ==}
@@ -677,8 +669,8 @@ packages:
     resolution: {integrity: sha512-80F22aiJ3GLyVnS/B3HzgR6RelZVumzj9jkL0Rhz4h0xYbNW9PjlQz5h3J/SShErbXBc295vseR4/MIbVmUbeA==}
     engines: {node: '>=12.0.0'}
 
-  exsolve@1.0.2:
-    resolution: {integrity: sha512-ZEcIMbthn2zeX4/wD/DLxDUjuCltHXT8Htvm/JFlTkdYgWh2+HGppgwwNUnIVxzxP7yJOPtuBAec0dLx6lVY8w==}
+  exsolve@1.0.4:
+    resolution: {integrity: sha512-xsZH6PXaER4XoV+NiT7JHp1bJodJVT+cxeSH1G0f0tlT0lJqYuHUP3bUx2HtfTDvOagMINYp8rsqusxud3RXhw==}
 
   fdir@6.4.3:
     resolution: {integrity: sha512-PMXmW2y1hDDfTSRc9gaXIuCCRpuoz3Kaz8cUelp3smouvfT632ozg2vrT6lJsHKKOF59YLbOGfAWGUcKEfRMQw==}
@@ -1203,10 +1195,6 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.0': {}
 
-  '@kyvg/vue3-notification@3.4.1(vue@3.5.13(typescript@5.7.3))':
-    dependencies:
-      vue: 3.5.13(typescript@5.7.3)
-
   '@primeuix/styled@0.5.0':
     dependencies:
       '@primeuix/utils': 0.5.1
@@ -1630,7 +1618,7 @@ snapshots:
 
   expect-type@1.2.0: {}
 
-  exsolve@1.0.2: {}
+  exsolve@1.0.4: {}
 
   fdir@6.4.3(picomatch@4.0.2):
     optionalDependencies:
@@ -1766,7 +1754,7 @@ snapshots:
   pkg-types@2.1.0:
     dependencies:
       confbox: 0.2.1
-      exsolve: 1.0.2
+      exsolve: 1.0.4
       pathe: 2.0.3
 
   postcss@8.5.3:
