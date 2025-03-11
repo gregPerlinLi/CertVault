@@ -56,7 +56,7 @@ public class AuthController {
      * @param request {@link HttpServletRequest}
      * @return {@link ResultVO}
      */
-    @GetMapping(value = "/logout")
+    @DeleteMapping(value = "/logout")
     public ResultVO<Void> logout(HttpServletRequest request) {
         if ( request.getSession().getAttribute("username") != null ) {
             log.info("User {} logout", request.getSession().getAttribute("username").toString());
