@@ -43,7 +43,7 @@ management:
         include: "*"
   endpoint:
     prometheus:
-      enabled: true
+      access: unrestricted
     health:
       show-details: always
   prometheus:
