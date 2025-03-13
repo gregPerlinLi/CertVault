@@ -1,0 +1,120 @@
+# Docker image configuration
+# This section defines the Docker image settings used by the deployment.
+# - repository: The URL of the Docker image repository.
+# - tag: The tag of the Docker image to be used.
+# - pullPolicy: The policy for pulling the Docker image.
+image:
+  repository: registry.gdutnic.com/cert-vault/cart-vault
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Global configuration
+# This section contains global settings that apply across the deployment.
+# - storageClass: The storage class to be used for persistent volumes.
+global:
+  storageClass: "standard"
+
+# Number of replicas for the deployment
+# This setting defines the number of pod replicas to be created for the deployment.
+replicaCount: 1
+
+# Spring Boot application configuration
+# This section configures the Spring Boot application settings.
+# - profile: The active profile for the Spring Boot application.
+# - logging: Logging levels for different packages.
+# - javaOpts: Java options to be passed to the JVM.
+springBoot:
+  profile: dev
+  logging:
+    level:
+      com_gregperlinli_certvault: debug
+      org_springframework: warn
+  javaOpts:
+    - "-Xmx512m" # Maximum heap size
+    - "-Xms256m" # Initial heap size
+    - "-XX:+UseZGC" # Use Z Garbage Collector
+    - "-XX:ZCollectionInterval=120" # Target collection interval in milliseconds
+    - "-XX:ZAllocationSpikeTolerance=4" # Allocation spike tolerance
+    - "-XX:-ZProactive" # Disable proactive mode
+    - "-XX:+HeapDumpOnOutOfMemoryError" # Enable heap dump on OutOfMemoryError
+    - "-XX:HeapDumpPath=./errorDump.hprof" # Path to heap dump file
+
+# Service configuration
+# This section defines the service settings for exposing the application.
+# - ports: Ports exposed by the service.
+#   - business: Business port for the application.
+#   - management: Management port for the application.
+service:
+  ports:
+    business: 1888
+    management: 1999
+
+# Service Monitor configuration for Prometheus
+# This section configures the service monitor for Prometheus.
+# - enabled: Whether the service monitor is enabled.
+# - path: Path for Prometheus metrics endpoint.
+# - port: Port for Prometheus metrics endpoint.
+serviceMonitor:
+  enabled: true
+  path: /actuator/prometheus
+  port: 1999
+
+# Redis configuration
+# This section defines the Redis settings used by the application.
+# for more options see https://github.com/bitnami/charts/tree/main/bitnami/redis
+# - internal: Whether to use an internal Redis instance.
+# - architecture: Redis architecture (standalone or cluster).
+# - external: Configuration for an external Redis instance.
+#   - host: Host of the external Redis instance.
+#   - port: Port of the external Redis instance.
+#   - database: Database index to use.
+#   - password: Password for the external Redis instance.
+redis:
+  internal: true
+  architecture: standalone
+  external:
+    host: redis-master.example.com
+    port: "6379"
+    database: "0"
+    password: "your-redis-password"
+
+# MySQL configuration
+# This section defines the MySQL settings used by the application.
+# - host: Host of the MySQL instance.
+# - port: Port of the MySQL instance.
+# - database: Database name.
+# - username: Username for MySQL.
+# - password: Password for MySQL.
+mysql:
+  host: localhost
+  port: 3306
+  database: certvault
+  username: user
+  password: password
+
+# Ingress configuration
+# This section configures the ingress settings for the application.
+# - enabled: Whether ingress is enabled.
+# - annotations: Annotations for the ingress.
+# - hosts: Hosts to be configured for the ingress.
+#   - host: Hostname.
+#   - paths: Paths to be configured for the host.
+#     - path: Path for the ingress.
+#     - pathType: Path type for the ingress.
+# - ingressClassName: Ingress class name.
+# - tls: TLS configuration for the ingress.
+#   - secretName: Secret name for TLS certificate.
+#   - hosts: Hosts for which the TLS certificate is valid.
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  ingressClassName: "nginx"
+  tls:
+    - secretName: my-tls-secret
+      hosts:
+        - chart-example.local

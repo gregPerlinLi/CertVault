@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cert-vault.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "cert-vault.name" . }}
+    helm.sh/chart: {{ include "cert-vault.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "cert-vault.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "cert-vault.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: business
+              containerPort: {{ .Values.service.ports.business }}
+            - name: management
+              containerPort: {{ .Values.service.ports.management }}
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.springBoot.profile }}
+            - name: SPRING_SERVER_PORT
+              value: {{ .Values.service.ports.business }}
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://{{ .Values.mysql.host }}:{{ .Values.mysql.port }}/{{ .Values.mysql.database }}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+            - name: SPRING_DATASOURCE_USERNAME
+              value: {{ .Values.mysql.username }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: {{ .Values.mysql.password }}
+            - name: SPRING_REDIS_HOST
+              value: {{
+                ternary
+                  .Values.redis.external.host
+                  (ternary (printf "%s-redis-master" .Release.Name) "localhost" .Values.redis.internal)
+                  (not .Values.redis.internal)
+              }}
+            - name: SPRING_REDIS_PORT
+              value: {{ ternary .Values.redis.external.port "6379" (not .Values.redis.internal) }}
+            - name: SPRING_REDIS_DATABASE
+              value: {{ ternary .Values.redis.external.database "0" (not .Values.redis.internal) }}
+            - name: SPRING_REDIS_PASSWORD
+              value: {{ ternary .Values.redis.external.password "" (not .Values.redis.internal) }}
+            - name: SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT
+              value: "{{ .Values.springBoot.logging.level.com_gregperlinli_certvault | default "debug" }}"
+            - name: SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK
+              value: "{{ .Values.springBoot.logging.level.org_springframework | default "warn" }}"
+            - name: SPRING_MANAGEMENT_SERVER_PORT
+              value: {{ .Values.service.ports.management }}
+            - name: JAVA_OPTS
+              value: {{ join " " .Values.springBoot.javaOpts }}
+          resources: {}
+          command: ["sh", "-c"]
+          args:
+            - java $JAVA_OPTS -jar /app.jar

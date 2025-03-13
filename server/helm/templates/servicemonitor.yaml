@@ -1,0 +1,20 @@
+{{- if .Values.serviceMonitor.enabled -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "cert-vault.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "cert-vault.name" . }}
+    helm.sh/chart: {{ include "cert-vault.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "cert-vault.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  endpoints:
+    - port: management
+      path: {{ .Values.serviceMonitor.path }}
+      interval: 30s
+{{- end -}}
