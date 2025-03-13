@@ -1,0 +1,60 @@
+server:
+  port: ${SPRING_SERVER_PORT:1888}
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://10.9.0.5:3306/cert_vault?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:cert_vault}
+    password: ${SPRING_DATASOURCE_PASSWORD:cert_2025_vault}
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:10.9.0.4}
+      port: ${SPRING_REDIS_PORT:6379}
+      database: ${SPRING_REDIS_DATABASE:8}
+      password: ${SPRING_REDIS_PASSWORD:cert_2025_vault}
+      timeout: 30000
+      client-type: lettuce
+      lettuce:
+        pool:
+          max-active: 10
+          min-idle: 5
+  cache:
+    type: redis
+    redis:
+      cache-null-values: true
+      key-prefix: "cache:"
+      use-key-prefix: true
+      time-to-live: 5m
+
+logging:
+  level:
+    com.gregperlinli.certvault: ${SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT:debug}
+    org.springframework: ${SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK:warn}
+
+management:
+  server:
+    port: ${SPRING_MANAGEMENT_SERVER_PORT:1999}
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    prometheus:
+      access: unrestricted
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    tags:
+      application: "${spring.application.name}"
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.gregperlinli.certvault.domain.entities
+  configuration:
+    map-underscore-to-camel-case: true
