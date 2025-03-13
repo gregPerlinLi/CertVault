@@ -3,13 +3,13 @@ server:
 
 spring:
   application:
-    name: teaching-evaluation-system
+    name: cert-vault
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/cert_vault?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: root
-    password: 12345678
+    username: cert_vault
+    password: cert_2025_vault
   data:
     redis:
       host: 127.0.0.1
