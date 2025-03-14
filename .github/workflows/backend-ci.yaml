@@ -41,13 +41,13 @@ jobs:
       - name: Build Docker image
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)
-          docker build -t ghcr.io/gregPerlinLi/cert-vault:$VERSION -t ghcr.io/gregPerlinLi/cert-vault:latest server/
+          docker build -t ghcr.io/gregperlinli/cert-vault:$VERSION -t ghcr.io/gregperlinli/cert-vault:latest server/
       # 推送 Docker 镜像
       - name: Push Docker image
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)
-          docker push ghcr.io/gregPerlinLi/cert-vault:$VERSION
-          docker push ghcr.io/gregPerlinLi/cert-vault:latest
+          docker push ghcr.io/gregperlinli/cert-vault:$VERSION
+          docker push ghcr.io/gregperlinli/cert-vault:latest
 
   deploy-helm:
     runs-on: ubuntu-latest
