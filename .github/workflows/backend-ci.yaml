@@ -42,13 +42,12 @@ jobs:
 
       # 获取 Maven 版本并设置为环境变量
       - name: Get Maven version
-        id: maven-version
-        run: echo "::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)"
+        run: echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)" >> $GITHUB_ENV
 
       # 修改 Chart.yaml 文件中的版本字段
       - name: Update Chart.yaml version
         run: |
-          sed -i "s/version: .*/version: ${{ steps.maven-version.outputs.version }}/" server/helm/Chart.yaml
+          sed -i "s/version: .*/version: ${{ env.VERSION }}/" server/helm/Chart.yaml
 
       # 登录到 GitHub Container Registry
       - name: Log in to GitHub Container Registry
@@ -65,8 +64,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.maven-version.outputs.version }}
-            type=raw,value=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            type=raw,value=${{ env.VERSION }}
+            type=raw,value=latest
 
       - name: Build and push Docker image
         id: push
