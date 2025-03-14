@@ -47,9 +47,9 @@ spec:
                   (not .Values.redis.internal)
               }}
             - name: SPRING_REDIS_PORT
-              value: {{ ternary .Values.redis.external.port "6379" (not .Values.redis.internal) }}
+              value: {{ quote (ternary .Values.redis.external.port "6379" (not .Values.redis.internal)) }}
             - name: SPRING_REDIS_DATABASE
-              value: {{ ternary .Values.redis.external.database "0" (not .Values.redis.internal) }}
+              value: {{ quote (ternary .Values.redis.external.database "0" (not .Values.redis.internal)) }}
             - name: SPRING_REDIS_PASSWORD
               value: {{ ternary .Values.redis.external.password "" (not .Values.redis.internal) }}
             - name: SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT
