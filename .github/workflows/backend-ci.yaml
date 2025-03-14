@@ -100,7 +100,8 @@ jobs:
 
       - name: Read environment variable
         run: |
-          cat version.env >> $GITHUB_ENV
+          source version.env
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "The value of VERSION is: ${{ env.VERSION }}"
 
       # 检出当前代码库
