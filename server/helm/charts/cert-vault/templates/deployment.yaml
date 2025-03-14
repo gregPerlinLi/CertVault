@@ -24,7 +24,7 @@ spec:
           image: busybox:1.36
           command: ['sh', '-c', 'until nc -zv {{ ternary .Values.redis.external.host (ternary (printf "%s-redis-master" .Release.Name) "localhost" .Values.redis.internal) (not .Values.redis.internal) }} {{ ternary .Values.redis.external.port "6379" (not .Values.redis.internal) }}; do echo waiting for redis; sleep 2; done;']
         - name: wait-for-mysql
-          image: mysql:8.0.0
+          image: mysql:5.7
           command: [ 'sh', '-c', 'until mysqladmin ping -u {{ .Values.mysql.username }} -p{{ .Values.mysql.password }} -h {{ .Values.mysql.host }} -P {{ .Values.mysql.port }} --silent; do echo waiting for mysql; sleep 2; done;' ]
       containers:
         - name: {{ .Chart.Name }}
