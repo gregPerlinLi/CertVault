@@ -6,7 +6,7 @@ ________  _______   ________  _________        ___      ___ ________  ___  ___  
    \ \_______\ \_______\ \__\\ _\    \ \__\       \ \__/ /     \ \__\ \__\ \_______\ \_______\ \__\
     \|_______|\|_______|\|__|\|__|    \|__|        \|__|/       \|__|\|__|\|_______|\|_______|\|__|
 
-Welcome To CertVault Auto-Signed SSL Certificate Management Platform Backend Server ~
+Welcome To CertVault Self-Signed SSL Certificate Management Platform Backend Server ~
 
 Server Version: ${application.version}
 SpringBoot Version: ${spring-boot.version}
