@@ -1,28 +1,32 @@
-# Docker image configuration
-# This section defines the Docker image settings used by the deployment.
-# - repository: The URL of the Docker image repository.
-# - tag: The tag of the Docker image to be used.
-# - pullPolicy: The policy for pulling the Docker image.
+## Docker image configuration
+## @param image.registry [default: ghcr.io] The URL of the Docker image registry
+## @param image.repository [default: gregperlinli/certvault] The repository name in the Docker image registry
+## @skip image.tag The tag of the Docker image to be used (e.g., latest, v1.0.0)
+## @param image.pullPolicy [default: IfNotPresent] The policy for pulling the Docker image
+##
 image:
-  repository: registry.gdutnic.com/cert-vault/cart-vault
+  registry: ghcr.io
+  repository: gregperlinli/certvault
   tag: latest
   pullPolicy: IfNotPresent
 
-# Global configuration
-# This section contains global settings that apply across the deployment.
-# - storageClass: The storage class to be used for persistent volumes.
+## Global configuration
+## @param global.storageClass [default: standard] The storage class to be used for persistent volumes
+##
 global:
   storageClass: "standard"
 
-# Number of replicas for the deployment
-# This setting defines the number of pod replicas to be created for the deployment.
+## Number of replicas for the deployment
+## @param replicaCount [default: 1] The number of pod replicas to be created for the deployment
+##
 replicaCount: 1
 
-# Spring Boot application configuration
-# This section configures the Spring Boot application settings.
-# - profile: The active profile for the Spring Boot application.
-# - logging: Logging levels for different packages.
-# - javaOpts: Java options to be passed to the JVM.
+## Spring Boot application configuration
+## @param springBoot.profile [default: dev] The active profile for the Spring Boot application
+## @param springBoot.logging.level.com_gregperlinli_certvault [default: debug] Logging level for the com.gregperlinli.certvault package
+## @param springBoot.logging.level.org_springframework [default: warn] Logging level for the org.springframework package
+## @param springBoot.javaOpts JVM options to be passed to the Java Virtual Machine
+##
 springBoot:
   profile: dev
   logging:
@@ -30,45 +34,53 @@ springBoot:
       com_gregperlinli_certvault: debug
       org_springframework: warn
   javaOpts:
-    - "-Xmx512m" # Maximum heap size
-    - "-Xms256m" # Initial heap size
-    - "-XX:+UseZGC" # Use Z Garbage Collector
-    - "-XX:ZCollectionInterval=120" # Target collection interval in milliseconds
-    - "-XX:ZAllocationSpikeTolerance=4" # Allocation spike tolerance
-    - "-XX:-ZProactive" # Disable proactive mode
-    - "-XX:+HeapDumpOnOutOfMemoryError" # Enable heap dump on OutOfMemoryError
-    - "-XX:HeapDumpPath=./errorDump.hprof" # Path to heap dump file
+    # Maximum heap size
+    - "-Xmx512m"
+    # Initial heap size
+    - "-Xms256m"
+    # Use Z Garbage Collector
+    - "-XX:+UseZGC"
+    # Target collection interval in milliseconds
+    - "-XX:ZCollectionInterval=120"
+    # Allocation spike tolerance
+    - "-XX:ZAllocationSpikeTolerance=4"
+    # Disable proactive mode
+    - "-XX:-ZProactive"
+    # Enable heap dump on OutOfMemoryError
+    - "-XX:+HeapDumpOnOutOfMemoryError"
+    # Path to heap dump file
+    - "-XX:HeapDumpPath=./errorDump.hprof"
 
-# Service configuration
-# This section defines the service settings for exposing the application.
-# - ports: Ports exposed by the service.
-#   - business: Business port for the application.
-#   - management: Management port for the application.
+## Service configuration
+## @param service.ports.business [default: 1888] Business port for the application
+## @param service.ports.management [default: 1999] Management port for the application
+##
 service:
   ports:
     business: 1888
     management: 1999
 
-# Service Monitor configuration for Prometheus
-# This section configures the service monitor for Prometheus.
-# - enabled: Whether the service monitor is enabled.
-# - path: Path for Prometheus metrics endpoint.
-# - port: Port for Prometheus metrics endpoint.
+## Service Monitor configuration for Prometheus
+## @param serviceMonitor.enabled [default: true] Whether the service monitor is enabled
+## @param serviceMonitor.path [default: /actuator/prometheus] Path for Prometheus metrics endpoint
+## @param serviceMonitor.port [default: 1999] Port for Prometheus metrics endpoint
+##
 serviceMonitor:
   enabled: true
   path: /actuator/prometheus
   port: 1999
 
-# Redis configuration
-# This section defines the Redis settings used by the application.
-# for more options see https://github.com/bitnami/charts/tree/main/bitnami/redis
-# - internal: Whether to use an internal Redis instance.
-# - architecture: Redis architecture (standalone or cluster).
-# - external: Configuration for an external Redis instance.
-#   - host: Host of the external Redis instance.
-#   - port: Port of the external Redis instance.
-#   - database: Database index to use.
-#   - password: Password for the external Redis instance.
+## Redis configuration
+## @param redis.internal [default: true] Whether to use an internal Redis instance (true) or an external Redis instance (false)
+## @param redis.architecture [default: standalone] The architecture of the Redis deployment (standalone or cluster)
+## @param redis.auth.enabled [default: true] Whether authentication is enabled for Redis
+## @param redis.auth.password [default: your-redis-password] The password used for Redis authentication
+## @param redis.external.host [default: redis-master.example.com] Hostname or IP address of the external Redis instance
+## @param redis.external.port [default: 6379] Port number of the external Redis instance
+## @param redis.external.database [default: 0] Database index to use
+## @param redis.external.auth.enabled [default: true] Whether authentication is enabled for the external Redis instance
+## @param redis.external.auth.password [default: your-redis-password] Password for the external Redis instance
+##
 redis:
   internal: true
   auth:
@@ -83,13 +95,13 @@ redis:
       enabled: true
       password: "your-redis-password"
 
-# MySQL configuration
-# This section defines the MySQL settings used by the application.
-# - host: Host of the MySQL instance.
-# - port: Port of the MySQL instance.
-# - database: Database name.
-# - username: Username for MySQL.
-# - password: Password for MySQL.
+## MySQL configuration
+## @param mysql.host [default: localhost] Host of the MySQL instance
+## @param mysql.port [default: 3306] Port of the MySQL instance
+## @param mysql.database [default: certvault] Database name
+## @param mysql.username [default: user] Username for MySQL
+## @param mysql.password [default: password] Password for MySQL
+##
 mysql:
   host: localhost
   port: 3306
@@ -97,19 +109,15 @@ mysql:
   username: user
   password: password
 
-# Ingress configuration
-# This section configures the ingress settings for the application.
-# - enabled: Whether ingress is enabled.
-# - annotations: Annotations for the ingress.
-# - hosts: Hosts to be configured for the ingress.
-#   - host: Hostname.
-#   - paths: Paths to be configured for the host.
-#     - path: Path for the ingress.
-#     - pathType: Path type for the ingress.
-# - ingressClassName: Ingress class name.
-# - tls: TLS configuration for the ingress.
-#   - secretName: Secret name for TLS certificate.
-#   - hosts: Hosts for which the TLS certificate is valid.
+## Ingress configuration
+## @param ingress.enabled [default: false] Whether ingress is enabled
+## @param ingress.annotations Annotations for the ingress
+## @param ingress.hosts.host [default: chart-example.local] Hostname for the ingress
+## @param ingress.hosts.paths.path [default: /] Path for the ingress
+## @param ingress.hosts.paths.pathType [default: ImplementationSpecific] Path type for the ingress
+## @param ingress.ingressClassName [default: nginx] Ingress class name
+## @skip ingress.tls TLS configuration for the ingress
+##
 ingress:
   enabled: false
   annotations: {}
@@ -119,7 +127,7 @@ ingress:
         - path: /
           pathType: ImplementationSpecific
   ingressClassName: "nginx"
-  tls:
-    - secretName: my-tls-secret
-      hosts:
-        - chart-example.local
+  # tls:
+  #   - secretName: my-tls-secret
+  #     hosts:
+  #      - chart-example.local
