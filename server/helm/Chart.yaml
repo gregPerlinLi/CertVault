@@ -8,7 +8,7 @@ keywords:
   - certificate
   - management
 type: application
-version: 0.1.0
+version: 1.0.0
 appVersion: "1.0"
 maintainers:
   - email: lihaolin13@outlook.com
