@@ -47,7 +47,8 @@ jobs:
 
       # 修改 Chart.yaml 文件中的版本字段
       - name: Update Chart.yaml version
-        run: sed -i "s/version: .*/version: ${{ steps.maven-version.outputs.version }}/" server/helm/Chart.yaml
+        run: |
+          sed -i "s/version: .*/version: ${{ steps.maven-version.outputs.version }}/" server/helm/Chart.yaml
 
       # 登录到 GitHub Container Registry
       - name: Log in to GitHub Container Registry
