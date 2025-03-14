@@ -1,5 +1,6 @@
 spring:
   application:
     name: CertVault
+    version: '@project.version@'
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}

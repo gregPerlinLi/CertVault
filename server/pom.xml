@@ -20,7 +20,7 @@
 
     <groupId>com.gregperlinli</groupId>
     <artifactId>server</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -170,7 +170,24 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <delimiters>
+                        <delimiter>@</delimiter> <!-- 使用@作为分隔符 -->
+                    </delimiters>
+                    <useDefaultDelimiters>false</useDefaultDelimiters> <!-- 禁用默认的${}分隔符 -->
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
