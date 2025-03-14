@@ -15,6 +15,7 @@ maintainers:
     name: gregPerlinLi
 sources:
   - https://github.com/gregperlinli/cert-vault
+  - https://github.com/gregperlinli/certvault-charts
 dependencies:
   - name: redis
     version: 20.11.3
