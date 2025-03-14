@@ -10,9 +10,20 @@ on:
 #    types:
 #      - created
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   build-backend:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
     steps:
       # 检出代码
       - name: Checkout code
@@ -33,21 +44,35 @@ jobs:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # 构建 Docker 镜像
-      - name: Build Docker image
-        run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)
-          docker build -t ghcr.io/gregperlinli/cert-vault:$VERSION -t ghcr.io/gregperlinli/cert-vault:latest server/
-      # 推送 Docker 镜像
-      - name: Push Docker image
-        run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)
-          docker push ghcr.io/gregperlinli/cert-vault:$VERSION
-          docker push ghcr.io/gregperlinli/cert-vault:latest
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: server/
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+#      - name: Build Docker image
+#        run: |
+#          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)
+#          docker build -t ghcr.io/gregperlinli/cert-vault:$VERSION -t ghcr.io/gregperlinli/cert-vault:latest server/
+#      # 推送 Docker 镜像
+#      - name: Push Docker image
+#        run: |
+#          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)
+#          docker push ghcr.io/gregperlinli/cert-vault:$VERSION
+#          docker push ghcr.io/gregperlinli/cert-vault:latest
 
   deploy-helm:
     runs-on: ubuntu-latest
