@@ -7,7 +7,7 @@
 image:
   registry: ghcr.io
   repository: gregperlinli/certvault
-  tag: latest
+  tag: ""
   pullPolicy: IfNotPresent
 
 ## Global configuration
@@ -70,6 +70,20 @@ serviceMonitor:
   path: /actuator/prometheus
   port: 1999
 
+## Resource configuration for the application
+## @param resources.requests.cpu [default: 500m] CPU request for the application container
+## @param resources.requests.memory [default: 512Mi] Memory request for the application container
+## @param resources.limits.cpu [default: 1000m] CPU limit for the application container
+## @param resources.limits.memory [default: 1024Mi] Memory limit for the application container
+##
+resources:
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1024Mi"
+
 ## Redis configuration
 ## @param redis.internal [default: true] Whether to use an internal Redis instance (true) or an external Redis instance (false)
 ## @param redis.architecture [default: standalone] The architecture of the Redis deployment (standalone or cluster)
@@ -80,6 +94,13 @@ serviceMonitor:
 ## @param redis.external.database [default: 0] Database index to use
 ## @param redis.external.auth.enabled [default: true] Whether authentication is enabled for the external Redis instance
 ## @param redis.external.auth.password [default: your-redis-password] Password for the external Redis instance
+## @param redis.sentinel.enabled [default: false] Whether to use Redis Sentinel for high availability
+## @param redis.sentinel.master [default: mymaster] The name of the Redis Sentinel master group
+## @param redis.sentinel.nodes [default: []] List of Redis Sentinel nodes
+## @param redis.resources.requests.cpu [default: 100m] CPU request for the Redis pod
+## @param redis.resources.requests.memory [default: 256Mi] Memory request for the Redis pod
+## @param redis.resources.limits.cpu [default: 250m] CPU limit for the Redis pod
+## @param redis.resources.limits.memory [default: 512Mi] Memory limit for the Redis pod
 ##
 redis:
   internal: true

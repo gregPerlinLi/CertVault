@@ -28,7 +28,7 @@ spec:
           command: [ 'sh', '-c', 'until mysqladmin ping -u {{ .Values.mysql.username }} -p{{ .Values.mysql.password }} -h {{ .Values.mysql.host }} -P {{ .Values.mysql.port }} --silent; do echo waiting for mysql; sleep 2; done;' ]
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.Version }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: business
@@ -100,7 +100,17 @@ spec:
             - name: JAVA_OPTS
               value: "{{ join " " .Values.springBoot.javaOpts }}"
             {{- end }}
-          resources: {}
+          resources:
+            {{- if .Values.resources.requests }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu | default "500m" }}
+              memory: {{ .Values.resources.requests.memory | default "512Mi" }}
+            {{- end }}
+            {{- if .Values.resources.limits }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu | default "1000m" }}
+              memory: {{ .Values.resources.limits.memory | default "1024Mi" }}
+            {{- end }}
           command: ["sh", "-c"]
           args:
             - java $JAVA_OPTS -jar /app.jar
