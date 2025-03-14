@@ -107,6 +107,8 @@ jobs:
         run: |
           rm -rf charts .github
           cp -r server/helm/* certvault-charts/
+          cp -r server/helm/.github certvault-charts/
+          cp server/helm/charts/README.md certvault-charts/README.md
 
       # 提交并推送到目标仓库的 main 分支
       - name: Commit and push to target repository
