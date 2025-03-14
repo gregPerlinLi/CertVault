@@ -71,12 +71,17 @@ serviceMonitor:
 #   - password: Password for the external Redis instance.
 redis:
   internal: true
+  auth:
+    enabled: true
+    password: "your-redis-password"
   architecture: standalone
   external:
     host: redis-master.example.com
     port: "6379"
     database: "0"
-    password: "your-redis-password"
+    auth:
+      enabled: true
+      password: "your-redis-password"
 
 # MySQL configuration
 # This section defines the MySQL settings used by the application.
