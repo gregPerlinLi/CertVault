@@ -126,7 +126,7 @@ jobs:
       # 复制 Helm 目录到目标仓库
       - name: Copy Helm directory to target repository
         run: |
-          rm -rf charts .github
+          rm -rf certvault-charts/charts certvault-charts/.github
           cp -r server/helm/* certvault-charts/
           cp -r server/helm/.github certvault-charts/
           cp server/helm/charts/cert-vault/README.md certvault-charts/README.md
