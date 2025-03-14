@@ -94,6 +94,7 @@ jobs:
           repository: gregPerlinLi/certvault-charts
           token: ${{ secrets.CERT_VAULT_CHARTS_TOKEN }}
           path: certvault-charts
+          ref: main
 
       # 配置 Git 用户信息
       - name: Configure Git user
