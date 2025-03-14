@@ -9,7 +9,7 @@ keywords:
   - management
 type: application
 version: 1.0.0
-appVersion: "1.0"
+appVersion: "1.0.0"
 maintainers:
   - email: lihaolin13@outlook.com
     name: gregPerlinLi
