@@ -75,16 +75,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-#      - name: Build Docker image
-#        run: |
-#          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)
-#          docker build -t ghcr.io/gregperlinli/cert-vault:$VERSION -t ghcr.io/gregperlinli/cert-vault:latest server/
-#      # 推送 Docker 镜像
-#      - name: Push Docker image
-#        run: |
-#          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)
-#          docker push ghcr.io/gregperlinli/cert-vault:$VERSION
-#          docker push ghcr.io/gregperlinli/cert-vault:latest
 
   deploy-helm:
     runs-on: ubuntu-latest
@@ -96,10 +86,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 确保 publish_dir 包含有效的静态文件
+      - name: Generate static files for GitHub Pages
+        run: |
+          mkdir -p server/helm/docs
+          echo "<html><body><h1>CertVault Helm Chart</h1></body></html>" > server/helm/docs/index.html
+
       # 配置 GitHub Pages
       - name: Setup GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: server/helm
-          commit_message: "Deploy Helm chart"
+          publish_dir: server/helm/docs
+          commit_message: "Deploy Helm chart to GitHub Pages"
+          # 明确指定 GitHub Pages 分支
+          publish_branch: gh-pages
+          force_orphan: true
