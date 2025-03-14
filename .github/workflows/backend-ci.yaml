@@ -47,8 +47,8 @@ jobs:
       # 修改 Chart.yaml 文件中的版本字段
       - name: Update Chart.yaml version
         run: |
-          sed -i "s/version: 0.0.0/version: ${{ env.VERSION }}/" server/helm/charts/Chart.yaml
-          sed -i "s/appVersion: .*/appVersion: \"${{ env.VERSION }}\"/" server/helm/charts/Chart.yaml
+          sed -i "s/version: 0.0.0/version: ${{ env.VERSION }}/" server/helm/charts/cert-vault/Chart.yaml
+          sed -i "s/appVersion: .*/appVersion: \"${{ env.VERSION }}\"/" server/helm/charts/cert-vault/Chart.yaml
 
       # 登录到 GitHub Container Registry
       - name: Log in to GitHub Container Registry
@@ -130,8 +130,8 @@ jobs:
           cp -r server/helm/* certvault-charts/
           cp -r server/helm/.github certvault-charts/
           cp server/helm/charts/README.md certvault-charts/README.md
-          sed -i "s/version: 0.0.0/version: ${{ env.VERSION }}/" certvault-charts/charts/Chart.yaml
-          sed -i "s/appVersion: .*/appVersion: \"${{ env.VERSION }}\"/" certvault-charts/charts/Chart.yaml
+          sed -i "s/version: 0.0.0/version: ${{ env.VERSION }}/" certvault-charts/charts/cert-vault/Chart.yaml
+          sed -i "s/appVersion: .*/appVersion: \"${{ env.VERSION }}\"/" certvault-charts/charts/cert-vault/Chart.yaml
 
       # 提交并推送到目标仓库的 main 分支
       - name: Commit and push to target repository
