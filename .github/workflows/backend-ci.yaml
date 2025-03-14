@@ -77,12 +77,32 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Set up environment variable
+        run: echo "VERSION=${{ env.VERSION }}" > version.env
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: version
+          path: version.env
+
   deploy-helm:
     runs-on: ubuntu-latest
     needs: build-backend
     permissions:
       contents: write
     steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: version
+          path: .
+
+      - name: Read environment variable
+        run: |
+          cat version.env >> $GITHUB_ENV
+          echo "The value of VERSION is: ${{ env.VERSION }}"
+
       # 检出当前代码库
       - name: Checkout code
         uses: actions/checkout@v3
