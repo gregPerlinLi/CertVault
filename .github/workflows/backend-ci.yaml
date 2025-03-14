@@ -97,7 +97,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: server/helm/docs
+          publish_dir: server/helm
           commit_message: "Deploy Helm chart to GitHub Pages"
           # 明确指定 GitHub Pages 分支
           publish_branch: gh-pages
