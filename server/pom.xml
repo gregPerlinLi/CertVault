@@ -10,6 +10,14 @@
         <version>3.4.3</version>
     </parent>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://github.com/gregPerlinLi/CertVault</url>
+        </repository>
+    </distributionManagement>
+
     <groupId>com.gregperlinli</groupId>
     <artifactId>server</artifactId>
     <version>0.0.1</version>
@@ -112,8 +120,8 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.70</version>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.80</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
