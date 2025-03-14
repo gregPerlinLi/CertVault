@@ -29,16 +29,27 @@ spec:
             - name: management
               containerPort: {{ .Values.service.ports.management }}
           env:
+            {{- if .Values.springBoot.profile }}
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.springBoot.profile }}
+            {{- end }}
+            {{- if .Values.service.ports.business }}
             - name: SPRING_SERVER_PORT
               value: {{ .Values.service.ports.business }}
+            {{- end }}
+            {{- if and .Values.mysql.host .Values.mysql.port .Values.mysql.database }}
             - name: SPRING_DATASOURCE_URL
               value: jdbc:mysql://{{ .Values.mysql.host }}:{{ .Values.mysql.port }}/{{ .Values.mysql.database }}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+            {{- end }}
+            {{- if .Values.mysql.username }}
             - name: SPRING_DATASOURCE_USERNAME
               value: {{ .Values.mysql.username }}
+            {{- end }}
+            {{- if .Values.mysql.password }}
             - name: SPRING_DATASOURCE_PASSWORD
               value: {{ .Values.mysql.password }}
+            {{- end }}
+            {{- if ternary .Values.redis.external.host (ternary (printf "%s-redis-master" .Release.Name) "localhost" .Values.redis.internal) (not .Values.redis.internal) }}
             - name: SPRING_REDIS_HOST
               value: {{
                 ternary
@@ -46,20 +57,42 @@ spec:
                   (ternary (printf "%s-redis-master" .Release.Name) "localhost" .Values.redis.internal)
                   (not .Values.redis.internal)
               }}
+            {{- end }}
+            {{- if ternary .Values.redis.external.port "6379" (not .Values.redis.internal) }}
             - name: SPRING_REDIS_PORT
               value: {{ quote (ternary .Values.redis.external.port "6379" (not .Values.redis.internal)) }}
+            {{- end }}
+            {{- if ternary .Values.redis.external.database "0" (not .Values.redis.internal) }}
             - name: SPRING_REDIS_DATABASE
               value: {{ quote (ternary .Values.redis.external.database "0" (not .Values.redis.internal)) }}
+            {{- end }}
+            {{- if .Values.redis.internal }}
+            {{- if .Values.redis.auth.enabled }}
             - name: SPRING_REDIS_PASSWORD
-              value: {{ ternary .Values.redis.external.password "" (not .Values.redis.internal) }}
+              value: {{ .Values.redis.auth.password }}
+            {{- end }}
+            {{- else }}
+            {{- if .Values.redis.external.auth.enabled }}
+            - name: SPRING_REDIS_PASSWORD
+              value: {{ .Values.redis.external.auth.password }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.springBoot.logging.level.com_gregperlinli_certvault }}
             - name: SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT
               value: "{{ .Values.springBoot.logging.level.com_gregperlinli_certvault | default "debug" }}"
+            {{- end }}
+            {{- if .Values.springBoot.logging.level.org_springframework }}
             - name: SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK
               value: "{{ .Values.springBoot.logging.level.org_springframework | default "warn" }}"
+            {{- end }}
+            {{- if .Values.service.ports.management }}
             - name: SPRING_MANAGEMENT_SERVER_PORT
               value: {{ .Values.service.ports.management }}
+            {{- end }}
+            {{- if .Values.springBoot.javaOpts }}
             - name: JAVA_OPTS
               value: {{ join " " .Values.springBoot.javaOpts }}
+            {{- end }}
           resources: {}
           command: ["sh", "-c"]
           args:
