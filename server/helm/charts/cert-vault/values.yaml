@@ -94,13 +94,6 @@ resources:
 ## @param redis.external.database [default: 0] Database index to use
 ## @param redis.external.auth.enabled [default: true] Whether authentication is enabled for the external Redis instance
 ## @param redis.external.auth.password [default: your-redis-password] Password for the external Redis instance
-## @param redis.sentinel.enabled [default: false] Whether to use Redis Sentinel for high availability
-## @param redis.sentinel.master [default: mymaster] The name of the Redis Sentinel master group
-## @param redis.sentinel.nodes [default: []] List of Redis Sentinel nodes
-## @param redis.resources.requests.cpu [default: 100m] CPU request for the Redis pod
-## @param redis.resources.requests.memory [default: 256Mi] Memory request for the Redis pod
-## @param redis.resources.limits.cpu [default: 250m] CPU limit for the Redis pod
-## @param redis.resources.limits.memory [default: 512Mi] Memory limit for the Redis pod
 ##
 redis:
   internal: true
