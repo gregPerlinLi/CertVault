@@ -82,23 +82,34 @@ jobs:
     permissions:
       contents: write
     steps:
-      # 检出代码
+      # 检出当前代码库
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 确保 publish_dir 包含有效的静态文件
-      - name: Generate static files for GitHub Pages
-        run: |
-          mkdir -p server/helm/docs
-          echo "<html><body><h1>CertVault Helm Chart</h1></body></html>" > server/helm/docs/index.html
-
-      # 配置 GitHub Pages
-      - name: Setup GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      # 检出目标仓库代码
+      - name: Checkout target repository
+        uses: actions/checkout@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: server/helm
-          commit_message: "Deploy Helm chart to GitHub Pages"
-          # 明确指定 GitHub Pages 分支
-          publish_branch: gh-pages
-          force_orphan: true
+          repository: gregPerlinLi/certvault-charts
+          token: ${{ secrets.CERT_VAULT_CHARTS_TOKEN }}
+          path: certvault-charts
+
+      # 配置 Git 用户信息
+      - name: Configure Git user
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      # 复制 Helm 目录到目标仓库
+      - name: Copy Helm directory to target repository
+        run: |
+          rm -rf charts .github
+          cp -r server/helm/* certvault-charts/
+
+      # 提交并推送到目标仓库的 main 分支
+      - name: Commit and push to target repository
+        run: |
+          cd certvault-charts
+          git add .
+          git commit -m "Update Helm chart from CertVault Backend Deploy" || echo "No changes to commit"
+          git push origin main
