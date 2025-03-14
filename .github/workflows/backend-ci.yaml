@@ -129,7 +129,7 @@ jobs:
           rm -rf charts .github
           cp -r server/helm/* certvault-charts/
           cp -r server/helm/.github certvault-charts/
-          cp server/helm/charts/README.md certvault-charts/README.md
+          cp server/helm/charts/cert-vault/README.md certvault-charts/README.md
           sed -i "s/version: 0.0.0/version: ${{ env.VERSION }}/" certvault-charts/charts/cert-vault/Chart.yaml
           sed -i "s/appVersion: .*/appVersion: \"${{ env.VERSION }}\"/" certvault-charts/charts/cert-vault/Chart.yaml
 
