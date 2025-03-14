@@ -47,7 +47,8 @@ jobs:
       # 修改 Chart.yaml 文件中的版本字段
       - name: Update Chart.yaml version
         run: |
-          sed -i "s/version: .*/version: ${{ env.VERSION }}/" server/helm/Chart.yaml
+          sed -i "s/version: 0.0.0/version: ${{ env.VERSION }}/" server/helm/charts/Chart.yaml
+          sed -i "s/appVersion: .*/appVersion: \"${{ env.VERSION }}\"/" server/helm/charts/Chart.yaml
 
       # 登录到 GitHub Container Registry
       - name: Log in to GitHub Container Registry
