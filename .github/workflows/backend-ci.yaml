@@ -3,10 +3,12 @@ name: CertVault Backend Deploy
 on:
   push:
     branches:
-      - main
-  release:
-    types:
-      - created
+      - dev
+    paths:
+      - server/**
+#  release:
+#    types:
+#      - created
 
 jobs:
   build-backend:
