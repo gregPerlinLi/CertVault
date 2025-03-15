@@ -31,3 +31,20 @@ jobs:
         uses: helm/chart-releaser-action@v1.7.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Copy README.md to gh-pages
+        run: |
+          cp ../README.md .
+
+      - name: Commit and push changes to gh-pages
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git add README.md
+          git commit -m "Update README.md"
+          git push origin gh-pages
