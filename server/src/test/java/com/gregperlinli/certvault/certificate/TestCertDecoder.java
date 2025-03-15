@@ -1,9 +1,11 @@
 package com.gregperlinli.certvault.certificate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gregperlinli.certvault.domain.entities.CertificateDetails;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * Test Certificate Decoder
@@ -13,15 +15,21 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @className {@code TestCertDecoder}
  * @date 2025/3/15 16:33
  */
-@SpringBootApplication
+@SpringBootTest
 @Slf4j
 public class TestCertDecoder {
+
+    @Resource
+    private ObjectMapper objectMapper;
 
     @Test
     public void testDecodeCertificate() throws Exception {
         String certBase64 = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVGRENDQXZ5Z0F3SUJBZ0lSQUptaFU2ZGx5bWpVSjNZakMxMHBXTTB3RFFZSktvWklodmNOQVFFTEJRQXcKZ1pveEN6QUpCZ05WQkFZVEFrTk9NUkl3RUFZRFZRUUlEQWxIZFdGdVoyUnZibWN4RHpBTkJnTlZCQWNNQmtOaApiblJ2YmpFVk1CTUdBMVVFQ2d3TVIzSmxaMUJsY214cGJreHBNUkl3RUFZRFZRUUxEQWxEWlhKMFZtRjFiSFF4CkVqQVFCZ05WQkFNTUNVTmxjblJXWVhWc2RERW5NQ1VHQ1NxR1NJYjNEUUVKQVJZWVozSmxaMUJsY214cGJreHAKUUc5MWRHeHZiMnN1WTI5dE1CNFhEVEkxTURNeE5UQTROREkxTlZvWERUSTFNRFF4TkRBNE5ESTFOVm93Z1oweApDekFKQmdOVkJBWVRBa05PTVJJd0VBWURWUVFJREFsSGRXRnVaMlJ2Ym1jeER6QU5CZ05WQkFjTUJrTmhiblJ2CmJqRVZNQk1HQTFVRUNnd01SM0psWjFCbGNteHBia3hwTVJJd0VBWURWUVFMREFsRFpYSjBWbUYxYkhReEZUQVQKQmdOVkJBTU1ER04yTG1kd2JDNWhZeTVqYmpFbk1DVUdDU3FHU0liM0RRRUpBUllZWjNKbFoxQmxjbXhwYmt4cApRRzkxZEd4dmIyc3VZMjl0TUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUErZk9GCjhJU0RCYzUzaGtxc0RmNDhYTDdmeW1STTFteHhhMU1mSmRsVW0zL2FoRHliTFlwM2p3Yll6WEVPMmp5Yit3YjIKRWxEMlRPU1RBd0lFNmwzNkszUVRZRDBBRld3STJPOE9SblAwelhyZDJvRHpUVTIzL1pkZFh6aDN1NWgzUjVwdwpIcGo0ZkYxVGtIR25xZEVOUDZrUUFtQlZWVlVBSHRaRlFiTmUycHNBcU9pTlZ4NWd0SkV4aEhpREZ3ckVFUlNvCmNYZi9NQXdKUU5nVkRFY3FqbXRSK1lCQkhscEVINUxZNVRpVmVqNHlLTktPU3F1WVpQeEtZa1h0K3dpL0xabFcKQW11NExyODBZN3JVM2NVcnY2UlNKWDNNeFNjTWNMQk8zRVFqalBWL2ZrcDdzVlhQbXhKSzloSHlGOXJYTi9HcgppbDJzODN1QWp2M0p2d2JXOXdJREFRQUJvMUF3VGpBZEJnTlZIUkVFRmpBVWdneGpkaTVuY0d3dVlXTXVZMjZICkJBb1NBQUV3RGdZRFZSMFBBUUgvQkFRREFnV2dNQjBHQTFVZEpRUVdNQlFHQ0NzR0FRVUZCd01CQmdnckJnRUYKQlFjREFqQU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFqaG1mQXVNSTdhVDhqWm9oeEowUlRjYTk2TXlTc2JxaAp4TE9IVU8vQ1kvdll5bStGWW44NzE0T1VDdldXeDdYbFJFRnp5MW5qU0xpY3pWTHVZN3o1QTdwMnlqMGtMejhFCk5zVmIrVk83TFNHRmM3a2QwM3BUQzB4cVZoenNidWoxdHVEcHFSTC82RkV1ekRCNUw0aEdXV1JsYXd2OHNBTEQKcjZnOGhDdzNxWS9LOEpBM3RuWDhIUTdWNDYrcW0zeHJIWmVNTG9KeUtIVk5WaUZ3QkpTMU8xamhCelN0Q0NIVQo3cGIrSUVRZjBoZ1lpZnlLR29tUVl2MlJrWEt3NEJNVUIyWm1DU2NSak1SczBrQzQ1Z0JXa2J2QjdKa2Vlc0ppCkxhbHN0c0lFd0pkZEpKWkhRa3diaTN5ejlNNnFwT1A0V2xIcDlaWm5YeUdROFp0RGdjck91QT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K";
         CertificateDetails certificateDetails = CertDecoder.decodeCertificate(certBase64);
-        log.info("certificateDetails: {}", certificateDetails);
+        log.debug("certificateDetails: {}", certificateDetails);
+
+        String json = objectMapper.writeValueAsString(certificateDetails);
+        log.info("certificateDetails JSON: {}", json);
     }
 
 }
