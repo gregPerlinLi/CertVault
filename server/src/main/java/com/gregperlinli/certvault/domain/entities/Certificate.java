@@ -49,10 +49,28 @@ public class Certificate implements Serializable {
     private String cert;
 
     /**
+     * CA UUID
+     */
+    @TableField("ca_uuid")
+    private String caUuid;
+
+    /**
      * 拥有者 ID
      */
     @TableField("owner")
     private Integer owner;
+
+    /**
+     * 不早于
+     */
+    @TableField("not_before")
+    private LocalDateTime notBefore;
+
+    /**
+     * 不晚于
+     */
+    @TableField("not_after")
+    private LocalDateTime notAfter;
 
     /**
      * 创建时间
