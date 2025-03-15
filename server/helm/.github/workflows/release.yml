@@ -32,6 +32,10 @@ jobs:
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
+      - name: Backup README.md
+        run: |
+          cp README.md ..
+
       - name: Checkout gh-pages branch
         uses: actions/checkout@v4
         with:
