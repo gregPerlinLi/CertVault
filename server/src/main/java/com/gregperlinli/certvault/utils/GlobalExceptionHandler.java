@@ -39,6 +39,11 @@ public class GlobalExceptionHandler {
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode()));
             return new ResultVO<>(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), msg);
         }
+        if ( e instanceof CertGenException ) {
+            // response.setStatus(ResultStatusCodeConstant.BUSINESS_EXCEPTION);
+            response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode()));
+            return new ResultVO<>(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode(), msg);
+        }
         if ( e instanceof BusinessException) {
             // response.setStatus(ResultStatusCodeConstant.BUSINESS_EXCEPTION);
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode()));
