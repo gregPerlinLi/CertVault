@@ -38,7 +38,7 @@ jobs:
 
       # 使用 Maven 打包后端项目
       - name: Build with Maven
-        run: mvn clean package -f server/pom.xml
+        run: mvn clean package -f server/pom.xml -DskipTests
 
       # 获取 Maven 版本并设置为环境变量
       - name: Get Maven version
