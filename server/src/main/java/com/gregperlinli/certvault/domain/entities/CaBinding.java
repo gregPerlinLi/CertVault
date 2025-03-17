@@ -3,6 +3,8 @@ package com.gregperlinli.certvault.domain.entities;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -22,6 +24,7 @@ import lombok.ToString;
 @TableName("ca_binding")
 public class CaBinding implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

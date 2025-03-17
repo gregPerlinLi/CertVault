@@ -1,5 +1,8 @@
 package com.gregperlinli.certvault.controller;
 
+import com.gregperlinli.certvault.certificate.CertDecoder;
+import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
+import com.gregperlinli.certvault.domain.dto.CertificateDetailsDTO;
 import com.gregperlinli.certvault.domain.dto.UpdateUserProfileDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
@@ -26,21 +29,40 @@ public class UserController {
     /**
      * Get user profile
      *
-     * @param request {@link HttpServletRequest}
-     * @return {@link ResultVO}
+     * @param request {@link HttpServletRequest} Request
+     * @return {@link ResultVO} Result
      */
     @GetMapping(value = "/profile")
     public ResultVO<UserProfileDTO> getProfile(HttpServletRequest request) {
-        return new ResultVO<>(200, "success", userService.getOwnProfile(request.getSession().getAttribute("username").toString()));
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success", userService.getOwnProfile(request.getSession().getAttribute("username").toString()));
     }
 
+    /**
+     * Update user profile by their own
+     *
+     * @param updateUserProfileDTO {@link UpdateUserProfileDTO} New user profile entity
+     * @param request {@link HttpServletRequest} Request
+     * @return {@link ResultVO} Result
+     */
     @PutMapping(value = "/profile")
     public ResultVO<Void> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO,
                                         HttpServletRequest request) {
         if ( userService.updateOwnProfile(request.getSession().getAttribute("username").toString(), updateUserProfileDTO) ) {
-            return new ResultVO<>(200, "update success");
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "update success");
         }
-        return new ResultVO<>(400, "update failed");
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "update failed");
+    }
+
+    /**
+     * Get certificate details
+     *
+     * @param certBase64 Certificate Base64
+     * @return {@link ResultVO} Result
+     * @throws Exception e exception
+     */
+    @GetMapping(value = "/cert/decode/{cert}")
+    public ResultVO<CertificateDetailsDTO> getCertificateDetails(@PathVariable("cert") String certBase64) throws Exception {
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success", new CertificateDetailsDTO(CertDecoder.decodeCertificate(certBase64)));
     }
 
 }

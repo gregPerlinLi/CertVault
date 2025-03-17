@@ -1,6 +1,7 @@
 package com.gregperlinli.certvault.domain.entities;
 
 import lombok.*;
+import lombok.experimental.Accessors;
 
 /**
  * Certificate Renewal Request
@@ -10,6 +11,7 @@ import lombok.*;
  * @className {@code CertRenewRequest}
  * @date 2025/3/15 15:25
  */
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString

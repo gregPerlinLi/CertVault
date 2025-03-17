@@ -27,27 +27,27 @@ public class GlobalExceptionHandler {
         if ( e instanceof LoginException) {
             // response.setStatus(ResultStatusCodeConstant.FORBIDDEN);
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode()));
-            return new ResultVO<>(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), msg);
+            return new ResultVO<>(((LoginException) e).getCode(), msg);
         }
         if ( e instanceof PermissionException) {
             // response.setStatus(ResultStatusCodeConstant.FORBIDDEN);
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.FORBIDDEN.getResultCode()));
-            return new ResultVO<>(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), msg);
+            return new ResultVO<>(((PermissionException) e).getCode(), msg);
         }
         if ( e instanceof ParamValidateException) {
             // response.setStatus(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION);
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode()));
-            return new ResultVO<>(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), msg);
+            return new ResultVO<>(((ParamValidateException) e).getCode(), msg);
         }
         if ( e instanceof CertGenException ) {
             // response.setStatus(ResultStatusCodeConstant.BUSINESS_EXCEPTION);
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode()));
-            return new ResultVO<>(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode(), msg);
+            return new ResultVO<>(((CertGenException) e).getCode(), msg);
         }
         if ( e instanceof BusinessException) {
             // response.setStatus(ResultStatusCodeConstant.BUSINESS_EXCEPTION);
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode()));
-            return new ResultVO<>(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode(), msg);
+            return new ResultVO<>(((BusinessException) e).getCode(), msg);
         }
         if ( e instanceof NoResourceFoundException) {
             // response.setStatus(ResultStatusCodeConstant.FORBIDDEN);
@@ -62,7 +62,7 @@ public class GlobalExceptionHandler {
         if ( e instanceof ServerException) {
             // response.setStatus(ResultStatusCodeConstant.SERVER_ERROR);
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.SERVER_ERROR.getResultCode()));
-            return new ResultVO<>(ResultStatusCodeConstant.SERVER_ERROR.getResultCode(), msg);
+            return new ResultVO<>(((ServerException) e).getCode(), msg);
         }
         // response.setStatus(ResultStatusCodeConstant.SERVER_ERROR);
         e.printStackTrace();

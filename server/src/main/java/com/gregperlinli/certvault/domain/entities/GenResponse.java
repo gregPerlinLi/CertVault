@@ -1,6 +1,8 @@
 package com.gregperlinli.certvault.domain.entities;
 
+import com.gregperlinli.certvault.utils.EncryptAndDecryptUtils;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
  * @className {@code CaGenResponseDTO}
  * @date 2025/3/15 11:52
  */
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
@@ -49,5 +52,21 @@ public class GenResponse {
      * Comment
      */
     private String comment;
+
+    public static Ca toCa(GenResponse response, Integer userId, LocalDateTime createdAt, LocalDateTime modifiedAt) throws Exception {
+        Ca ca = new Ca();
+        ca.setUuid(response.getUuid());
+        ca.setPrivkey(EncryptAndDecryptUtils.encrypt(response.getPrivkey()));
+        ca.setCert(response.getCert());
+        ca.setOwner(userId);
+        ca.setComment(response.getComment());
+        ca.setAvailable(true);
+        ca.setNotBefore(response.getNotBefore());
+        ca.setNotAfter(response.getNotAfter());
+        ca.setCreatedAt(createdAt);
+        ca.setModifiedAt(modifiedAt);
+        ca.setDeleted(false);
+        return ca;
+    }
 
 }
