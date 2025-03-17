@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.domain.entities;
 
+import com.gregperlinli.certvault.utils.EncryptAndDecryptUtils;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -43,5 +44,13 @@ public class CaRenewRequest {
      * The comment
      */
     private String comment;
+
+    public CaRenewRequest(Ca ca, Integer newExpiry) throws Exception {
+        this.uuid = ca.getUuid();
+        this.oldPrivkey = EncryptAndDecryptUtils.decrypt(ca.getPrivkey());
+        this.oldCert = ca.getCert();
+        this.newExpiry = newExpiry;
+        this.comment = ca.getComment();
+    }
 
 }
