@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -23,6 +26,7 @@ import lombok.ToString;
 @TableName("ca")
 public class Ca implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -35,7 +39,7 @@ public class Ca implements Serializable {
      * CA UUID
      */
     @TableField("uuid")
-    private Integer uuid;
+    private String uuid;
 
     /**
      * CA 私钥
@@ -68,13 +72,13 @@ public class Ca implements Serializable {
     private Boolean available;
 
     /**
-     * 不早于
+     * 在此之前不可用
      */
     @TableField("not_before")
     private LocalDateTime notBefore;
 
     /**
-     * 不晚于
+     * 在此之后不可用
      */
     @TableField("not_after")
     private LocalDateTime notAfter;
