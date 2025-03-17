@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { delay } from "@/utils";
+import { useUserStore } from "@/stores/user";
 import { useToast } from "primevue/usetoast";
 
 // Reactive
+const router = useRouter();
 const toast = useToast();
+const { signIn } = useUserStore();
 const errIdx = ref<number | null>(null);
 
 // Actions
@@ -20,9 +22,9 @@ async function trySignIn(ev: Event): Promise<void> {
     errIdx.value = 0;
     toast.add({
       severity: "error",
-      summary: "Error",
+      summary: "Validation Error",
       detail: "Username is required",
-      life: 3000
+      life: 5000
     });
     return;
   }
@@ -33,32 +35,21 @@ async function trySignIn(ev: Event): Promise<void> {
     errIdx.value = 1;
     toast.add({
       severity: "error",
-      summary: "Error",
+      summary: "Validation Error",
       detail: "Password is required",
-      life: 3000
+      life: 5000
     });
     return;
   }
 
-  // Sign in
+  // Try sign in
   ((ev as SubmitEvent).submitter! as HTMLButtonElement).disabled = true;
-  toast.add({
-    severity: "info",
-    summary: "Info",
-    detail: "Signing in",
-    life: 3000
-  });
 
-  // TODO: Call RESTful API to sign in
-  await delay(1000);
-  toast.add({
-    severity: "error",
-    summary: "Error",
-    detail: "TODO",
-    life: 3000
-  });
-  ((ev as SubmitEvent).submitter! as HTMLButtonElement).disabled = false;
-  // end TODO
+  if (await signIn(toast, username, passowrd)) {
+    router.push("/dashboard");
+  } else {
+    ((ev as SubmitEvent).submitter! as HTMLButtonElement).disabled = false;
+  }
 }
 </script>
 
