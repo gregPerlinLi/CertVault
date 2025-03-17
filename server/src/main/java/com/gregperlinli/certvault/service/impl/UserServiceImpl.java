@@ -3,7 +3,6 @@ package com.gregperlinli.certvault.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gregperlinli.certvault.constant.RedisKeyConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
-import com.gregperlinli.certvault.domain.dto.LoginResultDTO;
 import com.gregperlinli.certvault.domain.dto.UpdateUserProfileDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import com.gregperlinli.certvault.domain.entities.RoleBinding;
@@ -18,6 +17,7 @@ import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +39,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     RoleBindingMapper roleBindingMapper;
 
     @Override
-    public LoginResultDTO login(String username, String password, String sessionId) {
+    public UserProfileDTO login(String username, String password, String sessionId) {
         if ( !GenericUtils.allOfNullable(username, password) ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The parameter cannot be null.");
         }
@@ -48,7 +48,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         User user = this.getOne(userQueryWrapper);
         if ( user != null && AuthUtils.matchesPassword(password, user.getPassword()) ) {
             stringRedisTemplate.opsForValue().set(RedisKeyConstant.USER.joinLoginPrefix(sessionId), user.getUsername(), 60, TimeUnit.MINUTES);
-            return new LoginResultDTO(user);
+            return new UserProfileDTO(user);
         }
         return null;
     }
@@ -86,9 +86,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public Boolean updateOwnProfile(String username, UpdateUserProfileDTO updateUserProfileDTO) {
-        if ( !GenericUtils.ofNullable(updateUserProfileDTO.getDisplayName()) ) {
-            throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The parameter cannot be null.");
-        }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
         User user = this.getOne(queryWrapper);
@@ -100,7 +97,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     user.setPassword(AuthUtils.encryptPassword(updateUserProfileDTO.getNewPassword()));
                 }
             }
-            user.setDisplayName(updateUserProfileDTO.getDisplayName());
+            if ( GenericUtils.ofNullable(updateUserProfileDTO.getDisplayName()) ) {
+                user.setDisplayName(updateUserProfileDTO.getDisplayName());
+            }
+            if ( GenericUtils.ofNullable(updateUserProfileDTO.getEmail()) ) {
+                user.setEmail(updateUserProfileDTO.getEmail());
+            }
+            user.setModifiedAt(LocalDateTime.now());
             return this.updateById(user);
         }
         throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The user does not exist.");

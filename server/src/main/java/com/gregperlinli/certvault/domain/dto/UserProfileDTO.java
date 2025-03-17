@@ -31,6 +31,11 @@ public class UserProfileDTO {
     private String displayName;
 
     /**
+     * email
+     */
+    private String email;
+
+    /**
      * roles
      */
     private Integer role;
@@ -38,6 +43,7 @@ public class UserProfileDTO {
     public UserProfileDTO(User user) {
         this.username = user.getUsername();
         this.displayName = user.getDisplayName();
+        this.email = user.getEmail();
         this.role = user.getRole();
     }
 

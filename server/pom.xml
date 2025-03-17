@@ -10,9 +10,17 @@
         <version>3.4.3</version>
     </parent>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://github.com/gregPerlinLi/CertVault</url>
+        </repository>
+    </distributionManagement>
+
     <groupId>com.gregperlinli</groupId>
     <artifactId>server</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.8</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -112,18 +120,23 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.70</version>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.80</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-ext-jdk15on</artifactId>
-            <version>1.70</version>
+            <artifactId>bcprov-ext-jdk18on</artifactId>
+            <version>1.78.1</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.70</version>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.80</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-jdk18on</artifactId>
+            <version>1.80</version>
         </dependency>
 
         <dependency>
@@ -162,7 +175,24 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <delimiters>
+                        <delimiter>@</delimiter> <!-- 使用@作为分隔符 -->
+                    </delimiters>
+                    <useDefaultDelimiters>false</useDefaultDelimiters> <!-- 禁用默认的${}分隔符 -->
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

@@ -64,8 +64,20 @@ public class Ca implements Serializable {
     /**
      * 可用性
      */
-    @TableField("avaliable")
-    private Boolean avaliable;
+    @TableField("available")
+    private Boolean available;
+
+    /**
+     * 不早于
+     */
+    @TableField("not_before")
+    private LocalDateTime notBefore;
+
+    /**
+     * 不晚于
+     */
+    @TableField("not_after")
+    private LocalDateTime notAfter;
 
     /**
      * 创建时间

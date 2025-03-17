@@ -1,7 +1,9 @@
+import { useUserStore } from "@stores/user";
 import { createRouter, createWebHashHistory } from "vue-router";
+import { useToast } from "primevue";
 
-// Export router
-export default createRouter({
+// Create router
+const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     {
@@ -36,3 +38,20 @@ export default createRouter({
     }
   ]
 });
+
+// Set guards
+router.afterEach(async (to) => {
+  const { init } = useUserStore();
+  const toast = useToast();
+
+  // Pass guard
+  if (to.path === "/") {
+    return;
+  }
+
+  // Initialize user
+  init(toast);
+});
+
+// Export router
+export default router;

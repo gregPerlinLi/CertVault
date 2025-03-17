@@ -38,16 +38,22 @@ public class User implements Serializable {
     private String username;
 
     /**
-     * 密码
-     */
-    @TableField("password")
-    private String password;
-
-    /**
      * 显示名称
      */
     @TableField("display_name")
     private String displayName;
+
+    /**
+     * 邮箱
+     */
+    @TableField("email")
+    private String email;
+
+    /**
+     * 密码
+     */
+    @TableField("password")
+    private String password;
 
     /**
      * 角色

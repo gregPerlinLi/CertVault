@@ -1,0 +1,147 @@
+## Docker image configuration
+## @param image.registry [default: ghcr.io] The URL of the Docker image registry
+## @param image.repository [default: gregperlinli/certvault] The repository name in the Docker image registry
+## @skip image.tag The tag of the Docker image to be used (e.g., latest, v1.0.0)
+## @param image.pullPolicy [default: IfNotPresent] The policy for pulling the Docker image
+##
+image:
+  registry: ghcr.io
+  repository: gregperlinli/certvault
+  tag: ""
+  pullPolicy: IfNotPresent
+
+## Global configuration
+## @param global.storageClass [default: standard] The storage class to be used for persistent volumes
+##
+global:
+  storageClass: "standard"
+
+## Number of replicas for the deployment
+## @param replicaCount [default: 1] The number of pod replicas to be created for the deployment
+##
+replicaCount: 1
+
+## Spring Boot application configuration
+## @param springBoot.profile [default: dev] The active profile for the Spring Boot application
+## @param springBoot.logging.level.com_gregperlinli_certvault [default: debug] Logging level for the com.gregperlinli.certvault package
+## @param springBoot.logging.level.org_springframework [default: warn] Logging level for the org.springframework package
+## @param springBoot.javaOpts JVM options to be passed to the Java Virtual Machine
+##
+springBoot:
+  profile: dev
+  logging:
+    level:
+      com_gregperlinli_certvault: debug
+      org_springframework: warn
+  javaOpts:
+    # Maximum heap size
+    - "-Xmx512m"
+    # Initial heap size
+    - "-Xms256m"
+    # Use Z Garbage Collector
+    - "-XX:+UseZGC"
+    # Target collection interval in milliseconds
+    - "-XX:ZCollectionInterval=120"
+    # Allocation spike tolerance
+    - "-XX:ZAllocationSpikeTolerance=4"
+    # Disable proactive mode
+    - "-XX:-ZProactive"
+    # Enable heap dump on OutOfMemoryError
+    - "-XX:+HeapDumpOnOutOfMemoryError"
+    # Path to heap dump file
+    - "-XX:HeapDumpPath=./errorDump.hprof"
+
+## Service configuration
+## @param service.ports.business [default: 1888] Business port for the application
+## @param service.ports.management [default: 1999] Management port for the application
+##
+service:
+  ports:
+    business: 1888
+    management: 1999
+
+## Service Monitor configuration for Prometheus
+## @param serviceMonitor.enabled [default: true] Whether the service monitor is enabled
+## @param serviceMonitor.path [default: /actuator/prometheus] Path for Prometheus metrics endpoint
+## @param serviceMonitor.port [default: 1999] Port for Prometheus metrics endpoint
+##
+serviceMonitor:
+  enabled: true
+  path: /actuator/prometheus
+  port: 1999
+
+## Resource configuration for the application
+## @param resources.requests.cpu [default: 500m] CPU request for the application container
+## @param resources.requests.memory [default: 512Mi] Memory request for the application container
+## @param resources.limits.cpu [default: 1000m] CPU limit for the application container
+## @param resources.limits.memory [default: 1024Mi] Memory limit for the application container
+##
+resources:
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1024Mi"
+
+## Redis configuration
+## @param redis.internal [default: true] Whether to use an internal Redis instance (true) or an external Redis instance (false)
+## @param redis.architecture [default: standalone] The architecture of the Redis deployment (standalone or cluster)
+## @param redis.auth.enabled [default: true] Whether authentication is enabled for Redis
+## @param redis.auth.password [default: your-redis-password] The password used for Redis authentication
+## @param redis.external.host [default: redis-master.example.com] Hostname or IP address of the external Redis instance
+## @param redis.external.port [default: 6379] Port number of the external Redis instance
+## @param redis.external.database [default: 0] Database index to use
+## @param redis.external.auth.enabled [default: true] Whether authentication is enabled for the external Redis instance
+## @param redis.external.auth.password [default: your-redis-password] Password for the external Redis instance
+##
+redis:
+  internal: true
+  auth:
+    enabled: true
+    password: "your-redis-password"
+  architecture: standalone
+  external:
+    host: redis-master.example.com
+    port: "6379"
+    database: "0"
+    auth:
+      enabled: true
+      password: "your-redis-password"
+
+## MySQL configuration
+## @param mysql.host [default: localhost] Host of the MySQL instance
+## @param mysql.port [default: 3306] Port of the MySQL instance
+## @param mysql.database [default: certvault] Database name
+## @param mysql.username [default: user] Username for MySQL
+## @param mysql.password [default: password] Password for MySQL
+##
+mysql:
+  host: localhost
+  port: 3306
+  database: certvault
+  username: user
+  password: password
+
+## Ingress configuration
+## @param ingress.enabled [default: false] Whether ingress is enabled
+## @param ingress.annotations Annotations for the ingress
+## @param ingress.hosts.host [default: chart-example.local] Hostname for the ingress
+## @param ingress.hosts.paths.path [default: /] Path for the ingress
+## @param ingress.hosts.paths.pathType [default: ImplementationSpecific] Path type for the ingress
+## @param ingress.ingressClassName [default: nginx] Ingress class name
+## @skip ingress.tls TLS configuration for the ingress
+##
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  ingressClassName: "nginx"
+  # tls:
+  #   - secretName: my-tls-secret
+  #     hosts:
+  #      - chart-example.local

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { useMainStore } from "@/stores";
-import { useToast } from "primevue/usetoast";
+import { useUserStore } from "@/stores/user";
 import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
 
 // Reactive
+const router = useRouter();
 const toast = useToast();
 const confirm = useConfirm();
-const router = useRouter();
-const { username } = useMainStore();
+const { displayName, signOut } = useUserStore();
 
 // Actions
-const signOut = (): void => {
+const signOutOnClick = (): void => {
   confirm.require({
     header: "Sign Out",
     message: "Are you sure to sign out?",
@@ -23,16 +23,8 @@ const signOut = (): void => {
       severity: "secondary",
       variant: "outlined"
     },
-    accept: (): void => {
-      toast.add({
-        severity: "info",
-        summary: "Info",
-        detail: "Signed out",
-        life: 3000
-      });
-
-      // TODO: remove JWT
-
+    accept: () => {
+      signOut(toast);
       router.push("/");
     }
   });
@@ -47,14 +39,14 @@ const signOut = (): void => {
       <h1 class="font-bold select-none text-2xl">CertVault</h1>
     </RouterLink>
     <div class="flex gap-4 items-baseline">
-      <p class="italic text-neutral-500 text-sm">Welcome, {{ username }}</p>
+      <p class="italic text-neutral-500 text-sm">Welcome, {{ displayName }}</p>
       <Button
         v-tooltip.bottom="{ value: 'Sign Out', class: 'text-xs' }"
         aria-label="Sign out"
         icon="pi pi-sign-out"
         severity="danger"
         size="small"
-        @click="signOut"></Button>
+        @click="signOutOnClick"></Button>
     </div>
   </header>
 </template>

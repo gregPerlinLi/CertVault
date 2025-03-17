@@ -3,7 +3,7 @@ package com.gregperlinli.certvault.controller;
 import com.gregperlinli.certvault.constant.GeneralConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.LoginDTO;
-import com.gregperlinli.certvault.domain.dto.LoginResultDTO;
+import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import jakarta.annotation.Resource;
@@ -37,10 +37,10 @@ public class AuthController {
      * @return {@link ResultVO}
      */
     @PostMapping(value =  "/login")
-    public ResultVO<LoginResultDTO> login(@RequestBody LoginDTO loginDTO,
+    public ResultVO<UserProfileDTO> login(@RequestBody LoginDTO loginDTO,
                                           HttpServletRequest request,
                                           HttpServletResponse response) {
-        LoginResultDTO loginResult = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), request.getSession().getId());
+        UserProfileDTO loginResult = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), request.getSession().getId());
         if ( loginResult != null ) {
             request.getSession().setAttribute("username", loginDTO.getUsername());
             request.getSession().setAttribute("account_type", loginResult.getRole());
@@ -56,7 +56,7 @@ public class AuthController {
      * @param request {@link HttpServletRequest}
      * @return {@link ResultVO}
      */
-    @GetMapping(value = "/logout")
+    @DeleteMapping(value = "/logout")
     public ResultVO<Void> logout(HttpServletRequest request) {
         if ( request.getSession().getAttribute("username") != null ) {
             log.info("User {} logout", request.getSession().getAttribute("username").toString());
