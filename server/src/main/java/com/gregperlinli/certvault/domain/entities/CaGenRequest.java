@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.domain.entities;
 
+import com.gregperlinli.certvault.domain.dto.RequestCertDTO;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -64,5 +65,17 @@ public class CaGenRequest {
      * Comment
      */
     private String comment;
+
+    public CaGenRequest(RequestCertDTO requestCertDTO, String ownerEmail) {
+        this.country = requestCertDTO.getCountry();
+        this.province = requestCertDTO.getProvince();
+        this.city = requestCertDTO.getCity();
+        this.organization = requestCertDTO.getOrganization();
+        this.organizationalUnit = requestCertDTO.getOrganizationalUnit();
+        this.commonName = requestCertDTO.getCommonName();
+        this.emailAddress = ownerEmail;
+        this.expiry = requestCertDTO.getExpiry();
+        this.comment = requestCertDTO.getComment();
+    }
 
 }
