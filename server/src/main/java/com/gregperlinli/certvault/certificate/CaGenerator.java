@@ -67,14 +67,14 @@ public class CaGenerator {
             X500Name issuer = new X500Name(dnBuilder.toString());
 
             // 4. 设置有效期（当前时间 ± expiry 天）
-            Date notBeforeDate = new Date();
-            Date notAfterDate = new Date(notBeforeDate.getTime() + request.getExpiry() * 24L * 60 * 60 * 1000);
+            Date notBefore = new Date();
+            Date notAfter = new Date(notBefore.getTime() + request.getExpiry() * 24L * 60 * 60 * 1000);
 
             // 5. 构建证书
             X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                     issuer,
                     BigInteger.probablePrime(128, new SecureRandom()),
-                    notBeforeDate, notAfterDate,
+                    notBefore, notAfter,
                     issuer,
                     caKeyPair.getPublic()
             );
@@ -100,12 +100,13 @@ public class CaGenerator {
             String privKeyBase64 = encodeBase64(pemPrivateKey.getBytes());
 
             // 11. 填充并返回响应 DTO
-            return new GenResponse(UUID.randomUUID().toString(),
-                    privKeyBase64,
-                    certBase64,
-                    LocalDateTime.ofInstant(Instant.ofEpochMilli(notBeforeDate.getTime()), ZoneId.systemDefault()),
-                    LocalDateTime.ofInstant(Instant.ofEpochMilli(notAfterDate.getTime()), ZoneId.systemDefault()),
-                    request.getComment());
+            return new GenResponse()
+                    .setUuid(UUID.randomUUID().toString())
+                    .setPrivkey(privKeyBase64)
+                    .setCert(certBase64)
+                    .setNotBefore(LocalDateTime.ofInstant(Instant.ofEpochMilli(notBefore.getTime()), ZoneId.systemDefault()))
+                    .setNotAfter(LocalDateTime.ofInstant(Instant.ofEpochMilli(notAfter.getTime()), ZoneId.systemDefault()))
+                    .setComment(request.getComment());
 
         } catch (Exception e) {
             throw new CertGenException(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode(), e.getMessage());
@@ -167,12 +168,13 @@ public class CaGenerator {
             String newPrivKeyBase64 = encodeBase64(pemPrivateKey.getBytes());
 
             // 11. 填充并返回响应 DTO
-            return new GenResponse(renewRequest.getUuid(),
-                    newPrivKeyBase64,
-                    newCertBase64,
-                    LocalDateTime.ofInstant(Instant.ofEpochMilli(notBefore.getTime()), ZoneId.systemDefault()),
-                    LocalDateTime.ofInstant(Instant.ofEpochMilli(notAfter.getTime()), ZoneId.systemDefault()),
-                    renewRequest.getComment());
+            return new GenResponse()
+                    .setUuid(UUID.randomUUID().toString())
+                    .setPrivkey(newPrivKeyBase64)
+                    .setCert(newCertBase64)
+                    .setNotBefore(LocalDateTime.ofInstant(Instant.ofEpochMilli(notBefore.getTime()), ZoneId.systemDefault()))
+                    .setNotAfter(LocalDateTime.ofInstant(Instant.ofEpochMilli(notAfter.getTime()), ZoneId.systemDefault()))
+                    .setComment(renewRequest.getComment());
         } catch (Exception e) {
             throw new CertGenException(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode(), e.getMessage());
         }

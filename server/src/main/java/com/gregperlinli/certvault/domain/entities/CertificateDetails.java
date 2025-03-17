@@ -1,6 +1,7 @@
 package com.gregperlinli.certvault.domain.entities;
 
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.security.PublicKey;
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.util.Map;
  * @className {@code CertificateDetails}
  * @date 2025/3/15 16:02
  */
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString

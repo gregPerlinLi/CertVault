@@ -1,6 +1,7 @@
 package com.gregperlinli.certvault.domain.entities;
 
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
  * @className {@code CaGenResponseDTO}
  * @date 2025/3/15 11:52
  */
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString

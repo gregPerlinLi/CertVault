@@ -1,6 +1,7 @@
 package com.gregperlinli.certvault.domain.entities;
 
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @className {@code CertGenRequestDTO}
  * @date 2025/3/15 13:47
  */
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString

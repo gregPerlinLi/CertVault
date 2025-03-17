@@ -1,6 +1,7 @@
 package com.gregperlinli.certvault.domain.entities;
 
 import lombok.*;
+import lombok.experimental.Accessors;
 
 /**
  * CA Generate Request DTO
@@ -10,6 +11,7 @@ import lombok.*;
  * @className {@code CaGenRequestDTO}
  * @date 2025/3/15 11:52
  */
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
