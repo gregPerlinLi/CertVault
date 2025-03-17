@@ -53,7 +53,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
 
         // 提取用户信息
-        String adminAccount = session.getAttribute("username").toString();
+        String account = session.getAttribute("username").toString();
         Integer accountType = (Integer) session.getAttribute("account_type");
 
         // 路径权限校验
@@ -81,15 +81,15 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
 
         // 验证会话有效性
-        if (adminAccount == null) {
+        if (account == null) {
             log.info("No user information found in the session.");
             throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "Not logged in or session expired");
         }
 
         String sessionId = session.getId();
-        boolean sessionValid = userService.loginVerify(adminAccount, sessionId);
+        boolean sessionValid = userService.loginVerify(account, sessionId);
         if (!sessionValid) {
-            log.info("Session [{}] does not exist in Redis.", sessionId);
+            log.info("User [{}] Session [{}] does not exist in Redis.", account, sessionId);
             throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "The session has expired.");
         }
 
