@@ -51,6 +51,16 @@ springBoot:
     # Path to heap dump file
     - "-XX:HeapDumpPath=./errorDump.hprof"
 
+## Encryption configuration
+## @param encrypt.rsa.key.publicKey The public key used for RSA encryption
+## @param encrypt.rsa.key.privateKey The private key used for RSA decryption
+##
+encrypt:
+  rsa:
+    key:
+      publicKey: "changeme"
+      privateKey: "changeme"
+
 ## Service configuration
 ## @param service.ports.business [default: 1888] Business port for the application
 ## @param service.ports.management [default: 1999] Management port for the application
