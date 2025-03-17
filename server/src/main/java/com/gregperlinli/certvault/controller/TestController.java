@@ -32,7 +32,7 @@ public class TestController {
     @GetMapping(value = "/api")
     public ResultVO<TestDTO> testGet() {
         TestDTO testDTO = testService.testGet();
-        return new ResultVO<>(200, "success getting", testDTO);
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success getting", testDTO);
     }
 
     /**
@@ -43,7 +43,7 @@ public class TestController {
     @PostMapping(value = "/api")
     public ResultVO<TestDTO> testPost() {
         TestDTO testDTO = testService.testPost();
-        return new ResultVO<>(200, "success posting", testDTO);
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success posting", testDTO);
     }
 
     /**
@@ -54,7 +54,7 @@ public class TestController {
     @PutMapping(value = "/api")
     public ResultVO<TestDTO> testPut() {
         TestDTO testDTO = testService.testPut();
-        return new ResultVO<>(200, "success putting", testDTO);
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success putting", testDTO);
     }
 
     /**
@@ -65,7 +65,7 @@ public class TestController {
     @DeleteMapping(value = "/api")
     public ResultVO<TestDTO> testDelete() {
         TestDTO testDTO = testService.testDelete();
-        return new ResultVO<>(200, "success deleting", testDTO);
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success deleting", testDTO);
     }
 
     /**
@@ -76,7 +76,7 @@ public class TestController {
     @PatchMapping(value = "/api")
     public ResultVO<TestDTO> testPatch() {
         TestDTO testDTO = testService.testPatch();
-        return new ResultVO<>(200, "success patching", testDTO);
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success patching", testDTO);
     }
 
     /**
@@ -91,10 +91,10 @@ public class TestController {
                                        HttpServletResponse response) {
         String result = testService.getBCryptedPassword(password);
         if ( result != null ) {
-            return new ResultVO<>(200, "请求成功", result);
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Request success", result);
         }
         response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.FAILED.getResultCode()));
-        return new ResultVO<>(400, "请求失败", null);
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Request failed", null);
     }
 
 }

@@ -38,15 +38,13 @@ public class AuthController {
      */
     @PostMapping(value =  "/login")
     public ResultVO<UserProfileDTO> login(@RequestBody LoginDTO loginDTO,
-                                          HttpServletRequest request,
-                                          HttpServletResponse response) {
+                                          HttpServletRequest request) {
         UserProfileDTO loginResult = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), request.getSession().getId());
         if ( loginResult != null ) {
             request.getSession().setAttribute("username", loginDTO.getUsername());
             request.getSession().setAttribute("account_type", loginResult.getRole());
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Login Success!", loginResult);
         }
-        response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.FAILED.getResultCode()));
         return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Login failed, username or password error");
     }
 
