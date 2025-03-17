@@ -16,11 +16,11 @@ public enum GeneralConstant {
     /**
      * 新建账户初始密码
      */
-    INITIAL_PASSWORD("cert_v1234", "初始密码"),
+    INITIAL_PASSWORD("cert_v1234", "Initial Password"),
     /**
      * 响应状态码 Header
      */
-    STATUS_CODE("Status-Code","响应状态码 Header");
+    STATUS_CODE("Status-Code","Status Code Header");
 
 
     final String value;
