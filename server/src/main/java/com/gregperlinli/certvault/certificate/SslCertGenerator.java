@@ -94,15 +94,12 @@ public class SslCertGenerator {
                 List<GeneralName> generalNamesList = new ArrayList<>();
                 for (SubjectAltName san : request.getSubjectAltNames()) {
                     switch (san.getType()) {
-                        case DNS_NAME:
-                            generalNamesList.add(new GeneralName(GeneralName.dNSName, san.getValue()));
-                            break;
-                        case IP_ADDRESS:
-                            generalNamesList.add(new GeneralName(GeneralName.iPAddress, san.getValue()));
-                            break;
-                        case URI:
-                            generalNamesList.add(new GeneralName(GeneralName.uniformResourceIdentifier, san.getValue()));
-                            break;
+                        case DNS_NAME -> generalNamesList.add(new GeneralName(GeneralName.dNSName, san.getValue()));
+                        case IP_ADDRESS -> generalNamesList.add(new GeneralName(GeneralName.iPAddress, san.getValue()));
+                        case URI -> generalNamesList.add(new GeneralName(GeneralName.uniformResourceIdentifier, san.getValue()));
+                        case EMAIL -> generalNamesList.add(new GeneralName(GeneralName.rfc822Name, san.getValue()));
+                        case DIRECTORY_NAME -> generalNamesList.add(new GeneralName(GeneralName.directoryName, san.getValue()));
+                        case EDIPartyName -> generalNamesList.add(new GeneralName(GeneralName.ediPartyName, san.getValue()));
                     }
                 }
                 // 将列表转换为数组并构造 GeneralNames 对象
@@ -146,14 +143,13 @@ public class SslCertGenerator {
             String privKeyBase64 = CertUtils.encodeBase64(pemPrivateKey.getBytes());
 
             // 14. 返回响应
-            return new GenResponse(
-                    UUID.randomUUID().toString(),
-                    privKeyBase64,
-                    certBase64,
-                    LocalDateTime.ofInstant(Instant.ofEpochMilli(notBefore.getTime()), ZoneId.systemDefault()),
-                    LocalDateTime.ofInstant(Instant.ofEpochMilli(notAfter.getTime()), ZoneId.systemDefault()),
-                    request.getComment()
-            );
+            return new GenResponse()
+                    .setUuid(UUID.randomUUID().toString())
+                    .setPrivkey(privKeyBase64)
+                    .setCert(certBase64)
+                    .setNotBefore(LocalDateTime.ofInstant(Instant.ofEpochMilli(notBefore.getTime()), ZoneId.systemDefault()))
+                    .setNotAfter(LocalDateTime.ofInstant(Instant.ofEpochMilli(notAfter.getTime()), ZoneId.systemDefault()))
+                    .setComment(request.getComment());
 
         } catch (Exception e) {
             throw new CertGenException(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode(), e.getMessage());
@@ -245,14 +241,13 @@ public class SslCertGenerator {
             String privKeyBase64 = CertUtils.encodeBase64(pemPrivateKey.getBytes());
 
             // 11. 返回响应
-            return new GenResponse(
-                    request.getUuid(),
-                    privKeyBase64,
-                    certBase64,
-                    LocalDateTime.ofInstant(Instant.ofEpochMilli(notBefore.getTime()), ZoneId.systemDefault()),
-                    LocalDateTime.ofInstant(Instant.ofEpochMilli(notAfter.getTime()), ZoneId.systemDefault()),
-                    request.getComment()
-            );
+            return new GenResponse()
+                    .setUuid(request.getUuid())
+                    .setPrivkey(privKeyBase64)
+                    .setCert(certBase64)
+                    .setNotBefore(LocalDateTime.ofInstant(Instant.ofEpochMilli(notBefore.getTime()), ZoneId.systemDefault()))
+                    .setNotAfter(LocalDateTime.ofInstant(Instant.ofEpochMilli(notAfter.getTime()), ZoneId.systemDefault()))
+                    .setComment(request.getComment());
         } catch (Exception e) {
             throw new CertGenException(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode(), e.getMessage());
         }

@@ -96,20 +96,18 @@ public class CertDecoder {
                 List<String> sanList = new ArrayList<>();
                 for (GeneralName gn : generalNames.getNames()) {
                     switch (gn.getTagNo()) {
-                        case GeneralName.dNSName:
-                            sanList.add("DNS: " + gn.getName().toString());
-                            break;
-                        case GeneralName.iPAddress:
+                        case GeneralName.dNSName -> sanList.add("DNS: " + gn.getName().toString());
+                        case GeneralName.iPAddress -> {
                             // 将字节数组转换为IP地址字符串
                             ASN1OctetString octets = (ASN1OctetString) gn.getName();
                             byte[] ipAddressBytes = octets.getOctets();
                             sanList.add("IP: " + bytesToIpAddress(ipAddressBytes));
-                            break;
-                        case GeneralName.uniformResourceIdentifier:
-                            sanList.add("URI: " + gn.getName().toString());
-                            break;
-                        default:
-                            sanList.add("Unknown type " + gn.getTagNo() + ": " + gn.getName().toString());
+                        }
+                        case GeneralName.uniformResourceIdentifier -> sanList.add("URI: " + gn.getName().toString());
+                        case GeneralName.rfc822Name -> sanList.add("Email: " + gn.getName().toString());
+                        case GeneralName.directoryName -> sanList.add("DirectoryName: " + gn.getName().toString());
+                        case GeneralName.ediPartyName -> sanList.add("EDIPartyName: " + gn.getName().toString());
+                        default -> sanList.add("Unknown type " + gn.getTagNo() + ": " + gn.getName().toString());
                     }
                 }
                 return "SAN: " + String.join(", ", sanList);
