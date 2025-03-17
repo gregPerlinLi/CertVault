@@ -10,7 +10,7 @@ export interface UserProfileDTO {
   username: string;
   displayName: string;
   email: string;
-  role: number;
+  role: 1 | 2 | 3;
 }
 export const login = async (
   username: string,

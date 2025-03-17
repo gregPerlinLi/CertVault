@@ -3,9 +3,6 @@ import { getUserProfile, login, logout, type ResultVO } from "@/utils/api";
 import { useCookies } from "@vueuse/integrations/useCookies";
 import { type ToastServiceMethods } from "primevue";
 
-// Types
-type RoleType = "super" | "admin" | "user";
-
 // Export store
 export const useUserStore = createGlobalState(() => {
   // States
@@ -13,9 +10,21 @@ export const useUserStore = createGlobalState(() => {
   const username = ref<string | null>(null);
   const displayName = ref<string | null>(null);
   const email = ref<string | null>(null);
-  const role = ref<RoleType | null>(null);
+  const innerRole = ref<1 | 2 | 3 | null>(null);
 
   // Getters
+  const role = computed((): string => {
+    switch (innerRole.value) {
+      case 1:
+        return "User";
+      case 2:
+        return "Admin";
+      case 3:
+        return "Superadmin";
+      default:
+        return "";
+    }
+  });
 
   // Actions
   const resetAuthInfo = (): void => {
@@ -24,7 +33,7 @@ export const useUserStore = createGlobalState(() => {
     username.value = null;
     displayName.value = null;
     email.value = null;
-    role.value = null;
+    innerRole.value = null;
 
     cookies.remove("JSESSIONID");
   };
@@ -39,16 +48,7 @@ export const useUserStore = createGlobalState(() => {
       username.value = r.username;
       displayName.value = r.displayName;
       email.value = r.email;
-      switch (r.role) {
-        case 1:
-          role.value = "user";
-          break;
-        case 2:
-          role.value = "admin";
-          break;
-        default:
-          role.value = "super";
-      }
+      innerRole.value = r.role;
 
       initialized.value = true;
     } catch (err: unknown) {
@@ -83,16 +83,8 @@ export const useUserStore = createGlobalState(() => {
       username.value = r.username;
       displayName.value = r.displayName;
       email.value = r.email;
-      switch (r.role) {
-        case 1:
-          role.value = "user";
-          break;
-        case 2:
-          role.value = "admin";
-          break;
-        default:
-          role.value = "super";
-      }
+      innerRole.value = r.role;
+
       toast.add({
         severity: "success",
         summary: "Success",

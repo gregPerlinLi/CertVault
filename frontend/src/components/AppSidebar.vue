@@ -26,7 +26,7 @@ const menuModel = computed((): MenuItem[] =>
     {
       label: "Users",
       icon: "pi pi-users",
-      only: ["admin", "super"],
+      only: ["Admin", "Superadmin"],
       command: (): void => {
         router.push("/dashboard/users");
       }
@@ -41,28 +41,16 @@ const menuModel = computed((): MenuItem[] =>
     {
       label: "Settings",
       icon: "pi pi-cog",
-      only: ["super"],
+      only: ["Superadmin"],
       command: (): void => {
         router.push("/dashboard/settings");
       }
     }
   ].filter(
     (itm: MenuItem & { only?: string[] }): boolean =>
-      itm?.only?.includes(role.value!) ?? true
+      itm?.only?.includes(role.value) ?? true
   )
 );
-const roleName = computed((): string => {
-  switch (role.value) {
-    case "super":
-      return "Superadmin View";
-    case "admin":
-      return "Admin View";
-    case "user":
-      return "User View";
-    default:
-      return "";
-  }
-});
 </script>
 
 <template>
@@ -71,7 +59,7 @@ const roleName = computed((): string => {
       <PanelMenu :model="menuModel" />
       <hr class="border-neutral-200 border-t-2 dark:border-neutral-500" />
       <p class="leading-none select-none text-center text-neutral-400 text-sm">
-        {{ roleName }}
+        {{ role }} View
       </p>
     </div>
   </aside>
