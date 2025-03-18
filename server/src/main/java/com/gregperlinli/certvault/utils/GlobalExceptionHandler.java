@@ -5,6 +5,7 @@ import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.exception.*;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.MethodNotAllowedException;
@@ -54,7 +55,7 @@ public class GlobalExceptionHandler {
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode()));
             return new ResultVO<>(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), msg);
         }
-        if ( e instanceof MethodNotAllowedException || e instanceof NoSuchMethodException ) {
+        if ( e instanceof MethodNotAllowedException || e instanceof NoSuchMethodException || e instanceof HttpRequestMethodNotSupportedException) {
             // response.setStatus(ResultStatusCodeConstant.FORBIDDEN);
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.METHOD_NOT_ALLOWED.getResultCode()));
             return new ResultVO<>(ResultStatusCodeConstant.METHOD_NOT_ALLOWED.getResultCode(), msg);
