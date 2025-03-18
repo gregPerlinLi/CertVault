@@ -28,7 +28,7 @@ public class SubjectAltName {
         URI("URI"),            // 统一资源标识符
         EMAIL("EMAIL"),        // 邮箱地址
         DIRECTORY_NAME("DIRNAME"), // 目录名（X.500格式）
-        EDIPartyName("EDIPARTY");  // EDI Party Name
+        EDI_PARTY_NAME("EDIPARTY");  // EDI Party Name
 
         // 私有构造函数（若需要参数）
         private final String code;
