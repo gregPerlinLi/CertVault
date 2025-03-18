@@ -104,7 +104,7 @@ public class CertDecoder {
                         case GeneralName.uniformResourceIdentifier -> sanList.add("URI: " + gn.getName().toString());
                         case GeneralName.rfc822Name -> sanList.add("Email: " + gn.getName().toString());
                         case GeneralName.directoryName -> sanList.add("DirectoryName: " + gn.getName().toString());
-                        case GeneralName.ediPartyName -> sanList.add("EDI_PARTY_NAME: " + gn.getName().toString());
+                        case GeneralName.ediPartyName -> sanList.add("EDIPartyName: " + gn.getName().toString());
                         default -> sanList.add("Unknown type " + gn.getTagNo() + ": " + gn.getName().toString());
                     }
                 }
