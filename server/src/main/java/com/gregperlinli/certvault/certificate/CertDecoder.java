@@ -2,15 +2,13 @@ package com.gregperlinli.certvault.certificate;
 
 import com.gregperlinli.certvault.domain.entities.CertificateDetails;
 import com.gregperlinli.certvault.utils.CertUtils;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.PublicKey;
@@ -106,7 +104,7 @@ public class CertDecoder {
                         case GeneralName.uniformResourceIdentifier -> sanList.add("URI: " + gn.getName().toString());
                         case GeneralName.rfc822Name -> sanList.add("Email: " + gn.getName().toString());
                         case GeneralName.directoryName -> sanList.add("DirectoryName: " + gn.getName().toString());
-                        case GeneralName.ediPartyName -> sanList.add("EDIPartyName: " + gn.getName().toString());
+                        case GeneralName.ediPartyName -> sanList.add("EDI_PARTY_NAME: " + gn.getName().toString());
                         default -> sanList.add("Unknown type " + gn.getTagNo() + ": " + gn.getName().toString());
                     }
                 }
@@ -122,8 +120,67 @@ public class CertDecoder {
                 } else {
                     return "EKU value type error";
                 }
+            }  else if (oid.equals(Extension.basicConstraints.getId())) {
+                BasicConstraints bc = BasicConstraints.getInstance(ASN1Primitive.fromByteArray(extValueBytes));
+                String caStatus = bc.isCA() ? "CA:TRUE" : "CA:FALSE";
+                BigInteger pathLen = bc.getPathLenConstraint();
+                String pathLenStr = (pathLen != null) ? ", PathLen: " + pathLen : "";
+                String hexValue = bytesToHexString(extValueBytes);
+                return "BasicConstraints: " + caStatus + pathLenStr + " (HEX: " + hexValue + ")";
+            } else if (oid.equals(Extension.authorityKeyIdentifier.getId())) {
+                AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.getInstance(ASN1Primitive.fromByteArray(extValueBytes));
+                byte[] keyId = aki.getKeyIdentifier();
+                if (keyId != null) {
+                    return "AuthorityKeyIdentifier: " + bytesToHexString(keyId);
+                } else {
+                    return "AuthorityKeyIdentifier: No key identifier found";
+                }
+            } else if (oid.equals(Extension.subjectKeyIdentifier.getId())) {
+                SubjectKeyIdentifier ski = SubjectKeyIdentifier.getInstance(ASN1Primitive.fromByteArray(extValueBytes));
+                DEROctetString octets = (DEROctetString) ski.toASN1Primitive();
+                byte[] skiBytes = octets.getOctets();
+                return "SubjectKeyIdentifier: " + bytesToHexString(skiBytes);
+            } else if (oid.equals(Extension.cRLDistributionPoints.getId())) {
+                CRLDistPoint crlDistPoint = CRLDistPoint.getInstance(ASN1Primitive.fromByteArray(extValueBytes));
+                List<String> points = new ArrayList<>();
+                for (DistributionPoint dp : crlDistPoint.getDistributionPoints()) {
+                    DistributionPointName dpObj = dp.getDistributionPoint();
+                    if (dpObj != null && dpObj.getType() == DistributionPointName.FULL_NAME) {
+                        GeneralNames names = GeneralNames.getInstance(dpObj.getName());
+                        for (GeneralName gn : names.getNames()) {
+                            if (gn.getTagNo() == GeneralName.uniformResourceIdentifier) {
+                                points.add("URI: " + gn.getName().toString());
+                            }
+                        }
+                    }
+                }
+                return "CRLDistributionPoints: " + String.join(", ", points);
+            } else if (oid.equals(Extension.certificatePolicies.getId())) {
+                CertificatePolicies policies = CertificatePolicies.getInstance(ASN1Primitive.fromByteArray(extValueBytes));
+                List<String> policyList = new ArrayList<>();
+                List<PolicyInformation> policyInfoList = List.of(policies.getPolicyInformation());
+                for (PolicyInformation pi : policyInfoList) {
+                    String policyId = pi.getPolicyIdentifier().getId();
+                    if (pi.getPolicyQualifiers() != null) {
+                        policyList.add(policyId + " (Qualifiers: " + pi.getPolicyQualifiers().toString() + ")");
+                    } else {
+                        policyList.add(policyId);
+                    }
+                }
+                return "CertificatePolicies: " + String.join(", ", policyList);
+            } else if (oid.equals(Extension.authorityInfoAccess.getId())) {
+                AuthorityInformationAccess aia = AuthorityInformationAccess.getInstance(ASN1Primitive.fromByteArray(extValueBytes));
+                List<String> accessDescriptions = new ArrayList<>();
+                for (AccessDescription ad : aia.getAccessDescriptions()) {
+                    String method = ad.getAccessMethod().getId();
+                    GeneralName location = GeneralName.getInstance(ad.getAccessLocation());
+                    if (location.getTagNo() == GeneralName.uniformResourceIdentifier) {
+                        accessDescriptions.add(method + " -> " + location.getName().toString());
+                    }
+                }
+                return "AuthorityInformationAccess: " + String.join(", ", accessDescriptions);
             } else {
-                return "Unknown extension value type";
+                return "Unknown: " + bytesToHexString(extValueBytes);
             }
         } catch (Exception e) {
             return "Parsing failed [" + oid + "]: " + e.getMessage();
