@@ -1,9 +1,6 @@
 package com.gregperlinli.certvault.service.interfaces;
 
-import com.gregperlinli.certvault.domain.dto.CaInfoDTO;
-import com.gregperlinli.certvault.domain.dto.PageDTO;
-import com.gregperlinli.certvault.domain.dto.RequestCertDTO;
-import com.gregperlinli.certvault.domain.dto.ResponseCaDTO;
+import com.gregperlinli.certvault.domain.dto.*;
 import com.gregperlinli.certvault.domain.entities.Ca;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -28,6 +25,16 @@ public interface ICaService extends IService<Ca> {
     PageDTO<CaInfoDTO> getCas(String owner, Integer page, Integer limit);
 
     /**
+     * Get all CA bindings of a user
+     *
+     * @param username username
+     * @param page     page number
+     * @param limit    page size
+     * @return CA binding information
+     */
+    PageDTO<CaInfoDTO> getBoundCas(String username, Integer page, Integer limit);
+
+    /**
      * Get ca certificate
      *
      * @param uuid ca certificate uuid
@@ -39,13 +46,12 @@ public interface ICaService extends IService<Ca> {
     /**
      * Get ca private key
      *
-     * @param uuid ca private key uuid
-     * @param owner owner of the ca private key
-     * @param password password of the ca private key
+     * @param requestPrivkeyDTO ca private key info
+     * @param owner             owner of the ca private key
      * @return ca private key
      * @throws Exception decryption error
      */
-    String getCaPrivKey(String uuid, String owner, String password) throws Exception;
+    String getCaPrivKey(RequestPrivkeyDTO requestPrivkeyDTO, String owner) throws Exception;
 
     /**
      * Update ca comment
@@ -56,6 +62,15 @@ public interface ICaService extends IService<Ca> {
      * @return true if update successfully
      */
     Boolean updateCaComment(String uuid, String owner, String comment);
+
+    /**
+     * Modify ca availability
+     *
+     * @param uuid ca certificate uuid
+     * @param owner owner of the ca certificate
+     * @return the new ca availability
+     */
+    Boolean modifyCaAvailability(String uuid, String owner);
 
     /**
      * Request new ca certificate
