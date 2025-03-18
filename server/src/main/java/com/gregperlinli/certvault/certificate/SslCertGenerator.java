@@ -29,8 +29,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static com.gregperlinli.certvault.domain.entities.SubjectAltName.Type.DNS_NAME;
-
 /**
  * SSL Certificate Generator
  *
@@ -99,7 +97,7 @@ public class SslCertGenerator {
                         case URI -> generalNamesList.add(new GeneralName(GeneralName.uniformResourceIdentifier, san.getValue()));
                         case EMAIL -> generalNamesList.add(new GeneralName(GeneralName.rfc822Name, san.getValue()));
                         case DIRECTORY_NAME -> generalNamesList.add(new GeneralName(GeneralName.directoryName, san.getValue()));
-                        case EDIPartyName -> generalNamesList.add(new GeneralName(GeneralName.ediPartyName, san.getValue()));
+                        case EDI_PARTY_NAME -> generalNamesList.add(new GeneralName(GeneralName.ediPartyName, san.getValue()));
                     }
                 }
                 // 将列表转换为数组并构造 GeneralNames 对象
