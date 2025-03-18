@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.domain.entities;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -30,14 +31,14 @@ public class CaBinding implements Serializable {
     /**
      * 分配ID
      */
-    @TableId("id")
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
      * CA ID 
      */
-    @TableField("ca_id")
-    private Integer caId;
+    @TableField("ca_uuid")
+    private String caUuid;
 
     /**
      * 用户ID
