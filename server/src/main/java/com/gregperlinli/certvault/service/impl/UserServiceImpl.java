@@ -1,8 +1,10 @@
 package com.gregperlinli.certvault.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gregperlinli.certvault.constant.RedisKeyConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
+import com.gregperlinli.certvault.domain.dto.PageDTO;
 import com.gregperlinli.certvault.domain.dto.UpdateUserProfileDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import com.gregperlinli.certvault.domain.entities.RoleBinding;
@@ -82,6 +84,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return new UserProfileDTO(user);
         }
         throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The user does not exist.");
+    }
+
+    @Override
+    public PageDTO<UserProfileDTO> getAllUsers(Integer page, Integer limit) {
+        Page<User> userPage = new Page<>(page, limit);
+        Page<User> resultPage = this.page(userPage);
+        return new PageDTO<>(resultPage.getTotal(),
+                resultPage.getRecords().stream().map(UserProfileDTO::new).toList());
     }
 
     @Override

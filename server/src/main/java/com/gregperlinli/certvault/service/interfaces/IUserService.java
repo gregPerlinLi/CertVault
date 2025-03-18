@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.service.interfaces;
 
+import com.gregperlinli.certvault.domain.dto.PageDTO;
 import com.gregperlinli.certvault.domain.dto.UpdateUserProfileDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import com.gregperlinli.certvault.domain.entities.User;
@@ -26,30 +27,39 @@ public interface IUserService extends IService<User> {
     UserProfileDTO login(String username, String password, String sessionId);
 
     /**
-     * 登录校验
+     * Login Verify
      *
-     * @param username 用户名
-     * @param sessionId 登录会话ID
-     * @return 校验结果
+     * @param username username
+     * @param sessionId login session ID
+     * @return verify result
      */
     boolean loginVerify(String username, String sessionId);
 
     /**
-     * 注销账户
+     * Logout
      *
-     * @param sessionId 登录会话ID
+     * @param sessionId session ID
      */
     void logout(String sessionId);
 
     /**
-     * 获取自己的用户信息
+     * Get user profile
      *
-     * @param username 用户名
+     * @param username username
      */
     UserProfileDTO getOwnProfile(String username);
 
     /**
-     * 更新自己的用户信息
+     * Get all users
+     *
+     * @param page page
+     * @param limit limit
+     * @return user profile list
+     */
+    PageDTO<UserProfileDTO> getAllUsers(Integer page, Integer limit);
+
+    /**
+     * update user profile
      *
      * @param username 用户名
      * @param updateUserProfileDTO 更新用户信息DTO
