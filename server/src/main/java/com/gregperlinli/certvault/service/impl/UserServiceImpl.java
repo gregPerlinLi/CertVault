@@ -50,7 +50,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The parameter cannot be null.");
         }
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", username);
+        userQueryWrapper.eq("username", username)
+                        .eq("deleted", false);
         User user = this.getOne(userQueryWrapper);
         if ( user != null && AuthUtils.matchesPassword(password, user.getPassword()) ) {
             stringRedisTemplate.opsForValue().set(RedisKeyConstant.USER.joinLoginPrefix(sessionId), user.getUsername(), 60, TimeUnit.MINUTES);

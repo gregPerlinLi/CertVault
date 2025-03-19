@@ -30,7 +30,8 @@ public class CaBindingServiceImpl extends ServiceImpl<CaBindingMapper, CaBinding
     @Override
     public Boolean newBinding(CaBindingDTO caBindingDTO) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", caBindingDTO.getUsername());
+        userQueryWrapper.eq("username", caBindingDTO.getUsername())
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -45,7 +46,8 @@ public class CaBindingServiceImpl extends ServiceImpl<CaBindingMapper, CaBinding
     @Override
     public Boolean deleteBinding(CaBindingDTO caBindingDTO) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", caBindingDTO.getUsername());
+        userQueryWrapper.eq("username", caBindingDTO.getUsername())
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");

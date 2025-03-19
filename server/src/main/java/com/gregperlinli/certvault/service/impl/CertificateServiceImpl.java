@@ -50,7 +50,8 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
         Page<Certificate> certificatePage = new Page<>(page, limit);
         Page<Certificate> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -84,7 +85,8 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     @Override
     public String getCertificateCert(String uuid, String owner) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -114,7 +116,8 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     @Override
     public String getCertificatePrivkey(RequestPrivkeyDTO requestPrivkeyDTO, String owner) throws Exception {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -147,7 +150,8 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     @Override
     public Boolean updateCertComment(UpdateCommentDTO updateCommentDTO, String owner) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -179,7 +183,8 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     @Override
     public ResponseCertDTO requestCert(RequestCertDTO requestCertDTO, String owner) throws Exception {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -211,7 +216,8 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     @Override
     public ResponseCertDTO renewCert(String oldCertUuid, Integer expiry, String owner) throws Exception {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -261,7 +267,8 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     @Override
     public Boolean deleteCert(String uuid, String owner) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");

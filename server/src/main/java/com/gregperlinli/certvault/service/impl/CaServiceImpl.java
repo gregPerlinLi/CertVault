@@ -49,7 +49,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
         Page<Ca> caPage = new Page<>(page, limit);
         Page<Ca> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -82,10 +83,11 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
 
     @Override
     public PageDTO<CaInfoDTO> getBoundCas(String username, Integer page, Integer limit) {
-        Page<Ca> caPage = new Page<Ca>(page, limit);
+        Page<Ca> caPage = new Page<>(page, limit);
         Page<Ca> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", username);
+        userQueryWrapper.eq("username", username)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -126,7 +128,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     @Override
     public String getCaCert(String uuid, String owner) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -154,7 +157,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     @Override
     public String getCaPrivKey(RequestPrivkeyDTO requestPrivkeyDTO, String owner) throws Exception {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -182,7 +186,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     @Override
     public Boolean updateCaComment(String uuid, String owner, String comment) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -208,7 +213,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     @Override
     public Boolean modifyCaAvailability(String uuid, String owner) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -239,7 +245,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     @Override
     public ResponseCaDTO requestCa(RequestCertDTO requestCertDTO, String owner) throws Exception {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -261,7 +268,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     @Override
     public ResponseCaDTO renewCa(String oldCaUuid, Integer expiry, String owner) throws Exception {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
@@ -298,7 +306,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     @Override
     public Boolean deleteCa(String uuid, String owner) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", owner);
+        userQueryWrapper.eq("username", owner)
+                        .eq("deleted", false);
         User user = userService.getOne(userQueryWrapper);
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
