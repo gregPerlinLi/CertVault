@@ -159,7 +159,7 @@ ingress:
 ## Node Selector configuration
 ## @param nodeSelector A map of key-value pairs to select nodes for pod scheduling. Each entry specifies a node label and its required value to ensure pods are scheduled on specific nodes.
 ##
-nodeSelector:
+nodeSelector: {}
 ##  E.g.
 ##  kubernetes.io/arch: amd64
 ##  beta.kubernetes.io/os: linux
