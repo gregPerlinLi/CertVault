@@ -155,3 +155,54 @@ ingress:
   #   - secretName: my-tls-secret
   #     hosts:
   #      - chart-example.local
+
+## Node Selector configuration
+## @param nodeSelector A map of key-value pairs to select nodes for pod scheduling. Each entry specifies a node label and its required value to ensure pods are scheduled on specific nodes.
+##
+nodeSelector:
+##  E.g.
+##  kubernetes.io/arch: amd64
+##  beta.kubernetes.io/os: linux
+
+
+## Node Affinity configuration
+## @param nodeAffinity Defines node affinity rules based on node labels to control where pods are scheduled
+## @param nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution Mandatory node affinity conditions that must be met during scheduling but ignored post-scheduling
+## @param nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms List of node selector terms, each containing one or more match conditions
+## @param nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms.matchExpressions List of matching expressions defining label criteria
+## @param nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms.matchExpressions.key Label key to match
+## @param nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms.matchExpressions.operator Operator (e.g., In, NotIn)
+## @param nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms.matchExpressions.values Allowed label values list
+nodeAffinity: {}
+##  E.g.
+##  requiredDuringSchedulingIgnoredDuringExecution:
+##    nodeSelectorTerms:
+##      - matchExpressions:
+##        - key: kubernetes.io/arch
+##          operator: In
+##          values:
+##            - amd64
+##        - key: beta.kubernetes.io/os
+##          operator: In
+##          values:
+##             - linux
+
+## Pod Affinity configuration
+## @param podAffinity Defines pod affinity rules based on other pods' labels to control topological relationships
+## @param podAffinity.requiredDuringSchedulingIgnoredDuringExecution Mandatory pod affinity conditions that must be met during scheduling but ignored post-scheduling
+## @param podAffinity.requiredDuringSchedulingIgnoredDuringExecution.labelSelector Label selector to match other pods' labels
+## @param podAffinity.requiredDuringSchedulingIgnoredDuringExecution.labelSelector.matchExpressions List of matching expressions
+## @param podAffinity.requiredDuringSchedulingIgnoredDuringExecution.labelSelector.matchExpressions.key Label key to match
+## @param podAffinity.requiredDuringSchedulingIgnoredDuringExecution.labelSelector.matchExpressions.operator Operator (e.g., In, NotIn)
+## @param podAffinity.requiredDuringSchedulingIgnoredDuringExecution.labelSelector.matchExpressions.values Allowed label values list
+## @param podAffinity.requiredDuringSchedulingIgnoredDuringExecution.topologyKey Key to determine topology domain (e.g., availability zone)
+podAffinity: {}
+##  E.g.
+##  requiredDuringSchedulingIgnoredDuringExecution:
+##    - labelSelector:
+##        matchExpressions:
+##          - key: security
+##            operator: In
+##            values:
+##              - S1
+##        topologyKey: topology.kubernetes.io/zone

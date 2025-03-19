@@ -19,6 +19,19 @@ spec:
         app.kubernetes.io/name: {{ include "cert-vault.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      nodeSelector:
+        {{- if .Values.nodeSelector }}
+        {{ toYaml .Values.nodeSelector | nindent 8 }}
+        {{- end }}
+      affinity:
+        nodeAffinity:
+          {{- if .Values.nodeAffinity }}
+          {{ toYaml .Values.nodeAffinity | nindent 10 }}
+          {{- end }}
+        podAffinity:
+          {{- if .Values.podAffinity }}
+          {{ toYaml .Values.podAffinity | nindent 10 }}
+          {{- end }}
       initContainers:
         - name: wait-for-redis
           image: busybox:1.36
