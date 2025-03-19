@@ -59,7 +59,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
         caQueryWrapper.eq("owner", user.getId())
                     .eq("deleted", false);
         resultPage = this.page(caPage, caQueryWrapper);
-        if ( resultPage.getSize() == 0 || resultPage.getRecords() == null ) {
+        if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
             return new PageDTO<>(resultPage.getTotal(), null);
         }
         Set<Integer> ownerIds = resultPage.getRecords().stream()
