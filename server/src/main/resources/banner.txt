@@ -10,5 +10,7 @@ Welcome To CertVault Self-Signed SSL Certificate Management Platform Backend Ser
 
 Server Version: ${application.version}
 SpringBoot Version: ${spring-boot.version}
+SpringSecurity Version: @spring-security.version@
+Spring Version: ${spring.version}
 Java Version: ${java.version}
 Operating System: ${os.name} ${os.version}
