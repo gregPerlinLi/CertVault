@@ -74,7 +74,7 @@ public class AdminController {
      * @param request the request
      * @return the result
      */
-    @GetMapping(value = "/cert/ca_cert/{uuid}")
+    @GetMapping(value = "/cert/ca/cer/{uuid}")
     public ResultVO<String> getCaCert(@PathVariable("uuid") String uuid,
                                       HttpServletRequest request) {
         String result = caService.getCaCert(uuid, request.getSession().getAttribute("username").toString());
@@ -92,7 +92,7 @@ public class AdminController {
      * @return the result
      * @throws Exception if the decrypt is failed
      */
-    @PostMapping(value = "/cert/ca_privkey")
+    @PostMapping(value = "/cert/ca/privkey")
     public ResultVO<String> getCaPrivkey(@RequestBody RequestPrivkeyDTO requestPrivkeyDTO,
                                          HttpServletRequest request) throws Exception {
         String result = caService.getCaPrivKey(requestPrivkeyDTO, request.getSession().getAttribute("username").toString());
@@ -109,7 +109,7 @@ public class AdminController {
      * @param request the request
      * @return the result
      */
-    @PatchMapping(value = "/cert/ca_comment")
+    @PatchMapping(value = "/cert/ca/comment")
     public ResultVO<Void> updateCaComment(@RequestBody UpdateCommentDTO updateCommentDTO,
                                              HttpServletRequest request) {
         Boolean result = caService.updateCaComment(updateCommentDTO.getUuid(), request.getSession().getAttribute("username").toString(), updateCommentDTO.getComment());
@@ -126,7 +126,7 @@ public class AdminController {
      * @param request the request
      * @return the result
      */
-    @PatchMapping(value = "/cert/ca_available/{uuid}")
+    @PatchMapping(value = "/cert/ca/available/{uuid}")
     public ResultVO<Boolean> modifyCaAvailable(@PathVariable("uuid") String uuid,
                                             HttpServletRequest request) {
         Boolean result = caService.modifyCaAvailability(uuid, request.getSession().getAttribute("username").toString());
@@ -144,7 +144,7 @@ public class AdminController {
      * @return the result
      * @throws Exception if the encrypt is failed
      */
-    @PostMapping(value = "/cert/request_ca")
+    @PostMapping(value = "/cert/ca")
     public ResultVO<ResponseCaDTO> requestCa(@RequestBody RequestCertDTO requestCertDTO,
                                              HttpServletRequest request) throws Exception {
         ResponseCaDTO result = caService.requestCa(requestCertDTO, request.getSession().getAttribute("username").toString());
@@ -163,7 +163,7 @@ public class AdminController {
      * @return the result
      * @throws Exception if the decrypt is failed
      */
-    @PutMapping(value = "/cert/renew_ca/{uuid}/{expiry}")
+    @PutMapping(value = "/cert/ca/{uuid}/{expiry}")
     public ResultVO<ResponseCaDTO> renewCa(@PathVariable("uuid") String uuid,
                                            @PathVariable("expiry") Integer expiry,
                                            HttpServletRequest request) throws Exception {
@@ -197,7 +197,7 @@ public class AdminController {
      * @param caBindingDTO the CA binding DTO
      * @return the result
      */
-    @PostMapping(value = "/cert/bind_ca")
+    @PostMapping(value = "/cert/ca/bind")
     public ResultVO<Void> bindCaToUser(@RequestBody CaBindingDTO caBindingDTO) {
         Boolean result = caBindingService.newBinding(caBindingDTO);
         if ( result ) {
@@ -212,7 +212,7 @@ public class AdminController {
      * @param caBindingDTO the CA binding DTO
      * @return the result
      */
-    @DeleteMapping(value = "/cert/bind_ca")
+    @DeleteMapping(value = "/cert/ca/bind")
     public ResultVO<Void> unbindCaFromUser(@RequestBody CaBindingDTO caBindingDTO) {
         Boolean result = caBindingService.deleteBinding(caBindingDTO);
         if ( result ) {

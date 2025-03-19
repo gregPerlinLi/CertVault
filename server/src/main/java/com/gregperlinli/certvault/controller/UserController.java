@@ -85,7 +85,7 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
-    @GetMapping(value = "/cert/ca_cert/{uuid}")
+    @GetMapping(value = "/cert/ca/cer/{uuid}")
     public ResultVO<String> getCaCert(@PathVariable("uuid") String uuid,
                                       HttpServletRequest request) {
         String result = caService.getCaCert(uuid, request.getSession().getAttribute("username").toString());
@@ -121,7 +121,7 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
-    @GetMapping(value = "/cert/cert_cert/{uuid}")
+    @GetMapping(value = "/cert/cert/cer/{uuid}")
     public ResultVO<String> getCertificateCert(@PathVariable("uuid") String uuid,
                                               HttpServletRequest request) {
         String result = certificateService.getCertificateCert(uuid, request.getSession().getAttribute("username").toString());
@@ -139,7 +139,7 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
-    @PostMapping(value = "/cert/cert_privkey")
+    @PostMapping(value = "/cert/cert/privkey")
     public ResultVO<String> getCertificatePrivkey(@RequestBody RequestPrivkeyDTO requestPrivkeyDTO,
                                                  HttpServletRequest request) throws Exception {
         String result = certificateService.getCertificatePrivkey(requestPrivkeyDTO, request.getSession().getAttribute("username").toString());
@@ -149,7 +149,7 @@ public class UserController {
         return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "No data");
     }
 
-    @PatchMapping(value = "/cert/cert_comment")
+    @PatchMapping(value = "/cert/cert/comment")
     public ResultVO<Void> updateCertComment(@RequestBody UpdateCommentDTO updateCommentDTO,
                                              HttpServletRequest request) {
         Boolean result = certificateService.updateCertComment(updateCommentDTO, request.getSession().getAttribute("username").toString());
@@ -167,7 +167,7 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
-    @PostMapping(value = "/cert/request_cert")
+    @PostMapping(value = "/cert/cert")
     public ResultVO<ResponseCertDTO> requestCert(@RequestBody RequestCertDTO requestCertDTO,
                                                  HttpServletRequest request) throws Exception {
         ResponseCertDTO result = certificateService.requestCert(requestCertDTO, request.getSession().getAttribute("username").toString());
@@ -186,7 +186,7 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
-    @PutMapping(value = "/cert/renew_cert/{uuid}/{expiry}")
+    @PutMapping(value = "/cert/cert/{uuid}/{expiry}")
     public ResultVO<ResponseCertDTO> renewCert(@PathVariable("uuid") String oldCertUuid,
                                                @PathVariable("expiry") Integer expiry,
                                                HttpServletRequest request) throws Exception {
@@ -221,7 +221,7 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
-    @GetMapping(value = "/cert/decode/{cert}")
+    @GetMapping(value = "/cert/analyze/{cert}")
     public ResultVO<CertificateDetailsDTO> getCertificateDetails(@PathVariable("cert") String certBase64) throws Exception {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success", new CertificateDetailsDTO(CertDecoder.decodeCertificate(certBase64)));
     }
