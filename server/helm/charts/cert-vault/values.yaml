@@ -164,7 +164,6 @@ nodeSelector:
 ##  kubernetes.io/arch: amd64
 ##  beta.kubernetes.io/os: linux
 
-
 ## Node Affinity configuration
 ## @param nodeAffinity Defines node affinity rules based on node labels to control where pods are scheduled
 ## @param nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution Mandatory node affinity conditions that must be met during scheduling but ignored post-scheduling
