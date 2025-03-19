@@ -40,6 +40,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Resource
     RoleBindingMapper roleBindingMapper;
 
+    //////////////////////////////////////////////////
+    //   The following is the general user method   //
+    //////////////////////////////////////////////////
+
     @Override
     public UserProfileDTO login(String username, String password, String sessionId) {
         if ( !GenericUtils.allOfNullable(username, password) ) {
@@ -87,24 +91,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public PageDTO<UserProfileDTO> getAllUsers(Integer page, Integer limit) {
-        Page<User> userPage = new Page<>(page, limit);
-        Page<User> resultPage = this.page(userPage);
-        return new PageDTO<>(resultPage.getTotal(),
-                resultPage.getRecords().stream().map(UserProfileDTO::new).toList());
-    }
-
-    @Override
-    public Boolean updateOwnProfile(String username, UpdateUserProfileDTO updateUserProfileDTO) {
+    public Boolean updateUserProfile(String username, UpdateUserProfileDTO updateUserProfileDTO, boolean isSuperadmin) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
         User user = this.getOne(queryWrapper);
         if ( user != null ) {
             if ( GenericUtils.ofNullable(updateUserProfileDTO.getOldPassword()) || GenericUtils.ofNullable(updateUserProfileDTO.getNewPassword()) ) {
-                if ( !AuthUtils.matchesPassword(updateUserProfileDTO.getOldPassword(), user.getPassword())) {
-                    throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The old password is incorrect.");
-                } else {
+                if ( isSuperadmin || AuthUtils.matchesPassword(updateUserProfileDTO.getOldPassword(), user.getPassword()) ) {
                     user.setPassword(AuthUtils.encryptPassword(updateUserProfileDTO.getNewPassword()));
+                } else {
+                    throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The old password is incorrect.");
                 }
             }
             if ( GenericUtils.ofNullable(updateUserProfileDTO.getDisplayName()) ) {
@@ -119,10 +115,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The user does not exist.");
     }
 
-    private List<Integer> getRoleBindings(User user) {
+    /*private List<Integer> getRoleBindings(User user) {
         QueryWrapper<RoleBinding> roleBindingQueryWrapper = new QueryWrapper<>();
         roleBindingQueryWrapper.eq("uid", user.getId());
         List<RoleBinding> roleBindings = roleBindingMapper.selectList(roleBindingQueryWrapper);
         return roleBindings.stream().map(RoleBinding::getRoleId).toList();
+    }*/
+
+    //////////////////////////////////////////////////
+    // The following is the admin/superadmin method //
+    //////////////////////////////////////////////////
+
+
+    @Override
+    public PageDTO<UserProfileDTO> getAllUsers(Integer page, Integer limit) {
+        Page<User> userPage = new Page<>(page, limit);
+        Page<User> resultPage = this.page(userPage);
+        return new PageDTO<>(resultPage.getTotal(),
+                resultPage.getRecords().stream().map(UserProfileDTO::new).toList());
     }
+
 }

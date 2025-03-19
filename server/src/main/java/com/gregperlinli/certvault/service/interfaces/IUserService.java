@@ -16,6 +16,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserService extends IService<User> {
 
+    //////////////////////////////////////////////////
+    //   The following is the general user method   //
+    //////////////////////////////////////////////////
+
     /**
      * Login
      *
@@ -50,6 +54,19 @@ public interface IUserService extends IService<User> {
     UserProfileDTO getOwnProfile(String username);
 
     /**
+     * update user profile
+     *
+     * @param username 用户名
+     * @param updateUserProfileDTO 更新用户信息DTO
+     * @param isSuperadmin 是否为超级管理员
+     */
+    Boolean updateUserProfile(String username, UpdateUserProfileDTO updateUserProfileDTO, boolean isSuperadmin);
+
+    //////////////////////////////////////////////////
+    // The following is the admin/superadmin method //
+    //////////////////////////////////////////////////
+
+    /**
      * Get all users
      *
      * @param page page
@@ -58,12 +75,6 @@ public interface IUserService extends IService<User> {
      */
     PageDTO<UserProfileDTO> getAllUsers(Integer page, Integer limit);
 
-    /**
-     * update user profile
-     *
-     * @param username 用户名
-     * @param updateUserProfileDTO 更新用户信息DTO
-     */
-    Boolean updateOwnProfile(String username, UpdateUserProfileDTO updateUserProfileDTO);
+
 
 }
