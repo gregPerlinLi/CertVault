@@ -169,7 +169,7 @@ public class CaGenerator {
 
             // 11. 填充并返回响应 DTO
             return new GenResponse()
-                    .setUuid(UUID.randomUUID().toString())
+                    .setUuid(renewRequest.getUuid())
                     .setPrivkey(newPrivKeyBase64)
                     .setCert(newCertBase64)
                     .setNotBefore(LocalDateTime.ofInstant(Instant.ofEpochMilli(notBefore.getTime()), ZoneId.systemDefault()))

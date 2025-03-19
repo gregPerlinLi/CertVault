@@ -1,6 +1,9 @@
 package com.gregperlinli.certvault.domain.dto;
 
+import com.gregperlinli.certvault.domain.entities.SubjectAltName;
 import lombok.*;
+
+import java.util.List;
 
 /**
  * Request CA Certificate DTO
@@ -56,6 +59,11 @@ public class RequestCertDTO {
      * Expiry (day)
      */
     private Integer expiry;
+
+    /**
+     * Subject Alternative Name (Only required when applying for an SSL certificate)
+     */
+    private List<SubjectAltName> subjectAltNames;
 
     /**
      * Comment

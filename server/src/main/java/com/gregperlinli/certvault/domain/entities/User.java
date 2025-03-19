@@ -75,4 +75,10 @@ public class User implements Serializable {
      */
     @TableField("modified_at")
     private LocalDateTime modifiedAt;
+
+    /**
+     * 是否已被删除
+     */
+    @TableField("deleted")
+    private Boolean deleted;
 }

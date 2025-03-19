@@ -53,20 +53,38 @@ public class GenResponse {
      */
     private String comment;
 
-    public static Ca toCa(GenResponse response, Integer userId, LocalDateTime createdAt, LocalDateTime modifiedAt) throws Exception {
+    public Ca toCa(Integer userId, LocalDateTime createdAt, LocalDateTime modifiedAt) throws Exception {
         Ca ca = new Ca();
-        ca.setUuid(response.getUuid());
-        ca.setPrivkey(EncryptAndDecryptUtils.encrypt(response.getPrivkey()));
-        ca.setCert(response.getCert());
+        ca.setId(null);
+        ca.setUuid(this.getUuid());
+        ca.setPrivkey(EncryptAndDecryptUtils.encrypt(this.getPrivkey()));
+        ca.setCert(this.getCert());
         ca.setOwner(userId);
-        ca.setComment(response.getComment());
+        ca.setComment(this.getComment());
         ca.setAvailable(true);
-        ca.setNotBefore(response.getNotBefore());
-        ca.setNotAfter(response.getNotAfter());
+        ca.setNotBefore(this.getNotBefore());
+        ca.setNotAfter(this.getNotAfter());
         ca.setCreatedAt(createdAt);
         ca.setModifiedAt(modifiedAt);
         ca.setDeleted(false);
         return ca;
+    }
+
+    public Certificate toCert(String caUuid, Integer userId, LocalDateTime createdAt, LocalDateTime modifiedAt) throws Exception {
+        Certificate certificate = new Certificate();
+        certificate.setId(null);
+        certificate.setUuid(this.getUuid());
+        certificate.setPrivkey(EncryptAndDecryptUtils.encrypt(this.getPrivkey()));
+        certificate.setCert(this.getCert());
+        certificate.setCaUuid(caUuid);
+        certificate.setOwner(userId);
+        certificate.setComment(this.getComment());
+        certificate.setNotBefore(this.getNotBefore());
+        certificate.setNotAfter(this.getNotAfter());
+        certificate.setCreatedAt(createdAt);
+        certificate.setModifiedAt(modifiedAt);
+        certificate.setDeleted(false);
+        return certificate;
     }
 
 }

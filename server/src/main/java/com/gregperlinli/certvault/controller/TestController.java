@@ -29,7 +29,7 @@ public class TestController {
      *
      * @return 测试结果
      */
-    @GetMapping(value = "/api")
+    @GetMapping(value = {"/api/", "/api"})
     public ResultVO<TestDTO> testGet() {
         TestDTO testDTO = testService.testGet();
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success getting", testDTO);
@@ -40,7 +40,7 @@ public class TestController {
      *
      * @return 测试结果
      */
-    @PostMapping(value = "/api")
+    @PostMapping(value = {"/api/", "/api"})
     public ResultVO<TestDTO> testPost() {
         TestDTO testDTO = testService.testPost();
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success posting", testDTO);
@@ -51,7 +51,7 @@ public class TestController {
      *
      * @return 测试结果
      */
-    @PutMapping(value = "/api")
+    @PutMapping(value = {"/api/", "/api"})
     public ResultVO<TestDTO> testPut() {
         TestDTO testDTO = testService.testPut();
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success putting", testDTO);
@@ -62,7 +62,7 @@ public class TestController {
      *
      * @return 测试结果
      */
-    @DeleteMapping(value = "/api")
+    @DeleteMapping(value = {"/api/", "/api"})
     public ResultVO<TestDTO> testDelete() {
         TestDTO testDTO = testService.testDelete();
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success deleting", testDTO);
@@ -73,7 +73,7 @@ public class TestController {
      *
      * @return 测试结果
      */
-    @PatchMapping(value = "/api")
+    @PatchMapping(value = {"/api/", "/api"})
     public ResultVO<TestDTO> testPatch() {
         TestDTO testDTO = testService.testPatch();
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success patching", testDTO);

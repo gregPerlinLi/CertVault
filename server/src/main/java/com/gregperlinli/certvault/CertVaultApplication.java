@@ -1,7 +1,12 @@
 package com.gregperlinli.certvault;
 
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.SpringVersion;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Application entry point
@@ -15,6 +20,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class CertVaultApplication {
     public static void main(String[] args) {
-        org.springframework.boot.SpringApplication.run(CertVaultApplication.class, args);
+        SpringApplication app = new SpringApplication(CertVaultApplication.class);
+        String springFrameworkVersion = SpringVersion.getVersion();
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("spring.version", springFrameworkVersion);
+        app.setDefaultProperties(properties);
+        app.run(args);
     }
 }

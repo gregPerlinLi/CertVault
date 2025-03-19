@@ -53,7 +53,11 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
 
         // 提取用户信息
-        String account = session.getAttribute("username").toString();
+        Object username = session.getAttribute("username");
+        if ( username == null ) {
+            throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "No user information found in the session.");
+        }
+        String account = username.toString();
         Integer accountType = (Integer) session.getAttribute("account_type");
 
         // 路径权限校验

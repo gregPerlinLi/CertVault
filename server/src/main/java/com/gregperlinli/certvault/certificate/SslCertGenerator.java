@@ -7,8 +7,7 @@ import com.gregperlinli.certvault.domain.entities.GenResponse;
 import com.gregperlinli.certvault.domain.entities.SubjectAltName;
 import com.gregperlinli.certvault.domain.exception.CertGenException;
 import com.gregperlinli.certvault.utils.CertUtils;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -28,8 +27,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import static com.gregperlinli.certvault.domain.entities.SubjectAltName.Type.DNS_NAME;
 
 /**
  * SSL Certificate Generator
@@ -99,7 +96,20 @@ public class SslCertGenerator {
                         case URI -> generalNamesList.add(new GeneralName(GeneralName.uniformResourceIdentifier, san.getValue()));
                         case EMAIL -> generalNamesList.add(new GeneralName(GeneralName.rfc822Name, san.getValue()));
                         case DIRECTORY_NAME -> generalNamesList.add(new GeneralName(GeneralName.directoryName, san.getValue()));
-                        case EDIPartyName -> generalNamesList.add(new GeneralName(GeneralName.ediPartyName, san.getValue()));
+                        case EDI_PARTY_NAME -> {
+                            String[] parts = san.getValue().split(",");
+                            String nameAssigner = parts[0].split("=")[1];
+                            String partyName = parts[1].split("=")[1];
+                            // 手动构建 EDIPartyName 的 ASN.1 结构
+                            DERUTF8String nameAssignerStr = new DERUTF8String(nameAssigner);
+                            DERUTF8String partyNameStr = new DERUTF8String(partyName);
+                            ASN1EncodableVector vec = new ASN1EncodableVector();
+                            vec.add(nameAssignerStr);
+                            vec.add(partyNameStr);
+                            ASN1Sequence seq = new DERSequence(vec);
+                            // 将序列包装为 GeneralName
+                            generalNamesList.add(new GeneralName(GeneralName.ediPartyName, seq));
+                        }
                     }
                 }
                 // 将列表转换为数组并构造 GeneralNames 对象
