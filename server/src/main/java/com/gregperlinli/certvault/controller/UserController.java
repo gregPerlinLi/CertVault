@@ -53,7 +53,7 @@ public class UserController {
     @PutMapping(value = "/profile")
     public ResultVO<Void> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO,
                                         HttpServletRequest request) {
-        if ( userService.updateOwnProfile(request.getSession().getAttribute("username").toString(), updateUserProfileDTO) ) {
+        if ( userService.updateUserProfile(request.getSession().getAttribute("username").toString(), updateUserProfileDTO, false) ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "update success");
         }
         return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "update failed");
