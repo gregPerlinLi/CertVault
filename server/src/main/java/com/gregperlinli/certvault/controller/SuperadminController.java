@@ -21,7 +21,7 @@ import java.util.List;
  * @className {@code SuperadminController}
  * @date 2025/3/19 19:39
  */
-@RequestMapping("/api/superadmin")
+@RequestMapping("/api/v1/superadmin")
 @RestController
 public class SuperadminController {
 
@@ -67,7 +67,7 @@ public class SuperadminController {
      * @param updateUserProfileDTO the user information
      * @return updated result
      */
-    @PutMapping(value = "/user/{username}")
+    @PatchMapping(value = "/user/{username}")
     public ResultVO<Void> updateUserInfo(@PathVariable("username") String username,
                                          @RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
         Boolean result = userService.updateUserProfile(username, updateUserProfileDTO, true);

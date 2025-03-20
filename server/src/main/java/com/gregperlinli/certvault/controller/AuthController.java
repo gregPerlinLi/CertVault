@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @className {@code AuthController}
  * @date 2025/3/3 20:37
  */
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RestController
 @Slf4j
 public class AuthController {

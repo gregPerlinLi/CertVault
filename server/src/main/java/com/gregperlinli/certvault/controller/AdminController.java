@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
  * @className {@code AdminController}
  * @date 2025/3/17 17:46
  */
-@RequestMapping("/api/admin")
+@RequestMapping("/api/v1/admin")
 @RestController
 public class AdminController {
 

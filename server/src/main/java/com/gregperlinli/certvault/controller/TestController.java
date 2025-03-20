@@ -86,7 +86,7 @@ public class TestController {
      * @param response 响应对象
      * @return 加密结果
      */
-    @GetMapping(value = "/api/test/bcrypt/{password}")
+    @GetMapping(value = "/api/v1/test/bcrypt/{password}")
     public ResultVO<String> testBCrypt(@PathVariable("password") String password,
                                        HttpServletResponse response) {
         String result = testService.getBCryptedPassword(password);

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  * @className {@code UserController}
  * @date 2025/3/10 20:37
  */
-@RequestMapping("/api/user")
+@RequestMapping("/api/v1/user")
 @RestController
 public class UserController {
 
@@ -50,7 +50,7 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
-    @PutMapping(value = "/profile")
+    @PatchMapping(value = "/profile")
     public ResultVO<Void> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO,
                                         HttpServletRequest request) {
         if ( userService.updateUserProfile(request.getSession().getAttribute("username").toString(), updateUserProfileDTO, false) ) {
