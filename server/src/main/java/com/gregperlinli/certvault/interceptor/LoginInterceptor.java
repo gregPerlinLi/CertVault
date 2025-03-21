@@ -31,13 +31,13 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     static {
         // 路径模式需按优先级从高到低排列（如更具体的路径放前面）
-        PATH_ROLE_MAP.put("/api/superadmin/**", List.of(AccountTypeConstant.SUPERADMIN.getAccountType()));
-        PATH_ROLE_MAP.put("/api/admin/**", Arrays.asList(AccountTypeConstant.ADMIN.getAccountType(), AccountTypeConstant.SUPERADMIN.getAccountType()));
-        PATH_ROLE_MAP.put("/api/users/**", Arrays.asList(AccountTypeConstant.USER.getAccountType(), AccountTypeConstant.ADMIN.getAccountType(), AccountTypeConstant.SUPERADMIN.getAccountType()));
+        PATH_ROLE_MAP.put("/api/*/superadmin/**", List.of(AccountTypeConstant.SUPERADMIN.getAccountType()));
+        PATH_ROLE_MAP.put("/api/*/admin/**", Arrays.asList(AccountTypeConstant.ADMIN.getAccountType(), AccountTypeConstant.SUPERADMIN.getAccountType()));
+        PATH_ROLE_MAP.put("/api/*/users/**", Arrays.asList(AccountTypeConstant.USER.getAccountType(), AccountTypeConstant.ADMIN.getAccountType(), AccountTypeConstant.SUPERADMIN.getAccountType()));
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         IUserService userService = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getServletContext())
                 .getBean(IUserService.class);
 
