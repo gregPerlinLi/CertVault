@@ -1,6 +1,5 @@
 import router from "@/router";
 import { getUserProfile, login, logout, type ResultVO } from "@/utils/api";
-import { useCookies } from "@vueuse/integrations/useCookies";
 import { type ToastServiceMethods } from "primevue";
 
 // Export store
@@ -28,14 +27,10 @@ export const useUserStore = createGlobalState(() => {
 
   // Actions
   const resetAuthInfo = (): void => {
-    const cookies = useCookies();
-
     username.value = null;
     displayName.value = null;
     email.value = null;
     innerRole.value = null;
-
-    cookies.remove("JSESSIONID");
   };
   const init = async (toast: ToastServiceMethods) => {
     if (initialized.value) {
@@ -52,8 +47,6 @@ export const useUserStore = createGlobalState(() => {
 
       initialized.value = true;
     } catch (err: unknown) {
-      useCookies().remove("JSESSIONID");
-
       toast.add({
         severity: "error",
         summary: "Authentication Failed",
