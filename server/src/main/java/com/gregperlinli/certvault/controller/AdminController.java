@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.*;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
@@ -112,10 +113,11 @@ public class AdminController {
      * @param request the request
      * @return the result
      */
-    @PatchMapping(value = "/cert/ca/comment")
-    public ResultVO<Void> updateCaComment(@RequestBody UpdateCommentDTO updateCommentDTO,
+    @PatchMapping(value = "/cert/ca/comment/{uuid}")
+    public ResultVO<Void> updateCaComment(@PathVariable("uuid") String uuid,
+                                          @RequestBody JsonNode updateComment,
                                           HttpServletRequest request) {
-        Boolean result = caService.updateCaComment(updateCommentDTO.getUuid(), ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), updateCommentDTO.getComment());
+        Boolean result = caService.updateCaComment(uuid, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), updateComment.path("comment").asText());
         if ( result ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
         }
@@ -166,11 +168,11 @@ public class AdminController {
      * @return the result
      * @throws Exception if the decrypt is failed
      */
-    @PutMapping(value = "/cert/ca/{uuid}/{expiry}")
+    @PutMapping(value = "/cert/ca/{uuid}")
     public ResultVO<ResponseCaDTO> renewCa(@PathVariable("uuid") String uuid,
-                                           @PathVariable("expiry") Integer expiry,
+                                           @RequestBody JsonNode expiry,
                                            HttpServletRequest request) throws Exception {
-        ResponseCaDTO result = caService.renewCa(uuid, expiry, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        ResponseCaDTO result = caService.renewCa(uuid, expiry.get("expiry").asInt(), ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }

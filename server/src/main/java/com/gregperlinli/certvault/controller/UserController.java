@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.gregperlinli.certvault.certificate.CertDecoder;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.*;
@@ -151,10 +152,19 @@ public class UserController {
         return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "No data");
     }
 
-    @PatchMapping(value = "/cert/cert/comment")
-    public ResultVO<Void> updateCertComment(@RequestBody UpdateCommentDTO updateCommentDTO,
-                                             HttpServletRequest request) {
-        Boolean result = certificateService.updateCertComment(updateCommentDTO, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+    /**
+     * Update certificate comment
+     *
+     * @param uuid Certificate uuid
+     * @param updateComment Update comment entity
+     * @param request       {@link HttpServletRequest} Request
+     * @return {@link ResultVO} Result
+     */
+    @PatchMapping(value = "/cert/cert/comment/{uuid}")
+    public ResultVO<Void> updateCertComment(@PathVariable("uuid") String uuid,
+                                            @RequestBody JsonNode updateComment,
+                                            HttpServletRequest request) {
+        Boolean result = certificateService.updateCertComment(uuid, updateComment.get("comment").asText(), ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
         }
@@ -188,11 +198,11 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
-    @PutMapping(value = "/cert/cert/{uuid}/{expiry}")
+    @PutMapping(value = "/cert/cert/{uuid}")
     public ResultVO<ResponseCertDTO> renewCert(@PathVariable("uuid") String oldCertUuid,
-                                               @PathVariable("expiry") Integer expiry,
+                                               @RequestBody JsonNode expiry,
                                                HttpServletRequest request) throws Exception {
-        ResponseCertDTO result = certificateService.renewCert(oldCertUuid, expiry, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        ResponseCertDTO result = certificateService.renewCert(oldCertUuid, expiry.get("expiry").asInt(), ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
