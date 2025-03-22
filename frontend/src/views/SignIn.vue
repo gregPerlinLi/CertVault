@@ -44,8 +44,15 @@ async function trySignIn(ev: Event): Promise<void> {
 
   // Try sign in
   ((ev as SubmitEvent).submitter! as HTMLButtonElement).disabled = true;
+  toast.add({
+    severity: "info",
+    summary: "Info",
+    detail: "Signing in",
+    life: 3000
+  });
 
-  if (await signIn(toast, username, passowrd)) {
+  const err = await signIn(username, passowrd, toast);
+  if (err === null) {
     router.push("/dashboard");
   } else {
     ((ev as SubmitEvent).submitter! as HTMLButtonElement).disabled = false;

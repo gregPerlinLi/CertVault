@@ -40,17 +40,21 @@ const router = createRouter({
 });
 
 // Set guards
-router.afterEach(async (to) => {
-  const { init } = useUserStore();
+router.beforeEach(async (to) => {
+  const { signedIn, init } = useUserStore();
   const toast = useToast();
 
-  // Pass guard
-  if (to.path === "/") {
-    return;
-  }
-
   // Initialize user
-  init(toast);
+  await init(to.path === "/" ? undefined : toast);
+
+  // Redirect
+  if (signedIn.value) {
+    if (to.path === "/") {
+      return "/dashboard";
+    }
+  } else if (to.path !== "/") {
+    return "/";
+  }
 });
 
 // Export router

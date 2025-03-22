@@ -23,8 +23,14 @@ const signOutOnClick = (): void => {
       severity: "secondary",
       variant: "outlined"
     },
-    accept: () => {
-      signOut(toast);
+    accept: async () => {
+      toast.add({
+        severity: "info",
+        summary: "Info",
+        detail: "Signing out",
+        life: 3000
+      });
+      await signOut(toast);
       router.push("/");
     }
   });
