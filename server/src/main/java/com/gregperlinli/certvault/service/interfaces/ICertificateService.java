@@ -45,11 +45,12 @@ public interface ICertificateService extends IService<Certificate> {
     /**
      * Update SSL Certificate Comment
      *
-     * @param updateCommentDTO  Certificate Comment DTO
+     * @param uuid              Certificate UUID
+     * @param comment           Comment
      * @param owner             Owner of the Certificate
      * @return {@link Boolean}
      */
-    Boolean updateCertComment(UpdateCommentDTO updateCommentDTO, String owner);
+    Boolean updateCertComment(String uuid, String comment, String owner);
 
     /**
      * Request a SSL Certificate

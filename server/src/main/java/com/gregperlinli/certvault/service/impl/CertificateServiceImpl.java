@@ -156,7 +156,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     }
 
     @Override
-    public Boolean updateCertComment(UpdateCommentDTO updateCommentDTO, String owner) {
+    public Boolean updateCertComment(String uuid, String comment, String owner) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username", owner)
                         .eq("deleted", false);
@@ -165,7 +165,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
         QueryWrapper<Certificate> certificateQueryWrapper = new QueryWrapper<>();
-        certificateQueryWrapper.eq("uuid", updateCommentDTO.getUuid())
+        certificateQueryWrapper.eq("uuid",uuid)
                             .eq("deleted", false);
         Certificate certificate = this.getOne(certificateQueryWrapper);
         if ( certificate == null ) {
@@ -181,7 +181,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
                 ) ||
                 user.getRole() == AccountTypeConstant.SUPERADMIN.getAccountType()
         ) {
-            certificate.setComment(updateCommentDTO.getComment());
+            certificate.setComment(comment);
             certificate.setModifiedAt(LocalDateTime.now());
             return this.updateById(certificate);
         }
