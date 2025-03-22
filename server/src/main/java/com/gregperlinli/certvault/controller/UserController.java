@@ -67,10 +67,10 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
-    @GetMapping(value = "/cert/ca/{page}/{limit}")
-    public ResultVO<PageDTO<CaInfoDTO>> getCas(@PathVariable("page") Integer page,
-                                 @PathVariable("limit") Integer limit,
-                                 HttpServletRequest request) {
+    @GetMapping(value = "/cert/ca")
+    public ResultVO<PageDTO<CaInfoDTO>> getCas(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                               @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                               HttpServletRequest request) {
         PageDTO<CaInfoDTO> result = caService.getBoundCas(request.getSession().getAttribute("username").toString(), page, limit);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
@@ -103,10 +103,10 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
-    @GetMapping(value = "/cert/cert/{page}/{limit}")
-    public ResultVO<PageDTO<CertInfoDTO>> getCerts(@PathVariable("page") Integer page,
-                                                  @PathVariable("limit") Integer limit,
-                                                  HttpServletRequest request) {
+    @GetMapping(value = "/cert/cert")
+    public ResultVO<PageDTO<CertInfoDTO>> getCerts(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                   @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                   HttpServletRequest request) {
         PageDTO<CertInfoDTO> result = certificateService.getCertificates(request.getSession().getAttribute("username").toString(), page, limit);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
@@ -141,7 +141,7 @@ public class UserController {
      */
     @PostMapping(value = "/cert/cert/privkey")
     public ResultVO<String> getCertificatePrivkey(@RequestBody RequestPrivkeyDTO requestPrivkeyDTO,
-                                                 HttpServletRequest request) throws Exception {
+                                                  HttpServletRequest request) throws Exception {
         String result = certificateService.getCertificatePrivkey(requestPrivkeyDTO, request.getSession().getAttribute("username").toString());
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);

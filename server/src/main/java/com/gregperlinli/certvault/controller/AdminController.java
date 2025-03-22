@@ -38,9 +38,9 @@ public class AdminController {
      * @param limit the limit of the page
      * @return the result
      */
-    @GetMapping(value = "/users/{page}/{limit}")
-    public ResultVO<PageDTO<UserProfileDTO>> getAllUsers(@PathVariable("page") Integer page,
-                                                         @PathVariable("limit") Integer limit) {
+    @GetMapping(value = "/users")
+    public ResultVO<PageDTO<UserProfileDTO>> getAllUsers(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                         @RequestParam(value = "limit", defaultValue = "10") Integer limit) {
         PageDTO<UserProfileDTO> result = userService.getAllUsers(page, limit);
         if ( result != null && result.getList() != null && !result.getList().isEmpty()) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
@@ -56,9 +56,9 @@ public class AdminController {
      * @param request the request
      * @return the result
      */
-    @GetMapping(value = "/cert/ca/{page}/{limit}")
-    public ResultVO<PageDTO<CaInfoDTO>> getCas(@PathVariable("page") Integer page,
-                                               @PathVariable("limit") Integer limit,
+    @GetMapping(value = "/cert/ca")
+    public ResultVO<PageDTO<CaInfoDTO>> getCas(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                               @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                                HttpServletRequest request) {
         PageDTO<CaInfoDTO> result = caService.getCas(request.getSession().getAttribute("username").toString(), page, limit);
         if ( result != null && result.getList() != null ) {
