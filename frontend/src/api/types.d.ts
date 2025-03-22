@@ -7,7 +7,7 @@ export interface ResultVO<T = null> {
 
 export interface PaginationVO<T> {
   total: number;
-  list: T[];
+  list: T[] | null;
 }
 
 export interface UserProfileDTO {
@@ -35,8 +35,8 @@ export interface CertDetailDTO {
   notAfter: string;
   serialNumber: string;
   publicKey: {
-    modulus: number;
-    publicExponent: number;
+    modulus: bigint;
+    publicExponent: bigint;
     encoded: string;
     format: string;
     algorithm: string;
@@ -54,4 +54,14 @@ export interface CAInfoDTO {
   notAfter: string;
   createdAt: string;
   modifiedAt: string;
+}
+
+export interface ResponseCertDTO {
+  uuid: string;
+  privkey: string | null;
+  cert: string;
+  caUuid: string;
+  notBefore: string;
+  notAfter: string;
+  comment: string;
 }
