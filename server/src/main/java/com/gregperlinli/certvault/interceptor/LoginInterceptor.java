@@ -2,6 +2,7 @@ package com.gregperlinli.certvault.interceptor;
 
 import com.gregperlinli.certvault.constant.AccountTypeConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
+import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import com.gregperlinli.certvault.domain.exception.LoginException;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,16 +54,17 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
 
         // 提取用户信息
-        Object username = session.getAttribute("username");
-        if ( username == null ) {
+        // Object username = session.getAttribute("username");
+        UserProfileDTO account = (UserProfileDTO) session.getAttribute("account");
+        if ( account == null ) {
             throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "No user information found in the session.");
         }
-        String account = username.toString();
-        Integer accountType = (Integer) session.getAttribute("account_type");
+        // String account = username.toString();
+        // Integer accountType = (Integer) session.getAttribute("account_type");
 
         // 路径权限校验
         String requestURI = request.getRequestURI();
-        log.info("User: {}, Request URI: {}", request.getSession().getAttribute("username"), requestURI);
+        log.info("User: {}, Request URI: {}", account.getUsername(), requestURI);
         AntPathMatcher pathMatcher = new AntPathMatcher();
         List<Integer> requiredRoles = null;
 
@@ -77,24 +79,27 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         // 如果匹配到需要权限的路径，检查用户角色
         if (requiredRoles != null) {
-            boolean hasPermission = requiredRoles.contains(accountType);
+            boolean hasPermission = requiredRoles.contains(account.getRole());
             if (!hasPermission) {
-                log.info("Insufficient permissions: Path [{}] requires role [{}], user role is [{}].", requestURI, requiredRoles, accountType);
+                log.info("Insufficient permissions: Path [{}] requires role [{}], user role is [{}].", requestURI, requiredRoles, account.getRole());
                 throw new LoginException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "Insufficient permissions");
             }
         }
 
         // 验证会话有效性
-        if (account == null) {
-            log.info("No user information found in the session.");
-            throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "Not logged in or session expired");
-        }
+        // if (account == null) {
+        //     log.info("No user information found in the session.");
+        //     throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "Not logged in or session expired");
+        // }
 
         String sessionId = session.getId();
-        boolean sessionValid = userService.loginVerify(account, sessionId);
-        if (!sessionValid) {
+        UserProfileDTO redisAccount = userService.loginVerify(sessionId);
+        if ( redisAccount == null ) {
             log.info("User [{}] Session [{}] does not exist in Redis.", account, sessionId);
             throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "The session has expired.");
+        }
+        if ( !Objects.equals(account.getUsername(), redisAccount.getUsername()) || !Objects.equals(account.getRole(), redisAccount.getRole()) ) {
+            throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "The session information does not match.");
         }
 
         return true;
