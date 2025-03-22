@@ -41,8 +41,9 @@ public class AuthController {
                                           HttpServletRequest request) {
         UserProfileDTO loginResult = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), request.getSession().getId());
         if ( loginResult != null ) {
-            request.getSession().setAttribute("username", loginDTO.getUsername());
-            request.getSession().setAttribute("account_type", loginResult.getRole());
+            // request.getSession().setAttribute("username", loginDTO.getUsername());
+            // request.getSession().setAttribute("account_type", loginResult.getRole());
+            request.getSession().setAttribute("account", loginResult);
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Login Success!", loginResult);
         }
         return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Login failed, username or password error");
