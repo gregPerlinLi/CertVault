@@ -23,7 +23,7 @@ export const login = async (username: string, password: string) => {
 export const logout = async () => {
   const req = { method: "DELETE" } satisfies RequestInit;
 
-  const resp = await fetch("/api/v1/auth/login", req);
+  const resp = await fetch("/api/v1/auth/logout", req);
   if (!resp.ok) {
     throw Error(`${resp.statusText} (${resp.status})`);
   }
