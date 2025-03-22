@@ -31,13 +31,12 @@ public interface IUserService extends IService<User> {
     UserProfileDTO login(String username, String password, String sessionId);
 
     /**
-     * Login Verify
+     * Login verify from redis
      *
-     * @param username username
      * @param sessionId login session ID
      * @return verify result
      */
-    boolean loginVerify(String username, String sessionId);
+    UserProfileDTO loginVerify(String sessionId);
 
     /**
      * Logout
