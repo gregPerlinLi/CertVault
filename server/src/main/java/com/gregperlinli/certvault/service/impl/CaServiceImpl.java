@@ -172,7 +172,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     }
 
     @Override
-    public String getCaPrivKey(RequestPrivkeyDTO requestPrivkeyDTO, String owner) throws Exception {
+    public String getCaPrivKey(String uuid, String confirmPassword, String owner) throws Exception {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username", owner)
                         .eq("deleted", false);
@@ -180,11 +180,11 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
-        if ( !AuthUtils.matchesPassword(requestPrivkeyDTO.getPassword(), user.getPassword()) ) {
+        if ( !AuthUtils.matchesPassword(confirmPassword, user.getPassword()) ) {
             throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "Password validation failed.");
         }
         QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
-        caQueryWrapper.eq("uuid", requestPrivkeyDTO.getUuid())
+        caQueryWrapper.eq("uuid", uuid)
                     .eq("owner", user.getId())
                     .eq("deleted", false);
         Ca ca = this.getOne(caQueryWrapper);

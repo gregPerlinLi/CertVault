@@ -122,7 +122,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     }
 
     @Override
-    public String getCertificatePrivkey(RequestPrivkeyDTO requestPrivkeyDTO, String owner) throws Exception {
+    public String getCertificatePrivkey(String uuid, String confirmPassword, String owner) throws Exception {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username", owner)
                         .eq("deleted", false);
@@ -130,11 +130,11 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
-        if ( !AuthUtils.matchesPassword(requestPrivkeyDTO.getPassword(), user.getPassword()) ) {
+        if ( !AuthUtils.matchesPassword(confirmPassword, user.getPassword()) ) {
             throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "Password validation failed.");
         }
         QueryWrapper<Certificate> certificateQueryWrapper = new QueryWrapper<>();
-        certificateQueryWrapper.eq("uuid", requestPrivkeyDTO.getUuid())
+        certificateQueryWrapper.eq("uuid", uuid)
                             .eq("deleted", false);
         Certificate certificate = this.getOne(certificateQueryWrapper);
         if ( certificate == null) {

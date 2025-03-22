@@ -35,12 +35,13 @@ public interface ICertificateService extends IService<Certificate> {
     /**
      * Get SSL Certificate Private Key
      *
-     * @param requestPrivkeyDTO Certificate Private Key Request DTO
+     * @param uuid              Certificate UUID
+     * @param confirmPassword   Confirm password
      * @param owner             Owner of the Certificate
      * @return {@link String}
      * @throws Exception Decryption error
      */
-    String getCertificatePrivkey(RequestPrivkeyDTO requestPrivkeyDTO, String owner) throws Exception;
+    String getCertificatePrivkey(String uuid, String confirmPassword, String owner) throws Exception;
 
     /**
      * Update SSL Certificate Comment

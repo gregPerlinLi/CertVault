@@ -48,12 +48,13 @@ public interface ICaService extends IService<Ca> {
     /**
      * Get ca private key
      *
-     * @param requestPrivkeyDTO ca private key info
+     * @param uuid              ca certificate uuid
+     * @param confirmPassword   confirm password
      * @param owner             owner of the ca private key
      * @return ca private key
      * @throws Exception decryption error
      */
-    String getCaPrivKey(RequestPrivkeyDTO requestPrivkeyDTO, String owner) throws Exception;
+    String getCaPrivKey(String uuid, String confirmPassword, String owner) throws Exception;
 
     /**
      * Update ca comment
