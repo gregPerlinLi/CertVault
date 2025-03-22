@@ -98,7 +98,7 @@ public class AdminController {
      * @return the result
      * @throws Exception if the decrypt is failed
      */
-    @GetMapping(value = "/cert/ca/privkey/{uuid}")
+    @PostMapping(value = "/cert/ca/privkey/{uuid}")
     public ResultVO<String> getCaPrivkey(@PathVariable("uuid") String uuid,
                                          @RequestBody JsonNode confirmPassword,
                                          HttpServletRequest request) throws Exception {

@@ -156,7 +156,7 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
-    @GetMapping(value = "/cert/cert/privkey/{uuid}")
+    @PostMapping(value = "/cert/cert/privkey/{uuid}")
     public ResultVO<String> getCertificatePrivkey(@PathVariable("uuid") String uuid,
                                                   @RequestBody JsonNode confirmPassword,
                                                   HttpServletRequest request) throws Exception {
