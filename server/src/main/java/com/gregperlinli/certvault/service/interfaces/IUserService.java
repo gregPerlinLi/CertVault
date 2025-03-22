@@ -69,11 +69,12 @@ public interface IUserService extends IService<User> {
     /**
      * Get all users
      *
+     * @param keyword search keyword
      * @param page page
      * @param limit limit
      * @return user profile list
      */
-    PageDTO<UserProfileDTO> getAllUsers(Integer page, Integer limit);
+    PageDTO<UserProfileDTO> getUsers(String keyword, Integer page, Integer limit);
 
     /**
      * Create user

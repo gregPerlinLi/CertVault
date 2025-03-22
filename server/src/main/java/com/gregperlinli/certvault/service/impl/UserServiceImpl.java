@@ -124,9 +124,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
 
     @Override
-    public PageDTO<UserProfileDTO> getAllUsers(Integer page, Integer limit) {
+    public PageDTO<UserProfileDTO> getUsers(String keyword, Integer page, Integer limit) {
         Page<User> userPage = new Page<>(page, limit);
-        Page<User> resultPage = this.page(userPage);
+        Page<User> resultPage = null;
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        if ( keyword == null || keyword.isEmpty() ) {
+            userQueryWrapper.eq("deleted", false);
+        } else {
+            userQueryWrapper.like("username", keyword)
+                            .or()
+                            .like("display_name", keyword)
+                            .or()
+                            .like("email", keyword)
+                            .eq("deleted", false);
+        }
+        resultPage = this.page(userPage, userQueryWrapper);
         return new PageDTO<>(resultPage.getTotal(),
                 resultPage.getRecords().stream().map(UserProfileDTO::new).toList());
     }

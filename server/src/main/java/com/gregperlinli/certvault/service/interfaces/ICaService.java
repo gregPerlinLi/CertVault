@@ -15,24 +15,26 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ICaService extends IService<Ca> {
 
     /**
-     * Get all ca certificates
+     * Get ca certificates
      *
+     * @param keyword search keyword
      * @param owner owner of the ca certificates
      * @param page page number
      * @param limit page size
      * @return ca certificates info
      */
-    PageDTO<CaInfoDTO> getCas(String owner, Integer page, Integer limit);
+    PageDTO<CaInfoDTO> getCas(String keyword, String owner, Integer page, Integer limit);
 
     /**
      * Get all CA bindings of a user
      *
+     * @param keyword search keyword
      * @param username username
      * @param page     page number
      * @param limit    page size
      * @return CA binding information
      */
-    PageDTO<CaInfoDTO> getBoundCas(String username, Integer page, Integer limit);
+    PageDTO<CaInfoDTO> getBoundCas(String keyword, String username, Integer page, Integer limit);
 
     /**
      * Get ca certificate

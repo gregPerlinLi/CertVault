@@ -45,7 +45,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     ICaBindingService caBindingService;
 
     @Override
-    public PageDTO<CaInfoDTO> getCas(String owner, Integer page, Integer limit) {
+    public PageDTO<CaInfoDTO> getCas(String keyword, String owner, Integer page, Integer limit) {
         Page<Ca> caPage = new Page<>(page, limit);
         Page<Ca> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
@@ -56,8 +56,16 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
         QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
-        caQueryWrapper.eq("owner", user.getId())
+        if ( keyword == null || keyword.isEmpty() ) {
+            caQueryWrapper.eq("owner", user.getId())
                     .eq("deleted", false);
+        } else {
+            caQueryWrapper.like("uuid", keyword)
+                    .or()
+                    .like("comment", keyword)
+                    .eq("owner", user.getId())
+                    .eq("deleted", false);
+        }
         resultPage = this.page(caPage, caQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
             return new PageDTO<>(resultPage.getTotal(), null);
@@ -82,7 +90,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     }
 
     @Override
-    public PageDTO<CaInfoDTO> getBoundCas(String username, Integer page, Integer limit) {
+    public PageDTO<CaInfoDTO> getBoundCas(String keyword, String username, Integer page, Integer limit) {
         Page<Ca> caPage = new Page<>(page, limit);
         Page<Ca> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
@@ -99,9 +107,18 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
             return new PageDTO<>(0L, null);
         }
         QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
-        caQueryWrapper.in("uuid", caBindings.stream().map(CaBinding::getCaUuid).toList())
+        if ( keyword == null || keyword.isEmpty() ) {
+            caQueryWrapper.in("uuid", caBindings.stream().map(CaBinding::getCaUuid).toList())
                     .eq("available", true)
                     .eq("deleted", false);
+        } else {
+            caQueryWrapper.like("uuid", keyword)
+                    .or()
+                    .like("comment", keyword)
+                    .in("uuid", caBindings.stream().map(CaBinding::getCaUuid).toList())
+                    .eq("available", true)
+                    .eq("deleted", false);
+        }
         resultPage = this.page(caPage, caQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
             return new PageDTO<>(resultPage.getTotal(), null);

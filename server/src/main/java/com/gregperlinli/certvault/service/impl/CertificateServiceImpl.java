@@ -46,7 +46,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     ICaBindingService caBindingService;
 
     @Override
-    public PageDTO<CertInfoDTO> getCertificates(String owner, Integer page, Integer limit) {
+    public PageDTO<CertInfoDTO> getCertificates(String keyword, String owner, Integer page, Integer limit) {
         Page<Certificate> certificatePage = new Page<>(page, limit);
         Page<Certificate> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
@@ -57,8 +57,16 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
         QueryWrapper<Certificate> certificateQueryWrapper = new QueryWrapper<>();
-        certificateQueryWrapper.eq("owner", user.getId())
-                            .eq("deleted", false);
+        if ( keyword == null || keyword.isEmpty() ) {
+            certificateQueryWrapper.eq("owner", user.getId())
+                    .eq("deleted", false);
+        } else {
+            certificateQueryWrapper.like("uuid", keyword)
+                    .or()
+                    .like("comment", keyword)
+                    .eq("owner", user.getId())
+                    .eq("deleted", false);
+        }
         resultPage = this.page(certificatePage, certificateQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
             return new PageDTO<>(resultPage.getTotal(), null);

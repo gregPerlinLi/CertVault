@@ -32,16 +32,18 @@ public class AdminController {
     ICaBindingService caBindingService;
 
     /**
-     * Get all users
+     * Get users
      *
+     * @param keyword the keyword to search
      * @param page the page number
      * @param limit the limit of the page
      * @return the result
      */
     @GetMapping(value = "/users")
-    public ResultVO<PageDTO<UserProfileDTO>> getAllUsers(@RequestParam(value = "page", defaultValue = "1") Integer page,
-                                                         @RequestParam(value = "limit", defaultValue = "10") Integer limit) {
-        PageDTO<UserProfileDTO> result = userService.getAllUsers(page, limit);
+    public ResultVO<PageDTO<UserProfileDTO>> getUsers(@RequestParam(value = "keyword", required = false) String keyword,
+                                                      @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                      @RequestParam(value = "limit", defaultValue = "10") Integer limit) {
+        PageDTO<UserProfileDTO> result = userService.getUsers(keyword, page, limit);
         if ( result != null && result.getList() != null && !result.getList().isEmpty()) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -57,10 +59,11 @@ public class AdminController {
      * @return the result
      */
     @GetMapping(value = "/cert/ca")
-    public ResultVO<PageDTO<CaInfoDTO>> getCas(@RequestParam(value = "page", defaultValue = "1") Integer page,
+    public ResultVO<PageDTO<CaInfoDTO>> getCas(@RequestParam(value = "keyword", required = false) String keyword,
+                                               @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                                HttpServletRequest request) {
-        PageDTO<CaInfoDTO> result = caService.getCas(request.getSession().getAttribute("username").toString(), page, limit);
+        PageDTO<CaInfoDTO> result = caService.getCas(keyword, request.getSession().getAttribute("username").toString(), page, limit);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
