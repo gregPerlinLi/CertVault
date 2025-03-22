@@ -256,11 +256,11 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
-    @GetMapping(value = "/cert/analyze/{cert}")
-    public ResultVO<CertificateDetailsDTO> getCertificateDetails(@PathVariable("cert") String certBase64) throws Exception {
+    @PostMapping(value = "/cert/analyze")
+    public ResultVO<CertificateDetailsDTO> getCertificateDetails(@RequestBody JsonNode certBase64) throws Exception {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "success",
-                new CertificateDetailsDTO(CertDecoder.decodeCertificate(certBase64)));
+                new CertificateDetailsDTO(CertDecoder.decodeCertificate(certBase64.get("cert").asText())));
     }
 
 }
