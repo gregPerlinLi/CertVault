@@ -53,7 +53,7 @@ public class UserController {
     @PatchMapping(value = "/profile")
     public ResultVO<Void> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO,
                                         HttpServletRequest request) {
-        if ( userService.updateUserProfile(request.getSession().getAttribute("username").toString(), updateUserProfileDTO, false) ) {
+        if ( userService.updateUserProfile(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), updateUserProfileDTO, false) ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "update success");
         }
         return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "update failed");
@@ -72,7 +72,7 @@ public class UserController {
                                                @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                                HttpServletRequest request) {
-        PageDTO<CaInfoDTO> result = caService.getBoundCas(keyword, request.getSession().getAttribute("username").toString(), page, limit);
+        PageDTO<CaInfoDTO> result = caService.getBoundCas(keyword, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), page, limit);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -89,7 +89,7 @@ public class UserController {
     @GetMapping(value = "/cert/ca/cer/{uuid}")
     public ResultVO<String> getCaCert(@PathVariable("uuid") String uuid,
                                       HttpServletRequest request) {
-        String result = caService.getCaCert(uuid, request.getSession().getAttribute("username").toString());
+        String result = caService.getCaCert(uuid, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -109,7 +109,7 @@ public class UserController {
                                                    @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                    @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                                    HttpServletRequest request) {
-        PageDTO<CertInfoDTO> result = certificateService.getCertificates(keyword, request.getSession().getAttribute("username").toString(), page, limit);
+        PageDTO<CertInfoDTO> result = certificateService.getCertificates(keyword, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), page, limit);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -126,7 +126,7 @@ public class UserController {
     @GetMapping(value = "/cert/cert/cer/{uuid}")
     public ResultVO<String> getCertificateCert(@PathVariable("uuid") String uuid,
                                                HttpServletRequest request) {
-        String result = certificateService.getCertificateCert(uuid, request.getSession().getAttribute("username").toString());
+        String result = certificateService.getCertificateCert(uuid, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -144,7 +144,7 @@ public class UserController {
     @PostMapping(value = "/cert/cert/privkey")
     public ResultVO<String> getCertificatePrivkey(@RequestBody RequestPrivkeyDTO requestPrivkeyDTO,
                                                   HttpServletRequest request) throws Exception {
-        String result = certificateService.getCertificatePrivkey(requestPrivkeyDTO, request.getSession().getAttribute("username").toString());
+        String result = certificateService.getCertificatePrivkey(requestPrivkeyDTO, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -154,7 +154,7 @@ public class UserController {
     @PatchMapping(value = "/cert/cert/comment")
     public ResultVO<Void> updateCertComment(@RequestBody UpdateCommentDTO updateCommentDTO,
                                              HttpServletRequest request) {
-        Boolean result = certificateService.updateCertComment(updateCommentDTO, request.getSession().getAttribute("username").toString());
+        Boolean result = certificateService.updateCertComment(updateCommentDTO, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
         }
@@ -172,7 +172,7 @@ public class UserController {
     @PostMapping(value = "/cert/cert")
     public ResultVO<ResponseCertDTO> requestCert(@RequestBody RequestCertDTO requestCertDTO,
                                                  HttpServletRequest request) throws Exception {
-        ResponseCertDTO result = certificateService.requestCert(requestCertDTO, request.getSession().getAttribute("username").toString());
+        ResponseCertDTO result = certificateService.requestCert(requestCertDTO, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -192,7 +192,7 @@ public class UserController {
     public ResultVO<ResponseCertDTO> renewCert(@PathVariable("uuid") String oldCertUuid,
                                                @PathVariable("expiry") Integer expiry,
                                                HttpServletRequest request) throws Exception {
-        ResponseCertDTO result = certificateService.renewCert(oldCertUuid, expiry, request.getSession().getAttribute("username").toString());
+        ResponseCertDTO result = certificateService.renewCert(oldCertUuid, expiry, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -209,7 +209,7 @@ public class UserController {
     @DeleteMapping(value = "/cert/cert/{uuid}")
     public ResultVO<Void> deleteCert(@PathVariable("uuid") String uuid,
                                      HttpServletRequest request) {
-        Boolean result = certificateService.deleteCert(uuid, request.getSession().getAttribute("username").toString());
+        Boolean result = certificateService.deleteCert(uuid, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
         }
