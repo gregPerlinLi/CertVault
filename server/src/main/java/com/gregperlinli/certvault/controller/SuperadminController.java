@@ -39,7 +39,9 @@ public class SuperadminController {
     public ResultVO<UserProfileDTO> createUser(@RequestBody CreateUserDTO createUserDTO) throws Exception {
         UserProfileDTO userProfileDTO = userService.createUser(createUserDTO);
         if ( userProfileDTO != null ) {
-            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "create success", userProfileDTO);
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                    "create success",
+                    userProfileDTO);
         }
         return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "create failed");
     }
@@ -88,7 +90,8 @@ public class SuperadminController {
     @PatchMapping(value = "/user/role")
     public ResultVO<Void> updateUserRole(@RequestBody UpdateRoleDTO updateRoleDTO,
                                          HttpServletRequest request) throws Exception {
-        Boolean result = userService.updateUserRole(updateRoleDTO, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        Boolean result = userService.updateUserRole(updateRoleDTO,
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "update success");
         }
@@ -106,7 +109,8 @@ public class SuperadminController {
     @PatchMapping(value = "/users/role")
     public ResultVO<Void> updateUsersRole(@RequestBody List<UpdateRoleDTO> updateRoleDTOs,
                                           HttpServletRequest request) throws Exception {
-        Boolean result = userService.updateUsersRole(updateRoleDTOs, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        Boolean result = userService.updateUsersRole(updateRoleDTOs,
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "update success");
         }
@@ -123,7 +127,8 @@ public class SuperadminController {
     @DeleteMapping(value = "/user/{username}")
     public ResultVO<Void> deleteUser(@PathVariable("username") String username,
                                      HttpServletRequest request) {
-        Boolean result = userService.deleteUser(username, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        Boolean result = userService.deleteUser(username, ((UserProfileDTO)
+                request.getSession().getAttribute("account")).getUsername());
         if ( result ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "delete success");
         }
@@ -140,7 +145,8 @@ public class SuperadminController {
     @DeleteMapping(value = "/users")
     public ResultVO<Void> deleteUsers(@RequestBody List<String> usernames,
                                       HttpServletRequest request) {
-        Boolean result = userService.deleteUsers(usernames, ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        Boolean result = userService.deleteUsers(usernames, ((UserProfileDTO)
+                request.getSession().getAttribute("account")).getUsername());
         if ( result ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "delete success");
         }
