@@ -51,6 +51,13 @@ springBoot:
     # Path to heap dump file
     - "-XX:HeapDumpPath=./errorDump.hprof"
 
+init:
+  superadmin:
+    username: "superadmin"
+    displayName: "Default Superadmin"
+    email: "superadmin@certvault.example"
+    password: "changeme"
+
 ## Encryption configuration
 ## @param encrypt.rsa.key.publicKey The public key used for RSA encryption
 ## @param encrypt.rsa.key.privateKey The private key used for RSA decryption

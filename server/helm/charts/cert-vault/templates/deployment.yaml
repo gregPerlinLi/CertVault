@@ -109,6 +109,22 @@ spec:
             - name: SPRING_MANAGEMENT_SERVER_PORT
               value: "{{ .Values.service.ports.management }}"
             {{- end }}
+            {{- if .Values.init.superadmin.username }}
+            - name: SUPERADMIN_USERNAME
+              value: "{{ .Values.init.superadmin.username }}"
+            {{- end }}
+            {{- if .Values.init.superadmin.displayName}}
+            - name: SUPERADMIN_DISPLAY_NAME
+              value: "{{ .Values.init.superadmin.displayName }}"
+            {{- end }}
+            {{- if .Values.init.superadmin.email}}
+            - name: SUPERADMIN_EMAIL
+              value: "{{ .Values.init.superadmin.email }}"
+            {{- end }}
+            {{- if .Values.init.superadmin.password}}
+            - name: SUPERADMIN_PASSWORD
+              value: "{{ .Values.init.superadmin.password }}"
+            {{- end }}
             {{- if .Values.encrypt.rsa.key.publicKey }}
             - name: SPRING_RSA_PUBLIC_KEY
               value: "{{ .Values.encrypt.rsa.key.publicKey }}"
