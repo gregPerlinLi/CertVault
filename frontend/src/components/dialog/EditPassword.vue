@@ -80,7 +80,8 @@ const submit = async () => {
           label="Confirm"
           size="small"
           type="submit"
-          :disabled="busy"></Button>
+          :disabled="busy"
+          :loading="busy"></Button>
       </div>
     </form>
   </Dialog>

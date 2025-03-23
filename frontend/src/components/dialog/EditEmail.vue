@@ -84,7 +84,8 @@ const submit = async () => {
           label="Save"
           size="small"
           type="submit"
-          :disabled="busy"></Button>
+          :disabled="busy"
+          :loading="busy"></Button>
       </div>
     </form>
   </Dialog>
