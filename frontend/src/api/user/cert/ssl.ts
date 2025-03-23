@@ -15,15 +15,15 @@ export const getAllSslCertInfo = (
 export const getSslCert = (uuid: string) =>
   callRestfulApi<string>({
     method: "GET",
-    baseUrl: "/api/v1/user/cert/ssl/cer",
-    pathNames: [uuid]
+    baseUrl: "/api/v1/user/cert/ssl/{uuid}/cer",
+    pathNames: { uuid }
   });
 
 export const getSslPrivKey = (uuid: string, password: string) =>
   callRestfulApi<string>({
     method: "POST",
-    baseUrl: "/api/v1/user/cert/ssl/privkey",
-    pathNames: [uuid],
+    baseUrl: "/api/v1/user/cert/ssl/{uuid}/privkey",
+    pathNames: { uuid },
     payload: { password }
   });
 
@@ -52,22 +52,22 @@ export const requestSslCert = (payload: RequestCertPayload) =>
 export const renewSslCert = (uuid: string, expiry: number) =>
   callRestfulApi<ResponseCertDTO>({
     method: "PUT",
-    baseUrl: "/api/v1/user/cert/ssl",
-    pathNames: [uuid],
+    baseUrl: "/api/v1/user/cert/ssl/{uuid}",
+    pathNames: { uuid },
     payload: { expiry }
   });
 
 export const updateSslCertComment = (uuid: string, comment: string) =>
   callRestfulApi({
     method: "PATCH",
-    baseUrl: "/api/v1/user/cert/ssl/comment",
-    pathNames: [uuid],
+    baseUrl: "/api/v1/user/cert/ssl/{uuid}/comment",
+    pathNames: { uuid },
     payload: { comment }
   });
 
 export const deleteSslCert = (uuid: string) =>
   callRestfulApi({
     method: "DELETE",
-    baseUrl: "/api/v1/user/cert/ssl",
-    pathNames: [uuid]
+    baseUrl: "/api/v1/user/cert/ssl/{uuid}",
+    pathNames: { uuid }
   });

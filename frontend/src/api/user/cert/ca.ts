@@ -15,7 +15,7 @@ export const getAllBindedCaInfo = (
 export const getCaCert = (uuid: string, isChain?: boolean) =>
   callRestfulApi<string>({
     method: "GET",
-    baseUrl: "/api/v1/user/cert/ca/cer",
-    pathNames: [uuid],
+    baseUrl: "/api/v1/user/cert/ca/{uuid}/cer",
+    pathNames: { uuid },
     searchParams: { isChain }
   });
