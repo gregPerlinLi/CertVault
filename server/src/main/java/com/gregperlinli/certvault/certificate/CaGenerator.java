@@ -174,14 +174,14 @@ public class CaGenerator {
                 parentPrivateKey = parsePrivateKey(renewRequest.getParentCaPrivkey());
             }
 
-            // 验证父 CA 有效性
+            // 5. 验证父 CA 有效性
             if (isIntermediate) {
                 if (!parentCert.getSubject().equals(oldCert.getIssuer())) {
                     throw new CertGenException(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode(), "Parent CA does not match the issuer of the old certificate");
                 }
             }
 
-            // 检查父 CA 的路径长度约束
+            // 6. 检查父 CA 的路径长度约束
             if (isIntermediate) {
                 BasicConstraints parentBC = CertUtils.getBasicConstraints(parentCert);
                 if (parentBC != null && parentBC.getPathLenConstraint() != null) {
@@ -193,18 +193,18 @@ public class CaGenerator {
                 }
             }
 
-            // 3. 提取原始证书的主体信息
+            // 7. 提取原始证书的主体信息
             X500Name issuer = new X500Name(String.valueOf(oldCert.getSubject()));
             PublicKey publicKey = new JcaX509CertificateConverter()
                     .setProvider("BC")
                     .getCertificate(oldCert)
                     .getPublicKey();
 
-            // 4. 设置新有效期（当前时间 ± newExpiryDays）
+            // 8. 设置新有效期（当前时间 ± newExpiryDays）
             Date notBefore = new Date();
             Date notAfter = new Date(notBefore.getTime() + renewRequest.getNewExpiry() * 24L * 60 * 60 * 1000);
 
-            // 5. 构建新证书
+            // 9. 构建新证书
             X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                     issuer,
                     BigInteger.probablePrime(128, new SecureRandom()),
@@ -213,7 +213,7 @@ public class CaGenerator {
                     publicKey
             );
 
-            // 6. 保留原有扩展字段（如 BasicConstraints）
+            // 10. 保留原有扩展字段（如 BasicConstraints）
             // certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(0));
             // certBuilder.addExtension(Extension.keyUsage, true,
             //        new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.cRLSign));
@@ -226,25 +226,25 @@ public class CaGenerator {
                 certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
             }
 
-            // 7. 创建签名器（使用原始私钥）
+            // 11. 创建签名器（使用原始私钥）
             // ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
             //         .build(privateKey);
             ContentSigner signer = isIntermediate
                     ? new JcaContentSignerBuilder("SHA256WithRSAEncryption").build(parentPrivateKey)
                     : new JcaContentSignerBuilder("SHA256WithRSAEncryption").build(privateKey);
 
-            // 8. 生成最终证书
+            // 12. 生成最终证书
             X509CertificateHolder newCertHolder = certBuilder.build(signer);
 
-            // 9. 生成 PEM 格式的证书和私钥字符串（包含头尾）
+            // 13. 生成 PEM 格式的证书和私钥字符串（包含头尾）
             String pemCert = generatePemCertificate(newCertHolder);
             String pemPrivateKey = generatePemPrivateKey(privateKey);
 
-            // 10. 对 PEM 内容进行 Base64 编码
+            // 14. 对 PEM 内容进行 Base64 编码
             String newCertBase64 = encodeBase64(pemCert.getBytes());
             String newPrivKeyBase64 = encodeBase64(pemPrivateKey.getBytes());
 
-            // 11. 填充并返回响应 DTO
+            // 15. 填充并返回响应 DTO
             return new GenResponse()
                     .setUuid(renewRequest.getUuid())
                     .setPrivkey(newPrivKeyBase64)
