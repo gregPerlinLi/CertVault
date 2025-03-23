@@ -14,6 +14,7 @@ import com.gregperlinli.certvault.utils.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +41,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Resource
     StringRedisTemplate stringRedisTemplate;
 
+    @Resource
+    RedisTemplate redisTemplate;
+
     private static final int BATCH_SIZE = 500;
 
     //////////////////////////////////////////////////
@@ -56,19 +60,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         .eq("deleted", false);
         User user = this.getOne(userQueryWrapper);
         if ( user != null && AuthUtils.matchesPassword(password, user.getPassword()) ) {
-            stringRedisTemplate.opsForValue().set(RedisKeyConstant.USER.joinLoginPrefix(sessionId), user.getUsername(), 60, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(RedisKeyConstant.USER.joinLoginPrefix(sessionId), new UserProfileDTO(user), 60, TimeUnit.MINUTES);
             return new UserProfileDTO(user);
         }
         return null;
     }
 
     @Override
-    public boolean loginVerify(String username, String sessionId) {
+    public UserProfileDTO loginVerify(String sessionId) {
         if ( !GenericUtils.ofNullable(sessionId) ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The parameter cannot be empty.");
         }
-        String loginUser = stringRedisTemplate.opsForValue().get(RedisKeyConstant.USER.joinLoginPrefix(sessionId));
-        return username.equals(loginUser);
+        return (UserProfileDTO) redisTemplate.opsForValue().get(RedisKeyConstant.USER.joinLoginPrefix(sessionId));
     }
 
     @Override
@@ -76,7 +79,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if ( !GenericUtils.ofNullable(sessionId) ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The parameter cannot be empty.");
         }
-        stringRedisTemplate.delete(RedisKeyConstant.USER.joinLoginPrefix(sessionId));
+        redisTemplate.delete(RedisKeyConstant.USER.joinLoginPrefix(sessionId));
     }
 
     @Override
@@ -124,9 +127,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
 
     @Override
-    public PageDTO<UserProfileDTO> getAllUsers(Integer page, Integer limit) {
+    public PageDTO<UserProfileDTO> getUsers(String keyword, Integer page, Integer limit) {
         Page<User> userPage = new Page<>(page, limit);
-        Page<User> resultPage = this.page(userPage);
+        Page<User> resultPage = null;
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        if ( keyword == null || keyword.isEmpty() ) {
+            userQueryWrapper.eq("deleted", false);
+        } else {
+            userQueryWrapper.like("username", keyword)
+                            .or()
+                            .like("display_name", keyword)
+                            .or()
+                            .like("email", keyword)
+                            .eq("deleted", false);
+        }
+        resultPage = this.page(userPage, userQueryWrapper);
         return new PageDTO<>(resultPage.getTotal(),
                 resultPage.getRecords().stream().map(UserProfileDTO::new).toList());
     }

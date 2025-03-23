@@ -1,14 +1,15 @@
 package com.gregperlinli.certvault.utils;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.bouncycastle.util.io.pem.PemWriter;
 
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 
@@ -99,6 +100,20 @@ public class CertUtils {
             PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(pemObject.getContent());
             return new JcaPEMKeyConverter().getPrivateKey(privateKeyInfo);
         }
+    }
+
+    /**
+     * 辅助方法：获取证书的 BasicConstraints
+     *
+     * @param cert 证书
+     * @return BasicConstraints
+     */
+    public static BasicConstraints getBasicConstraints(X509CertificateHolder cert) {
+        Extension ext = cert.getExtensions().getExtension(Extension.basicConstraints);
+        if (ext != null) {
+            return BasicConstraints.getInstance(ext.getParsedValue());
+        }
+        return null;
     }
 
 }

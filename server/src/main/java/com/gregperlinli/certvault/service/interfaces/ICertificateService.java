@@ -15,40 +15,52 @@ public interface ICertificateService extends IService<Certificate> {
     /**
      * Get own SSL Certificates
      *
+     * @param keyword Search keyword
      * @param owner  Owner of the Certificate
      * @param page   Page number
      * @param limit  Number of certificates per page
      * @return {@link PageDTO<CertificateDetailsDTO>}
      */
-    PageDTO<CertInfoDTO> getCertificates(String owner, Integer page, Integer limit);
+    PageDTO<CertInfoDTO> getCertificates(String keyword, String owner, Integer page, Integer limit);
 
     /**
      * Get SSL Certificate
      *
      * @param uuid   Certificate UUID
      * @param owner  Owner of the Certificate
-     * @return {@link String}
+     * @return {@link String} BASE64 SSL Certificate
      */
     String getCertificateCert(String uuid, String owner);
 
     /**
+     * Get SSL Certificate Chain
+     *
+     * @param uuid  Certificate UUID
+     * @param owner Owner of the Certificate
+     * @return {@link String} BASE64 SSL Certificate Chain
+     */
+    String getCertificateCertChain(String uuid, String owner);
+
+    /**
      * Get SSL Certificate Private Key
      *
-     * @param requestPrivkeyDTO Certificate Private Key Request DTO
+     * @param uuid              Certificate UUID
+     * @param confirmPassword   Confirm password
      * @param owner             Owner of the Certificate
-     * @return {@link String}
+     * @return {@link String} BASE64 SSL Certificate Private Key
      * @throws Exception Decryption error
      */
-    String getCertificatePrivkey(RequestPrivkeyDTO requestPrivkeyDTO, String owner) throws Exception;
+    String getCertificatePrivkey(String uuid, String confirmPassword, String owner) throws Exception;
 
     /**
      * Update SSL Certificate Comment
      *
-     * @param updateCommentDTO  Certificate Comment DTO
+     * @param uuid              Certificate UUID
+     * @param comment           Comment
      * @param owner             Owner of the Certificate
      * @return {@link Boolean}
      */
-    Boolean updateCertComment(UpdateCommentDTO updateCommentDTO, String owner);
+    Boolean updateCertComment(String uuid, String comment, String owner);
 
     /**
      * Request a SSL Certificate

@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.*;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
@@ -10,6 +11,8 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Base64;
+
 /**
  * Admin Controller
  *
@@ -18,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  * @className {@code AdminController}
  * @date 2025/3/17 17:46
  */
-@RequestMapping("/api/admin")
+@RequestMapping("/api/v1/admin")
 @RestController
 public class AdminController {
 
@@ -32,16 +35,18 @@ public class AdminController {
     ICaBindingService caBindingService;
 
     /**
-     * Get all users
+     * Get users
      *
+     * @param keyword the keyword to search
      * @param page the page number
      * @param limit the limit of the page
      * @return the result
      */
-    @GetMapping(value = "/users/{page}/{limit}")
-    public ResultVO<PageDTO<UserProfileDTO>> getAllUsers(@PathVariable("page") Integer page,
-                                                         @PathVariable("limit") Integer limit) {
-        PageDTO<UserProfileDTO> result = userService.getAllUsers(page, limit);
+    @GetMapping(value = "/users")
+    public ResultVO<PageDTO<UserProfileDTO>> getUsers(@RequestParam(value = "keyword", required = false) String keyword,
+                                                      @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                      @RequestParam(value = "limit", defaultValue = "10") Integer limit) {
+        PageDTO<UserProfileDTO> result = userService.getUsers(keyword, page, limit);
         if ( result != null && result.getList() != null && !result.getList().isEmpty()) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -56,11 +61,13 @@ public class AdminController {
      * @param request the request
      * @return the result
      */
-    @GetMapping(value = "/cert/ca/{page}/{limit}")
-    public ResultVO<PageDTO<CaInfoDTO>> getCas(@PathVariable("page") Integer page,
-                                               @PathVariable("limit") Integer limit,
+    @GetMapping(value = "/cert/ca")
+    public ResultVO<PageDTO<CaInfoDTO>> getCas(@RequestParam(value = "keyword", required = false) String keyword,
+                                               @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                               @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                                HttpServletRequest request) {
-        PageDTO<CaInfoDTO> result = caService.getCas(request.getSession().getAttribute("username").toString(), page, limit);
+        PageDTO<CaInfoDTO> result = caService.getCas(keyword,
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), page, limit);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -71,13 +78,22 @@ public class AdminController {
      * Get a CA certificate
      *
      * @param uuid the uuid of the CA
+     * @param isChain whether to get the certificate chain
      * @param request the request
      * @return the result
      */
     @GetMapping(value = "/cert/ca/cer/{uuid}")
     public ResultVO<String> getCaCert(@PathVariable("uuid") String uuid,
+                                      @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
                                       HttpServletRequest request) {
-        String result = caService.getCaCert(uuid, request.getSession().getAttribute("username").toString());
+        String result = null;
+        if ( isChain ) {
+            result = caService.getCaCertChain(uuid,
+                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        } else {
+            result = caService.getCaCert(uuid,
+                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        }
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -87,15 +103,18 @@ public class AdminController {
     /**
      * Get a CA private key
      *
-     * @param requestPrivkeyDTO the request private key DTO
+     * @param uuid the uuid of the CA
      * @param request the request
      * @return the result
      * @throws Exception if the decrypt is failed
      */
-    @PostMapping(value = "/cert/ca/privkey")
-    public ResultVO<String> getCaPrivkey(@RequestBody RequestPrivkeyDTO requestPrivkeyDTO,
+    @PostMapping(value = "/cert/ca/privkey/{uuid}")
+    public ResultVO<String> getCaPrivkey(@PathVariable("uuid") String uuid,
+                                         @RequestBody JsonNode confirmPassword,
                                          HttpServletRequest request) throws Exception {
-        String result = caService.getCaPrivKey(requestPrivkeyDTO, request.getSession().getAttribute("username").toString());
+        String result = caService.getCaPrivKey(uuid,
+                confirmPassword.path("password").asText(),
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -105,14 +124,17 @@ public class AdminController {
     /**
      * Update a CA comment
      *
-     * @param updateCommentDTO the update comment DTO
+     * @param uuid the uuid of the CA
      * @param request the request
      * @return the result
      */
-    @PatchMapping(value = "/cert/ca/comment")
-    public ResultVO<Void> updateCaComment(@RequestBody UpdateCommentDTO updateCommentDTO,
-                                             HttpServletRequest request) {
-        Boolean result = caService.updateCaComment(updateCommentDTO.getUuid(), request.getSession().getAttribute("username").toString(), updateCommentDTO.getComment());
+    @PatchMapping(value = "/cert/ca/comment/{uuid}")
+    public ResultVO<Void> updateCaComment(@PathVariable("uuid") String uuid,
+                                          @RequestBody JsonNode updateComment,
+                                          HttpServletRequest request) {
+        Boolean result = caService.updateCaComment(uuid,
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
+                updateComment.path("comment").asText());
         if ( result ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
         }
@@ -128,8 +150,9 @@ public class AdminController {
      */
     @PatchMapping(value = "/cert/ca/available/{uuid}")
     public ResultVO<Boolean> modifyCaAvailable(@PathVariable("uuid") String uuid,
-                                            HttpServletRequest request) {
-        Boolean result = caService.modifyCaAvailability(uuid, request.getSession().getAttribute("username").toString());
+                                               HttpServletRequest request) {
+        Boolean result = caService.modifyCaAvailability(uuid,
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Enabled", true);
         }
@@ -147,7 +170,8 @@ public class AdminController {
     @PostMapping(value = "/cert/ca")
     public ResultVO<ResponseCaDTO> requestCa(@RequestBody RequestCertDTO requestCertDTO,
                                              HttpServletRequest request) throws Exception {
-        ResponseCaDTO result = caService.requestCa(requestCertDTO, request.getSession().getAttribute("username").toString());
+        ResponseCaDTO result = caService.requestCa(requestCertDTO,
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -163,11 +187,12 @@ public class AdminController {
      * @return the result
      * @throws Exception if the decrypt is failed
      */
-    @PutMapping(value = "/cert/ca/{uuid}/{expiry}")
+    @PutMapping(value = "/cert/ca/{uuid}")
     public ResultVO<ResponseCaDTO> renewCa(@PathVariable("uuid") String uuid,
-                                           @PathVariable("expiry") Integer expiry,
+                                           @RequestBody JsonNode expiry,
                                            HttpServletRequest request) throws Exception {
-        ResponseCaDTO result = caService.renewCa(uuid, expiry, request.getSession().getAttribute("username").toString());
+        ResponseCaDTO result = caService.renewCa(uuid, expiry.get("expiry").asInt(),
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -184,7 +209,8 @@ public class AdminController {
     @DeleteMapping(value = "/cert/ca/{uuid}")
     public ResultVO<Void> deleteCa(@PathVariable("uuid") String uuid,
                                    HttpServletRequest request) {
-        Boolean result = caService.deleteCa(uuid, request.getSession().getAttribute("username").toString());
+        Boolean result = caService.deleteCa(uuid,
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
         }

@@ -18,9 +18,13 @@
         </repository>
     </distributionManagement>
 
+    <name>CertVault</name>
+    <description>
+        CertVault Self-Signed SSL Certificate Management Platform.
+    </description>
     <groupId>com.gregperlinli</groupId>
-    <artifactId>server</artifactId>
-    <version>0.1.0</version>
+    <artifactId>certvault</artifactId>
+    <version>0.3.0</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -195,6 +199,16 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <excludes>
+                    <exclude>static/**/*</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>static/**/*</include>
+                </includes>
             </resource>
         </resources>
         <plugins>

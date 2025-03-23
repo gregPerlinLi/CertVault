@@ -20,11 +20,9 @@ import com.gregperlinli.certvault.utils.EncryptAndDecryptUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -45,7 +43,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     ICaBindingService caBindingService;
 
     @Override
-    public PageDTO<CaInfoDTO> getCas(String owner, Integer page, Integer limit) {
+    public PageDTO<CaInfoDTO> getCas(String keyword, String owner, Integer page, Integer limit) {
         Page<Ca> caPage = new Page<>(page, limit);
         Page<Ca> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
@@ -56,8 +54,16 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
         QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
-        caQueryWrapper.eq("owner", user.getId())
+        if ( keyword == null || keyword.isEmpty() ) {
+            caQueryWrapper.eq("owner", user.getId())
                     .eq("deleted", false);
+        } else {
+            caQueryWrapper.like("uuid", keyword)
+                    .or()
+                    .like("comment", keyword)
+                    .eq("owner", user.getId())
+                    .eq("deleted", false);
+        }
         resultPage = this.page(caPage, caQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
             return new PageDTO<>(resultPage.getTotal(), null);
@@ -70,6 +76,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
                 resultPage.getRecords().stream().map(ca -> {
                     CaInfoDTO dto = new CaInfoDTO();
                     dto.setUuid(ca.getUuid());
+                    dto.setParentCa(ca.getParentCa());
+                    dto.setAllowSubCa(ca.getAllowSubCa());
                     dto.setComment(ca.getComment());
                     dto.setAvailable(ca.getAvailable());
                     dto.setNotBefore(ca.getNotBefore());
@@ -82,7 +90,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     }
 
     @Override
-    public PageDTO<CaInfoDTO> getBoundCas(String username, Integer page, Integer limit) {
+    public PageDTO<CaInfoDTO> getBoundCas(String keyword, String username, Integer page, Integer limit) {
         Page<Ca> caPage = new Page<>(page, limit);
         Page<Ca> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
@@ -99,9 +107,18 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
             return new PageDTO<>(0L, null);
         }
         QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
-        caQueryWrapper.in("uuid", caBindings.stream().map(CaBinding::getCaUuid).toList())
+        if ( keyword == null || keyword.isEmpty() ) {
+            caQueryWrapper.in("uuid", caBindings.stream().map(CaBinding::getCaUuid).toList())
                     .eq("available", true)
                     .eq("deleted", false);
+        } else {
+            caQueryWrapper.like("uuid", keyword)
+                    .or()
+                    .like("comment", keyword)
+                    .in("uuid", caBindings.stream().map(CaBinding::getCaUuid).toList())
+                    .eq("available", true)
+                    .eq("deleted", false);
+        }
         resultPage = this.page(caPage, caQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
             return new PageDTO<>(resultPage.getTotal(), null);
@@ -114,6 +131,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
                 resultPage.getRecords().stream().map(ca -> {
                     CaInfoDTO dto = new CaInfoDTO();
                     dto.setUuid(ca.getUuid());
+                    dto.setParentCa(ca.getParentCa());
+                    dto.setAllowSubCa(ca.getAllowSubCa());
                     dto.setComment(ca.getComment());
                     dto.setAvailable(ca.getAvailable());
                     dto.setNotBefore(ca.getNotBefore());
@@ -155,7 +174,86 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     }
 
     @Override
-    public String getCaPrivKey(RequestPrivkeyDTO requestPrivkeyDTO, String owner) throws Exception {
+    public String getCaCertChain(String uuid, String owner) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("username", owner)
+                .eq("deleted", false);
+        User user = userService.getOne(userQueryWrapper);
+        if ( user == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
+        }
+        QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
+        caQueryWrapper.eq("uuid", uuid)
+                .eq("deleted", false);
+        Ca currentCa = this.getOne(caQueryWrapper);
+        if ( currentCa == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The certificate does not exist.");
+        }
+        if ( !Objects.equals( currentCa.getOwner(), user.getId() ) &&
+                !( user.getRole() == AccountTypeConstant.ADMIN.getAccountType() &&
+                        caBindingService.exists( new QueryWrapper<CaBinding>()
+                                .eq("ca_uuid", currentCa.getParentCa())
+                                .eq("uid", user.getId())) ) &&
+                user.getRole() != AccountTypeConstant.SUPERADMIN.getAccountType()
+        ) {
+            throw new ParamValidateException(
+                    ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The certificate is not yours."
+            );
+        }
+        // 收集证书链（处理二次编码）
+        List<String> certChain = new ArrayList<>();
+        // 处理当前证书
+        String certBase64 = currentCa.getCert();
+        if (certBase64 != null && !certBase64.isEmpty()) {
+            try {
+                // 解码二次编码的PEM字符串（原始PEM内容）
+                String pemContent = new String(
+                        Base64.getDecoder().decode(certBase64),
+                        StandardCharsets.UTF_8
+                );
+                certChain.add(pemContent);
+            } catch (IllegalArgumentException e) {
+                throw new ParamValidateException(
+                        ResultStatusCodeConstant.FAILED.getResultCode(),
+                        "Invalid certificate format in database."
+                );
+            }
+        }
+        // 向上查找CA链
+        String currentCaUuid = currentCa.getParentCa();
+        while (currentCaUuid != null && !currentCaUuid.isEmpty()) {
+            Ca ca = this.getOne(new QueryWrapper<Ca>()
+                    .eq("uuid", currentCaUuid)
+                    .eq("deleted", false));
+            if (ca == null) {
+                break;
+            }
+            String caCertBase64 = ca.getCert();
+            if (caCertBase64 != null && !caCertBase64.isEmpty()) {
+                try {
+                    String pemContent = new String(
+                            Base64.getDecoder().decode(caCertBase64),
+                            StandardCharsets.UTF_8
+                    );
+                    certChain.add(pemContent);
+                } catch (IllegalArgumentException e) {
+                    throw new ParamValidateException(
+                            ResultStatusCodeConstant.FAILED.getResultCode(),
+                            "Invalid CA certificate format in database."
+                    );
+                }
+            }
+            currentCaUuid = ca.getParentCa();
+        }
+        // 拼接证书链并Base64编码
+        String chainContent = String.join("\n", certChain);
+        return Base64.getEncoder().encodeToString(
+                chainContent.getBytes(StandardCharsets.UTF_8)
+        );
+    }
+
+    @Override
+    public String getCaPrivKey(String uuid, String confirmPassword, String owner) throws Exception {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username", owner)
                         .eq("deleted", false);
@@ -163,11 +261,11 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
-        if ( !AuthUtils.matchesPassword(requestPrivkeyDTO.getPassword(), user.getPassword()) ) {
+        if ( !AuthUtils.matchesPassword(confirmPassword, user.getPassword()) ) {
             throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "Password validation failed.");
         }
         QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
-        caQueryWrapper.eq("uuid", requestPrivkeyDTO.getUuid())
+        caQueryWrapper.eq("uuid", uuid)
                     .eq("owner", user.getId())
                     .eq("deleted", false);
         Ca ca = this.getOne(caQueryWrapper);
@@ -251,9 +349,35 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
-        GenResponse genResponse = CaGenerator.generateCaCertificate(new CaGenRequest(requestCertDTO, user.getEmail()));
         LocalDateTime now = LocalDateTime.now();
-        boolean result = this.save(genResponse.toCa(user.getId(), now, now));
+        boolean result = false;
+        GenResponse genResponse = null;
+        if ( requestCertDTO.getCaUuid() == null || requestCertDTO.getCaUuid().isEmpty() ) {
+            genResponse = CaGenerator.generateCaCertificate(new CaGenRequest(requestCertDTO, user.getEmail()));
+            result = this.save(genResponse.toCa(user.getId(), now, now));
+        } else {
+            QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
+            caQueryWrapper.eq("uuid", requestCertDTO.getCaUuid())
+                    .eq("available", true)
+                    .eq("deleted", false);
+            Ca ca = this.getOne(caQueryWrapper);
+            if ( !ca.getAllowSubCa() ) {
+                throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The CA does not allow sub CA.");
+            }
+            QueryWrapper<CaBinding> caBindingQueryWrapper = new QueryWrapper<>();
+            caBindingQueryWrapper.eq("uid", user.getId())
+                    .eq("ca_uuid", requestCertDTO.getCaUuid());
+            if (
+                    ( caBindingService.getOne(caBindingQueryWrapper) != null && ca.getAvailable() ) ||
+                    Objects.equals( ca.getOwner(), user.getId() ) ||
+                    user.getRole() == AccountTypeConstant.SUPERADMIN.getAccountType()
+            ) {
+                genResponse = CaGenerator.generateCaCertificate(new CaGenRequest(requestCertDTO, EncryptAndDecryptUtils.decrypt(ca.getPrivkey()), ca.getCert(), requestCertDTO.getAllowSubCa(), user.getEmail()));
+                result = this.save(genResponse.toIntCa(ca.getUuid(), requestCertDTO.getAllowSubCa(), user.getId(), now, now));
+            } else {
+                throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The CA is not yours.");
+            }
+        }
         if ( result ) {
             CaBinding caBinding = new CaBinding();
             caBinding.setCaUuid(genResponse.getUuid());
@@ -282,25 +406,35 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The CA does not exist.");
         }
         if (
-                Objects.equals( ca.getOwner(), user.getId() ) ||
-                user.getRole() == AccountTypeConstant.SUPERADMIN.getAccountType()
+                !Objects.equals( ca.getOwner(), user.getId() ) &&
+                user.getRole() != AccountTypeConstant.SUPERADMIN.getAccountType()
         ) {
-            CaRenewRequest caRenewRequest = new CaRenewRequest(ca, expiry);
-            GenResponse genResponse = CaGenerator.renewCaCertificate(caRenewRequest);
-            ca.setCert(genResponse.getCert());
-            ca.setNotBefore(genResponse.getNotBefore());
-            ca.setNotAfter(genResponse.getNotAfter());
-            ca.setModifiedAt(LocalDateTime.now());
-            UpdateWrapper<Ca> caUpdateWrapper = new UpdateWrapper<>();
-            caUpdateWrapper.eq("uuid", oldCaUuid);
-            boolean result = this.update(ca, caUpdateWrapper);
-            if ( result ) {
-                genResponse.setPrivkey(null);
-                return new ResponseCaDTO(genResponse);
-            }
-            return null;
+            throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The CA is not yours.");
         }
-        throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The CA is not yours.");
+        CaRenewRequest caRenewRequest = new CaRenewRequest(ca, expiry);
+        if ( ca.getParentCa() != null ) {
+            caQueryWrapper.clear();
+            caQueryWrapper.eq("uuid", ca.getParentCa());
+            Ca parentCa = this.getOne(caQueryWrapper);
+            if ( parentCa == null ) {
+                throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The parent CA does not exist.");
+            }
+            caRenewRequest.setParentCa(parentCa.getCert());
+            caRenewRequest.setParentCaPrivkey(EncryptAndDecryptUtils.decrypt(parentCa.getPrivkey()));
+        }
+        GenResponse genResponse = CaGenerator.renewCaCertificate(caRenewRequest);
+        ca.setCert(genResponse.getCert());
+        ca.setNotBefore(genResponse.getNotBefore());
+        ca.setNotAfter(genResponse.getNotAfter());
+        ca.setModifiedAt(LocalDateTime.now());
+        UpdateWrapper<Ca> caUpdateWrapper = new UpdateWrapper<>();
+        caUpdateWrapper.eq("uuid", oldCaUuid);
+        boolean result = this.update(ca, caUpdateWrapper);
+        if ( result ) {
+            genResponse.setPrivkey(null);
+            return new ResponseCaDTO(genResponse);
+        }
+        return null;
     }
 
     @Override

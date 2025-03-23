@@ -21,10 +21,9 @@ import com.gregperlinli.certvault.utils.EncryptAndDecryptUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -46,7 +45,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     ICaBindingService caBindingService;
 
     @Override
-    public PageDTO<CertInfoDTO> getCertificates(String owner, Integer page, Integer limit) {
+    public PageDTO<CertInfoDTO> getCertificates(String keyword, String owner, Integer page, Integer limit) {
         Page<Certificate> certificatePage = new Page<>(page, limit);
         Page<Certificate> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
@@ -57,8 +56,16 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
         QueryWrapper<Certificate> certificateQueryWrapper = new QueryWrapper<>();
-        certificateQueryWrapper.eq("owner", user.getId())
-                            .eq("deleted", false);
+        if ( keyword == null || keyword.isEmpty() ) {
+            certificateQueryWrapper.eq("owner", user.getId())
+                    .eq("deleted", false);
+        } else {
+            certificateQueryWrapper.like("uuid", keyword)
+                    .or()
+                    .like("comment", keyword)
+                    .eq("owner", user.getId())
+                    .eq("deleted", false);
+        }
         resultPage = this.page(certificatePage, certificateQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
             return new PageDTO<>(resultPage.getTotal(), null);
@@ -114,7 +121,86 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     }
 
     @Override
-    public String getCertificatePrivkey(RequestPrivkeyDTO requestPrivkeyDTO, String owner) throws Exception {
+    public String getCertificateCertChain(String uuid, String owner) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("username", owner)
+                .eq("deleted", false);
+        User user = userService.getOne(userQueryWrapper);
+        if ( user == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
+        }
+        QueryWrapper<Certificate> certificateQueryWrapper = new QueryWrapper<>();
+        certificateQueryWrapper.eq("uuid", uuid)
+                .eq("deleted", false);
+        Certificate certificate = this.getOne(certificateQueryWrapper);
+        if ( certificate == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The certificate does not exist.");
+        }
+        if ( !Objects.equals( certificate.getOwner(), user.getId() ) &&
+             !( user.getRole() == AccountTypeConstant.ADMIN.getAccountType() &&
+                     caBindingService.exists( new QueryWrapper<CaBinding>()
+                             .eq("ca_uuid", certificate.getCaUuid())
+                             .eq("uid", user.getId())) ) &&
+             user.getRole() != AccountTypeConstant.SUPERADMIN.getAccountType()
+        ) {
+            throw new ParamValidateException(
+                    ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The certificate is not yours."
+            );
+        }
+        // 收集证书链（处理二次编码）
+        List<String> certChain = new ArrayList<>();
+        // 处理当前证书
+        String certBase64 = certificate.getCert();
+        if (certBase64 != null && !certBase64.isEmpty()) {
+            try {
+                // 解码二次编码的PEM字符串（原始PEM内容）
+                String pemContent = new String(
+                        Base64.getDecoder().decode(certBase64),
+                        StandardCharsets.UTF_8
+                );
+                certChain.add(pemContent);
+            } catch (IllegalArgumentException e) {
+                throw new ParamValidateException(
+                        ResultStatusCodeConstant.FAILED.getResultCode(),
+                        "Invalid certificate format in database."
+                );
+            }
+        }
+        // 向上查找CA链
+        String currentCaUuid = certificate.getCaUuid();
+        while (currentCaUuid != null && !currentCaUuid.isEmpty()) {
+            Ca ca = caService.getOne(new QueryWrapper<Ca>()
+                    .eq("uuid", currentCaUuid)
+                    .eq("deleted", false));
+            if (ca == null) {
+                break;
+            }
+            String caCertBase64 = ca.getCert();
+            if (caCertBase64 != null && !caCertBase64.isEmpty()) {
+                try {
+                    String pemContent = new String(
+                            Base64.getDecoder().decode(caCertBase64),
+                            StandardCharsets.UTF_8
+                    );
+                    certChain.add(pemContent);
+                } catch (IllegalArgumentException e) {
+                    throw new ParamValidateException(
+                            ResultStatusCodeConstant.FAILED.getResultCode(),
+                            "Invalid CA certificate format in database."
+                    );
+                }
+            }
+            currentCaUuid = ca.getParentCa();
+        }
+        // 拼接证书链并Base64编码
+        String chainContent = String.join("\n", certChain);
+        return Base64.getEncoder().encodeToString(
+                chainContent.getBytes(StandardCharsets.UTF_8)
+        );
+    }
+
+    @Override
+    public String getCertificatePrivkey(String uuid, String confirmPassword, String owner) throws Exception {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username", owner)
                         .eq("deleted", false);
@@ -122,11 +208,11 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
         if ( user == null ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
-        if ( !AuthUtils.matchesPassword(requestPrivkeyDTO.getPassword(), user.getPassword()) ) {
+        if ( !AuthUtils.matchesPassword(confirmPassword, user.getPassword()) ) {
             throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "Password validation failed.");
         }
         QueryWrapper<Certificate> certificateQueryWrapper = new QueryWrapper<>();
-        certificateQueryWrapper.eq("uuid", requestPrivkeyDTO.getUuid())
+        certificateQueryWrapper.eq("uuid", uuid)
                             .eq("deleted", false);
         Certificate certificate = this.getOne(certificateQueryWrapper);
         if ( certificate == null) {
@@ -148,7 +234,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     }
 
     @Override
-    public Boolean updateCertComment(UpdateCommentDTO updateCommentDTO, String owner) {
+    public Boolean updateCertComment(String uuid, String comment, String owner) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username", owner)
                         .eq("deleted", false);
@@ -157,7 +243,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
         QueryWrapper<Certificate> certificateQueryWrapper = new QueryWrapper<>();
-        certificateQueryWrapper.eq("uuid", updateCommentDTO.getUuid())
+        certificateQueryWrapper.eq("uuid",uuid)
                             .eq("deleted", false);
         Certificate certificate = this.getOne(certificateQueryWrapper);
         if ( certificate == null ) {
@@ -173,7 +259,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
                 ) ||
                 user.getRole() == AccountTypeConstant.SUPERADMIN.getAccountType()
         ) {
-            certificate.setComment(updateCommentDTO.getComment());
+            certificate.setComment(comment);
             certificate.setModifiedAt(LocalDateTime.now());
             return this.updateById(certificate);
         }

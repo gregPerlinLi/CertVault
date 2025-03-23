@@ -76,7 +76,9 @@ public class TestController {
     @PatchMapping(value = {"/api/", "/api"})
     public ResultVO<TestDTO> testPatch() {
         TestDTO testDTO = testService.testPatch();
-        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "success patching", testDTO);
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                "success patching",
+                testDTO);
     }
 
     /**
@@ -86,15 +88,18 @@ public class TestController {
      * @param response 响应对象
      * @return 加密结果
      */
-    @GetMapping(value = "/api/test/bcrypt/{password}")
+    @GetMapping(value = "/api/v1/test/bcrypt/{password}")
     public ResultVO<String> testBCrypt(@PathVariable("password") String password,
                                        HttpServletResponse response) {
         String result = testService.getBCryptedPassword(password);
         if ( result != null ) {
-            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Request success", result);
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                    "Request success",
+                    result);
         }
-        response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.FAILED.getResultCode()));
-        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Request failed", null);
+        response.setHeader(GeneralConstant.STATUS_CODE.getValue(),
+                String.valueOf(ResultStatusCodeConstant.FAILED.getResultCode()));
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Request failed");
     }
 
 }

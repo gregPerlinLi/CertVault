@@ -23,6 +23,10 @@ public class CaInfoDTO {
 
     private String owner;
 
+    private String parentCa;
+
+    private Boolean allowSubCa;
+
     private String comment;
 
     private Boolean available;

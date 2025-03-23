@@ -1,12 +1,16 @@
-import router from "@/router";
-import { getUserProfile, login, logout, type ResultVO } from "@/utils/api";
-import { useCookies } from "@vueuse/integrations/useCookies";
+import { login, logout } from "@/api/authentication";
+import {
+  getProfile,
+  updateProfile,
+  type UpdateProfileRequestPayload
+} from "@/api/user";
 import { type ToastServiceMethods } from "primevue";
 
 // Export store
 export const useUserStore = createGlobalState(() => {
   // States
   const initialized = ref(false);
+  const signedIn = ref(false);
   const username = ref<string | null>(null);
   const displayName = ref<string | null>(null);
   const email = ref<string | null>(null);
@@ -27,59 +31,33 @@ export const useUserStore = createGlobalState(() => {
   });
 
   // Actions
-  const resetAuthInfo = (): void => {
-    const cookies = useCookies();
-
-    username.value = null;
-    displayName.value = null;
-    email.value = null;
-    innerRole.value = null;
-
-    cookies.remove("JSESSIONID");
-  };
-  const init = async (toast: ToastServiceMethods) => {
+  const init = async (toast?: ToastServiceMethods) => {
     if (initialized.value) {
       return;
     }
 
-    try {
-      const r = await getUserProfile();
-
-      username.value = r.username;
-      displayName.value = r.displayName;
-      email.value = r.email;
-      innerRole.value = r.role;
-
-      initialized.value = true;
-    } catch (err: unknown) {
-      useCookies().remove("JSESSIONID");
-
-      toast.add({
+    const err = await syncFromRemote();
+    initialized.value = true;
+    if (err !== null) {
+      toast?.add({
         severity: "error",
         summary: "Authentication Failed",
-        detail: "Please re-sign in",
-        life: 3000
+        detail: err.message,
+        life: 5000
       });
-
-      router.push("/");
+    } else {
+      signedIn.value = true;
     }
   };
   const signIn = async (
-    toast: ToastServiceMethods,
     usrname: string,
-    passwd: string
+    passwd: string,
+    toast: ToastServiceMethods
   ) => {
-    resetAuthInfo();
-    toast.add({
-      severity: "info",
-      summary: "Info",
-      detail: "Signing in",
-      life: 3000
-    });
-
     try {
       const r = await login(usrname, passwd);
 
+      signedIn.value = true;
       username.value = r.username;
       displayName.value = r.displayName;
       email.value = r.email;
@@ -92,30 +70,21 @@ export const useUserStore = createGlobalState(() => {
         life: 3000
       });
 
-      return true;
+      return null;
     } catch (err: unknown) {
       toast.add({
         severity: "error",
         summary: "Failed to Sign in",
-        detail:
-          err instanceof Error ? err.message : (err as ResultVO<null>).msg,
+        detail: (err as Error).message,
         life: 5000
       });
 
-      return false;
+      return err as Error;
     }
   };
   const signOut = async (toast: ToastServiceMethods) => {
-    toast.add({
-      severity: "info",
-      summary: "Info",
-      detail: "Signing out",
-      life: 3000
-    });
-
     try {
       await logout();
-      resetAuthInfo();
 
       toast.add({
         severity: "success",
@@ -124,29 +93,89 @@ export const useUserStore = createGlobalState(() => {
         life: 3000
       });
 
-      return true;
+      return null;
     } catch (err: unknown) {
       toast.add({
         severity: "error",
-        summary: "Failed to Sign in",
-        detail:
-          err instanceof Error ? err.message : (err as ResultVO<null>).msg,
+        summary: "Failed to Sign out",
+        detail: (err as Error).message,
         life: 5000
       });
 
-      return false;
+      return err as Error;
+    } finally {
+      signedIn.value = false;
+      username.value = null;
+      displayName.value = null;
+      email.value = null;
+      innerRole.value = null;
+    }
+  };
+  const syncFromRemote = async (toast?: ToastServiceMethods) => {
+    try {
+      const p = await getProfile();
+
+      username.value = p.username;
+      displayName.value = p.displayName;
+      email.value = p.email;
+      innerRole.value = p.role;
+
+      return null;
+    } catch (err: unknown) {
+      toast?.add({
+        severity: "error",
+        summary: "Failed to Get User Profile",
+        detail: (err as Error).message,
+        life: 5000
+      });
+
+      return err as Error;
+    }
+  };
+  const syncToRemote = async (
+    payload: UpdateProfileRequestPayload,
+    toast: ToastServiceMethods
+  ) => {
+    try {
+      await updateProfile(payload);
+
+      const err = await syncFromRemote();
+      if (err !== null) {
+        throw err;
+      }
+
+      toast.add({
+        severity: "success",
+        summary: "Success",
+        detail: "Successfully updated the user profile",
+        life: 3000
+      });
+
+      return null;
+    } catch (err: unknown) {
+      toast.add({
+        severity: "error",
+        summary: "Fail to Update User Profile",
+        detail: (err as Error).message,
+        life: 5000
+      });
+
+      return err as Error;
     }
   };
 
   // Returns
   return {
     initialized,
+    signedIn,
     username,
     displayName,
     email,
     role,
     init,
     signIn,
-    signOut
+    signOut,
+    syncFromRemote,
+    syncToRemote
   };
 });

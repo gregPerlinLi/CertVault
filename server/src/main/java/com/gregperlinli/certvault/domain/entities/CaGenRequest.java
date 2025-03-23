@@ -22,6 +22,21 @@ import lombok.experimental.Accessors;
 public class CaGenRequest {
 
     /**
+     * Parent CA Key
+     */
+    private String parentCaPrivkey;
+
+    /**
+     * Parent CA
+     */
+    private String parentCa;
+
+    /**
+     * Allow Signing Sub CA
+     */
+    private Boolean allowSubCa = false;
+
+    /**
      * Country
      */
     private String country;
@@ -67,6 +82,21 @@ public class CaGenRequest {
     private String comment;
 
     public CaGenRequest(RequestCertDTO requestCertDTO, String ownerEmail) {
+        this.country = requestCertDTO.getCountry();
+        this.province = requestCertDTO.getProvince();
+        this.city = requestCertDTO.getCity();
+        this.organization = requestCertDTO.getOrganization();
+        this.organizationalUnit = requestCertDTO.getOrganizationalUnit();
+        this.commonName = requestCertDTO.getCommonName();
+        this.emailAddress = ownerEmail;
+        this.expiry = requestCertDTO.getExpiry();
+        this.comment = requestCertDTO.getComment();
+    }
+
+    public CaGenRequest(RequestCertDTO requestCertDTO, String parentCaPrivkey, String parentCa, Boolean allowSubCa, String ownerEmail) {
+        this.parentCaPrivkey = parentCaPrivkey;
+        this.parentCa = parentCa;
+        this.allowSubCa = allowSubCa;
         this.country = requestCertDTO.getCountry();
         this.province = requestCertDTO.getProvince();
         this.city = requestCertDTO.getCity();

@@ -54,6 +54,18 @@ public class Ca implements Serializable {
     private String cert;
 
     /**
+     * 父 CA UUID
+     */
+    @TableField("parent_ca")
+    private String parentCa;
+
+    /**
+     * 是否允许创建子 CA
+     */
+    @TableField("allow_sub_ca")
+    private Boolean allowSubCa;
+
+    /**
      * 拥有者 ID
      */
     @TableField("owner")

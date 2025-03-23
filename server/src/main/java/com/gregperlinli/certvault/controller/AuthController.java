@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @className {@code AuthController}
  * @date 2025/3/3 20:37
  */
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RestController
 @Slf4j
 public class AuthController {
@@ -39,13 +39,19 @@ public class AuthController {
     @PostMapping(value =  "/login")
     public ResultVO<UserProfileDTO> login(@RequestBody LoginDTO loginDTO,
                                           HttpServletRequest request) {
-        UserProfileDTO loginResult = userService.login(loginDTO.getUsername(), loginDTO.getPassword(), request.getSession().getId());
+        UserProfileDTO loginResult = userService.login(loginDTO.getUsername(),
+                loginDTO.getPassword(),
+                request.getSession().getId());
         if ( loginResult != null ) {
-            request.getSession().setAttribute("username", loginDTO.getUsername());
-            request.getSession().setAttribute("account_type", loginResult.getRole());
-            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Login Success!", loginResult);
+            // request.getSession().setAttribute("username", loginDTO.getUsername());
+            // request.getSession().setAttribute("account_type", loginResult.getRole());
+            request.getSession().setAttribute("account", loginResult);
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                    "Login Success!",
+                    loginResult);
         }
-        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Login failed, username or password error");
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(),
+                "Login failed, username or password error");
     }
 
     /**
@@ -60,10 +66,12 @@ public class AuthController {
             log.info("User {} logout", request.getSession().getAttribute("username").toString());
             userService.logout(request.getSession().getId());
             request.getSession().invalidate();
-            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Logout Success!");
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                    "Logout Success!");
         }
         log.warn("User logout failed, please login first!");
-        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Logout failed, please login first!");
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(),
+                "Logout failed, please login first!");
     }
 
 }

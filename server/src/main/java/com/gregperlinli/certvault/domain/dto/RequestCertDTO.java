@@ -21,9 +21,14 @@ import java.util.List;
 public class RequestCertDTO {
 
     /**
-     * CA UUID (Only required when applying for an SSL certificate)
+     * CA UUID (Only required when applying for an SSL certificate or Intermediate CA)
      */
     private String caUuid;
+
+    /**
+     * Whether to allow sub-CA (Only required when applying for an Intermediate CA)
+     */
+    private Boolean allowSubCa;
 
     /**
      * Country

@@ -15,24 +15,26 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ICaService extends IService<Ca> {
 
     /**
-     * Get all ca certificates
+     * Get ca certificates
      *
+     * @param keyword search keyword
      * @param owner owner of the ca certificates
      * @param page page number
      * @param limit page size
      * @return ca certificates info
      */
-    PageDTO<CaInfoDTO> getCas(String owner, Integer page, Integer limit);
+    PageDTO<CaInfoDTO> getCas(String keyword, String owner, Integer page, Integer limit);
 
     /**
      * Get all CA bindings of a user
      *
+     * @param keyword search keyword
      * @param username username
      * @param page     page number
      * @param limit    page size
      * @return CA binding information
      */
-    PageDTO<CaInfoDTO> getBoundCas(String username, Integer page, Integer limit);
+    PageDTO<CaInfoDTO> getBoundCas(String keyword, String username, Integer page, Integer limit);
 
     /**
      * Get ca certificate
@@ -44,14 +46,24 @@ public interface ICaService extends IService<Ca> {
     String getCaCert(String uuid, String owner);
 
     /**
+     * Get ca certificate chain
+     *
+     * @param uuid ca certificate uuid
+     * @param owner owner of the ca certificate
+     * @return ca certificate chain
+     */
+    String getCaCertChain(String uuid, String owner);
+
+    /**
      * Get ca private key
      *
-     * @param requestPrivkeyDTO ca private key info
+     * @param uuid              ca certificate uuid
+     * @param confirmPassword   confirm password
      * @param owner             owner of the ca private key
      * @return ca private key
      * @throws Exception decryption error
      */
-    String getCaPrivKey(RequestPrivkeyDTO requestPrivkeyDTO, String owner) throws Exception;
+    String getCaPrivKey(String uuid, String confirmPassword, String owner) throws Exception;
 
     /**
      * Update ca comment
