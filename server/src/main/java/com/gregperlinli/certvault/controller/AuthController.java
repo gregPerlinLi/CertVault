@@ -33,7 +33,6 @@ public class AuthController {
      *
      * @param loginDTO {@link LoginDTO}
      * @param request {@link HttpServletRequest}
-     * @param response {@link HttpServletResponse}
      * @return {@link ResultVO}
      */
     @PostMapping(value =  "/login")
@@ -62,8 +61,8 @@ public class AuthController {
      */
     @DeleteMapping(value = "/logout")
     public ResultVO<Void> logout(HttpServletRequest request) {
-        if ( request.getSession().getAttribute("username") != null ) {
-            log.info("User {} logout", request.getSession().getAttribute("username").toString());
+        if ( request.getSession().getAttribute("account") != null ) {
+            log.info("User {} logout", request.getSession().getAttribute("account").toString());
             userService.logout(request.getSession().getId());
             request.getSession().invalidate();
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
