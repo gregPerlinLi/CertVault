@@ -58,9 +58,8 @@ const submit = async () => {
   const err = await syncToRemote({ email: newEmail.value }, toast);
   if (err === null) {
     visible.value = false;
-  } else {
-    busy.value = false;
   }
+  busy.value = false;
 };
 </script>
 

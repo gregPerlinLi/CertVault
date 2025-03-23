@@ -50,9 +50,8 @@ const submit = async () => {
   if (err === null) {
     newPassword.value = "";
     visible.value = false;
-  } else {
-    busy.value = false;
   }
+  busy.value = false;
 };
 </script>
 
