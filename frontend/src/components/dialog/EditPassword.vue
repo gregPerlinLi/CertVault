@@ -50,9 +50,8 @@ const submit = async () => {
   if (err === null) {
     newPassword.value = "";
     visible.value = false;
-  } else {
-    busy.value = false;
   }
+  busy.value = false;
 };
 </script>
 
@@ -81,7 +80,8 @@ const submit = async () => {
           label="Confirm"
           size="small"
           type="submit"
-          :disabled="busy"></Button>
+          :disabled="busy"
+          :loading="busy"></Button>
       </div>
     </form>
   </Dialog>

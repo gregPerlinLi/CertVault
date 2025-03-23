@@ -35,6 +35,16 @@ const submit = async () => {
     });
     return;
   }
+  if (newDisplayName.value === props.value) {
+    invalid.value = true;
+    toast.add({
+      severity: "error",
+      summary: "Validation Error",
+      detail: "No changes found",
+      life: 5000
+    });
+    return;
+  }
 
   // Try update
   busy.value = true;
@@ -48,9 +58,8 @@ const submit = async () => {
   const err = await syncToRemote({ displayName: newDisplayName.value }, toast);
   if (err === null) {
     visible.value = false;
-  } else {
-    busy.value = false;
   }
+  busy.value = false;
 };
 </script>
 
@@ -79,7 +88,8 @@ const submit = async () => {
           label="Save"
           size="small"
           type="submit"
-          :disabled="busy"></Button>
+          :disabled="busy"
+          :loading="busy"></Button>
       </div>
     </form>
   </Dialog>

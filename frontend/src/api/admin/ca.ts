@@ -11,8 +11,8 @@ export const getAllCaInfo = (page: number, limit: number, keyword?: string) =>
 export const getCaPrivKey = (uuid: string, password: string) =>
   callRestfulApi<string>({
     method: "POST",
-    baseUrl: "/api/v1/admin/cert/ca/privkey",
-    pathNames: [uuid],
+    baseUrl: "/api/v1/admin/cert/ca/{uuid}/privkey",
+    pathNames: { uuid },
     payload: { password }
   });
 
@@ -42,31 +42,31 @@ export const requestCaCert = (payload: RequestCaCertPayload) =>
 export const renewCaCert = (uuid: string, expiry: number) =>
   callRestfulApi<ResponseCaDTO>({
     method: "PUT",
-    baseUrl: "/api/v1/admin/cert/ca",
-    pathNames: [uuid],
+    baseUrl: "/api/v1/admin/cert/ca/{uuid}",
+    pathNames: { uuid },
     payload: { expiry }
   });
 
 export const toggleCaAvailability = (uuid: string) =>
   callRestfulApi({
     method: "PATCH",
-    baseUrl: "/api/v1/admin/cert/ca/available",
-    pathNames: [uuid]
+    baseUrl: "/api/v1/admin/cert/ca/{uuid}/available",
+    pathNames: { uuid }
   });
 
 export const updateCaComment = (uuid: string, comment: string) =>
   callRestfulApi({
     method: "PATCH",
-    baseUrl: "/api/v1/admin/cert/ca/comment",
-    pathNames: [uuid],
+    baseUrl: "/api/v1/admin/cert/ca/{uuid}/comment",
+    pathNames: { uuid },
     payload: { comment }
   });
 
 export const deleteCa = (uuid: string) =>
   callRestfulApi({
     method: "DELETE",
-    baseUrl: "/api/v1/admin/cert/ca",
-    pathNames: [uuid]
+    baseUrl: "/api/v1/admin/cert/ca/{uuid}",
+    pathNames: { uuid }
   });
 
 export const bindCaToUsr = (caUuid: string, username: string) =>

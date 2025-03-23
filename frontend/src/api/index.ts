@@ -12,7 +12,7 @@ export const createURLSearchParams = (
 export interface RestfulApiOption {
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   baseUrl: string;
-  pathNames?: string[];
+  pathNames?: Record<string, string>;
   searchParams?: Record<string, any>;
   payload?: any;
   jsonParser?: typeof JSON.parse;
@@ -20,7 +20,10 @@ export interface RestfulApiOption {
 export const callRestfulApi = async <U = null>(
   opts: RestfulApiOption
 ): Promise<U> => {
-  const pathname = [opts.baseUrl, ...(opts.pathNames ?? [])].join("/");
+  const pathname = Object.entries(opts.pathNames ?? {}).reduce(
+    (prev, [k, v]) => prev.replace(`{${k}}`, encodeURIComponent(v)),
+    opts.baseUrl
+  );
   const params = createURLSearchParams(opts.searchParams ?? {});
   const uri = params.size > 0 ? `${pathname}?${params}` : pathname;
 
