@@ -21,10 +21,9 @@ import com.gregperlinli.certvault.utils.EncryptAndDecryptUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -119,6 +118,85 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
             return certificate.getCert();
         }
         throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The certificate is not yours.");
+    }
+
+    @Override
+    public String getCertificateCertChain(String uuid, String owner) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("username", owner)
+                .eq("deleted", false);
+        User user = userService.getOne(userQueryWrapper);
+        if ( user == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
+        }
+        QueryWrapper<Certificate> certificateQueryWrapper = new QueryWrapper<>();
+        certificateQueryWrapper.eq("uuid", uuid)
+                .eq("deleted", false);
+        Certificate certificate = this.getOne(certificateQueryWrapper);
+        if ( certificate == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The certificate does not exist.");
+        }
+        if ( !Objects.equals( certificate.getOwner(), user.getId() ) &&
+             !( user.getRole() == AccountTypeConstant.ADMIN.getAccountType() &&
+                     caBindingService.exists( new QueryWrapper<CaBinding>()
+                             .eq("ca_uuid", certificate.getCaUuid())
+                             .eq("uid", user.getId())) ) &&
+             user.getRole() != AccountTypeConstant.SUPERADMIN.getAccountType()
+        ) {
+            throw new ParamValidateException(
+                    ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The certificate is not yours."
+            );
+        }
+        // 收集证书链（处理二次编码）
+        List<String> certChain = new ArrayList<>();
+        // 处理当前证书
+        String certBase64 = certificate.getCert();
+        if (certBase64 != null && !certBase64.isEmpty()) {
+            try {
+                // 解码二次编码的PEM字符串（原始PEM内容）
+                String pemContent = new String(
+                        Base64.getDecoder().decode(certBase64),
+                        StandardCharsets.UTF_8
+                );
+                certChain.add(pemContent);
+            } catch (IllegalArgumentException e) {
+                throw new ParamValidateException(
+                        ResultStatusCodeConstant.FAILED.getResultCode(),
+                        "Invalid certificate format in database."
+                );
+            }
+        }
+        // 向上查找CA链
+        String currentCaUuid = certificate.getCaUuid();
+        while (currentCaUuid != null && !currentCaUuid.isEmpty()) {
+            Ca ca = caService.getOne(new QueryWrapper<Ca>()
+                    .eq("uuid", currentCaUuid)
+                    .eq("deleted", false));
+            if (ca == null) {
+                break;
+            }
+            String caCertBase64 = ca.getCert();
+            if (caCertBase64 != null && !caCertBase64.isEmpty()) {
+                try {
+                    String pemContent = new String(
+                            Base64.getDecoder().decode(caCertBase64),
+                            StandardCharsets.UTF_8
+                    );
+                    certChain.add(pemContent);
+                } catch (IllegalArgumentException e) {
+                    throw new ParamValidateException(
+                            ResultStatusCodeConstant.FAILED.getResultCode(),
+                            "Invalid CA certificate format in database."
+                    );
+                }
+            }
+            currentCaUuid = ca.getParentCa();
+        }
+        // 拼接证书链并Base64编码
+        String chainContent = String.join("\n", certChain);
+        return Base64.getEncoder().encodeToString(
+                chainContent.getBytes(StandardCharsets.UTF_8)
+        );
     }
 
     @Override

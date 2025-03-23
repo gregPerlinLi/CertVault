@@ -28,9 +28,18 @@ public interface ICertificateService extends IService<Certificate> {
      *
      * @param uuid   Certificate UUID
      * @param owner  Owner of the Certificate
-     * @return {@link String}
+     * @return {@link String} BASE64 SSL Certificate
      */
     String getCertificateCert(String uuid, String owner);
+
+    /**
+     * Get SSL Certificate Chain
+     *
+     * @param uuid  Certificate UUID
+     * @param owner Owner of the Certificate
+     * @return {@link String} BASE64 SSL Certificate Chain
+     */
+    String getCertificateCertChain(String uuid, String owner);
 
     /**
      * Get SSL Certificate Private Key
@@ -38,7 +47,7 @@ public interface ICertificateService extends IService<Certificate> {
      * @param uuid              Certificate UUID
      * @param confirmPassword   Confirm password
      * @param owner             Owner of the Certificate
-     * @return {@link String}
+     * @return {@link String} BASE64 SSL Certificate Private Key
      * @throws Exception Decryption error
      */
     String getCertificatePrivkey(String uuid, String confirmPassword, String owner) throws Exception;
