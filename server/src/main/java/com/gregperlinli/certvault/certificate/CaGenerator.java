@@ -5,6 +5,7 @@ import com.gregperlinli.certvault.domain.entities.CaGenRequest;
 import com.gregperlinli.certvault.domain.entities.GenResponse;
 import com.gregperlinli.certvault.domain.entities.CaRenewRequest;
 import com.gregperlinli.certvault.domain.exception.CertGenException;
+import com.gregperlinli.certvault.utils.CertUtils;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
@@ -53,7 +54,19 @@ public class CaGenerator {
             keyGen.initialize(2048);
             KeyPair caKeyPair = keyGen.generateKeyPair();
 
-            // 3. 构建 X500Name（证书主题）
+            // 3. 判断是否为中间 CA
+            boolean isIntermediate = (request.getParentCa() != null
+                    && request.getParentCaPrivkey() != null);
+
+            // 4. 解析父 CA 的证书和私钥（仅当是中间 CA 时）
+            X509CertificateHolder parentCert = null;
+            PrivateKey parentPrivateKey = null;
+            if (isIntermediate) {
+                parentCert = parseCertificate(request.getParentCa());
+                parentPrivateKey = parsePrivateKey(request.getParentCaPrivkey());
+            }
+
+            // 5. 构建 X500Name（证书主题）
             StringBuilder dnBuilder = new StringBuilder();
             dnBuilder.append("C=").append(request.getCountry());
             dnBuilder.append(",ST=").append(request.getProvince());
@@ -64,42 +77,63 @@ public class CaGenerator {
             if (request.getEmailAddress() != null) {
                 dnBuilder.append(",emailAddress=").append(request.getEmailAddress());
             }
-            X500Name issuer = new X500Name(dnBuilder.toString());
+            X500Name subject = new X500Name(dnBuilder.toString());
 
-            // 4. 设置有效期（当前时间 ± expiry 天）
+            // 6. 设置颁发者（issuer）
+            X500Name issuer = isIntermediate
+                    ? new X500Name(parentCert.getSubject().toString())
+                    : subject;
+
+            // 7. 设置有效期（当前时间 ± expiry 天）
             Date notBefore = new Date();
             Date notAfter = new Date(notBefore.getTime() + request.getExpiry() * 24L * 60 * 60 * 1000);
 
-            // 5. 构建证书
+            // 8. 构建证书
             X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                     issuer,
                     BigInteger.probablePrime(128, new SecureRandom()),
                     notBefore, notAfter,
-                    issuer,
+                    subject,
                     caKeyPair.getPublic()
             );
 
-            // 6. 添加扩展字段
+            // 9. 添加扩展字段
+            // certBuilder.addExtension(Extension.keyUsage, true,
+            //         new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.cRLSign));
+            // certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(1));
             certBuilder.addExtension(Extension.keyUsage, true,
                     new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.cRLSign));
-            certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(0));
+            if (isIntermediate) {
+                // 中间 CA：允许签发下级 CA 的条件
+                // 0 表示只能签发终端，1 表示可签发 1 层下级 CA
+                int pathLen = request.getAllowSubCa() ? 1 : 0;
+                certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(pathLen));
+            } else {
+                // 根 CA：允许无限层级
+                certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+            }
 
-            // 7. 创建签名器（SHA256withRSA）
-            ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
+            // 10. 创建签名器（SHA256withRSA）
+            // ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
+            //         .build(caKeyPair.getPrivate());
+            ContentSigner signer = isIntermediate
+                    ? new JcaContentSignerBuilder("SHA256WithRSAEncryption")
+                    .build(parentPrivateKey)
+                    : new JcaContentSignerBuilder("SHA256WithRSAEncryption")
                     .build(caKeyPair.getPrivate());
 
-            // 8. 生成最终证书
+            // 11. 生成最终证书
             X509CertificateHolder certHolder = certBuilder.build(signer);
 
-            // 9. 生成 PEM 格式的证书和私钥字符串（包含头尾）
+            // 12. 生成 PEM 格式的证书和私钥字符串（包含头尾）
             String pemCert = generatePemCertificate(certHolder);
             String pemPrivateKey = generatePemPrivateKey(caKeyPair.getPrivate());
 
-            // 10. 对 PEM 内容进行 Base64 编码
+            // 13. 对 PEM 内容进行 Base64 编码
             String certBase64 = encodeBase64(pemCert.getBytes());
             String privKeyBase64 = encodeBase64(pemPrivateKey.getBytes());
 
-            // 11. 填充并返回响应 DTO
+            // 14. 填充并返回响应 DTO
             return new GenResponse()
                     .setUuid(UUID.randomUUID().toString())
                     .setPrivkey(privKeyBase64)
@@ -127,6 +161,38 @@ public class CaGenerator {
             X509CertificateHolder oldCert = parseCertificate(renewRequest.getOldCert());
             PrivateKey privateKey = parsePrivateKey(renewRequest.getOldPrivkey());
 
+
+            // 3. 判断是否为中间 CA
+            boolean isIntermediate = (renewRequest.getParentCa() != null
+                    && renewRequest.getParentCaPrivkey() != null);
+
+            // 4. 解析父 CA 的证书和私钥（仅当是中间 CA 时）
+            X509CertificateHolder parentCert = null;
+            PrivateKey parentPrivateKey = null;
+            if (isIntermediate) {
+                parentCert = parseCertificate(renewRequest.getParentCa());
+                parentPrivateKey = parsePrivateKey(renewRequest.getParentCaPrivkey());
+            }
+
+            // 验证父 CA 有效性
+            if (isIntermediate) {
+                if (!parentCert.getSubject().equals(oldCert.getIssuer())) {
+                    throw new CertGenException(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode(), "Parent CA does not match the issuer of the old certificate");
+                }
+            }
+
+            // 检查父 CA 的路径长度约束
+            if (isIntermediate) {
+                BasicConstraints parentBC = CertUtils.getBasicConstraints(parentCert);
+                if (parentBC != null && parentBC.getPathLenConstraint() != null) {
+                    int parentPathLen = parentBC.getPathLenConstraint().intValue();
+                    int currentPathLen = renewRequest.getAllowSubCa() ? 1 : 0;
+                    if (currentPathLen > parentPathLen) {
+                        throw new CertGenException(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode(), "Parent CA does not allow issuing CA with this path length");
+                    }
+                }
+            }
+
             // 3. 提取原始证书的主体信息
             X500Name issuer = new X500Name(String.valueOf(oldCert.getSubject()));
             PublicKey publicKey = new JcaX509CertificateConverter()
@@ -148,13 +214,24 @@ public class CaGenerator {
             );
 
             // 6. 保留原有扩展字段（如 BasicConstraints）
-            certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(0));
+            // certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(0));
+            // certBuilder.addExtension(Extension.keyUsage, true,
+            //        new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.cRLSign));
             certBuilder.addExtension(Extension.keyUsage, true,
                     new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.cRLSign));
+            if (isIntermediate) {
+                int pathLen = renewRequest.getAllowSubCa() ? 1 : 0;
+                certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(pathLen));
+            } else {
+                certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+            }
 
             // 7. 创建签名器（使用原始私钥）
-            ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
-                    .build(privateKey);
+            // ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
+            //         .build(privateKey);
+            ContentSigner signer = isIntermediate
+                    ? new JcaContentSignerBuilder("SHA256WithRSAEncryption").build(parentPrivateKey)
+                    : new JcaContentSignerBuilder("SHA256WithRSAEncryption").build(privateKey);
 
             // 8. 生成最终证书
             X509CertificateHolder newCertHolder = certBuilder.build(signer);
