@@ -1,7 +1,7 @@
 package com.gregperlinli.certvault.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.gregperlinli.certvault.certificate.CertDecoder;
+import com.gregperlinli.certvault.certificate.CertAnalyzer;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.*;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
@@ -43,7 +43,7 @@ public class UserController {
     public ResultVO<UserProfileDTO> getProfile(HttpServletRequest request) {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "success",
-                userService.getOwnProfile(request.getSession().getAttribute("username").toString()));
+                userService.getOwnProfile(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername()));
     }
 
     /**
@@ -97,7 +97,7 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
-    @GetMapping(value = "/cert/ca/cer/{uuid}")
+    @GetMapping(value = "/cert/ca/{uuid}/cer")
     public ResultVO<String> getCaCert(@PathVariable("uuid") String uuid,
                                       @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
                                       HttpServletRequest request) {
@@ -123,7 +123,7 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
-    @GetMapping(value = "/cert/cert")
+    @GetMapping(value = "/cert/ssl")
     public ResultVO<PageDTO<CertInfoDTO>> getCerts(@RequestParam(value = "keyword", required = false) String keyword,
                                                    @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                    @RequestParam(value = "limit", defaultValue = "10") Integer limit,
@@ -146,7 +146,7 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
-    @GetMapping(value = "/cert/cert/cer/{uuid}")
+    @GetMapping(value = "/cert/ssl/{uuid}/cer")
     public ResultVO<String> getCertificateCert(@PathVariable("uuid") String uuid,
                                                @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
                                                HttpServletRequest request) {
@@ -172,7 +172,7 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
-    @PostMapping(value = "/cert/cert/privkey/{uuid}")
+    @PostMapping(value = "/cert/ssl/{uuid}/privkey")
     public ResultVO<String> getCertificatePrivkey(@PathVariable("uuid") String uuid,
                                                   @RequestBody JsonNode confirmPassword,
                                                   HttpServletRequest request) throws Exception {
@@ -193,7 +193,7 @@ public class UserController {
      * @param request       {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
-    @PatchMapping(value = "/cert/cert/comment/{uuid}")
+    @PatchMapping(value = "/cert/ssl/{uuid}/comment")
     public ResultVO<Void> updateCertComment(@PathVariable("uuid") String uuid,
                                             @RequestBody JsonNode updateComment,
                                             HttpServletRequest request) {
@@ -214,7 +214,7 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
-    @PostMapping(value = "/cert/cert")
+    @PostMapping(value = "/cert/ssl")
     public ResultVO<ResponseCertDTO> requestCert(@RequestBody RequestCertDTO requestCertDTO,
                                                  HttpServletRequest request) throws Exception {
         ResponseCertDTO result = certificateService.requestCert(requestCertDTO,
@@ -234,7 +234,7 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
-    @PutMapping(value = "/cert/cert/{uuid}")
+    @PutMapping(value = "/cert/ssl/{uuid}")
     public ResultVO<ResponseCertDTO> renewCert(@PathVariable("uuid") String oldCertUuid,
                                                @RequestBody JsonNode expiry,
                                                HttpServletRequest request) throws Exception {
@@ -254,7 +254,7 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
-    @DeleteMapping(value = "/cert/cert/{uuid}")
+    @DeleteMapping(value = "/cert/ssl/{uuid}")
     public ResultVO<Void> deleteCert(@PathVariable("uuid") String uuid,
                                      HttpServletRequest request) {
         Boolean result = certificateService.deleteCert(uuid,
@@ -276,7 +276,7 @@ public class UserController {
     public ResultVO<CertificateDetailsDTO> getCertificateDetails(@RequestBody JsonNode certBase64) throws Exception {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "success",
-                new CertificateDetailsDTO(CertDecoder.decodeCertificate(certBase64.get("cert").asText())));
+                new CertificateDetailsDTO(CertAnalyzer.analyzeCertificate(certBase64.get("cert").asText())));
     }
 
 }

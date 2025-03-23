@@ -59,6 +59,13 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
 
+init:
+  superadmin:
+    username: ${SUPERADMIN_USERNAME:superadmin}
+    display-name: ${SUPERADMIN_DISPLAY_NAME:Default Superadmin}
+    email: ${SUPERADMIN_EMAIL:superadmin@certvault.example}
+    password: ${SUPERADMIN_PASSWORD:CertVault@2025}
+
 encrypt:
   rsa:
     key:

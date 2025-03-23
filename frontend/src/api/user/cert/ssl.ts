@@ -1,12 +1,33 @@
-import type {
-  CertInfoDTO,
-  PaginationVO,
-  ResponseCertDTO,
-  ResultVO
-} from "@/api/types";
-import { createURLSearchParams } from "@/utils";
+import type { CertInfoDTO, PaginationVO, ResponseCertDTO } from "@/api/types";
+import { callRestfulApi } from "@/api";
 
-export interface RequestCertRequestPayload {
+export const getAllSslCertInfo = (
+  page: number,
+  limit: number,
+  keyword?: string
+) =>
+  callRestfulApi<PaginationVO<CertInfoDTO>>({
+    method: "GET",
+    baseUrl: "/api/v1/user/cert/ssl",
+    searchParams: { page, limit, keyword }
+  });
+
+export const getSslCert = (uuid: string) =>
+  callRestfulApi<string>({
+    method: "GET",
+    baseUrl: "/api/v1/user/cert/ssl/{uuid}/cer",
+    pathNames: { uuid }
+  });
+
+export const getSslPrivKey = (uuid: string, password: string) =>
+  callRestfulApi<string>({
+    method: "POST",
+    baseUrl: "/api/v1/user/cert/ssl/{uuid}/privkey",
+    pathNames: { uuid },
+    payload: { password }
+  });
+
+export interface RequestCertPayload {
   caUuid?: string;
   country: string;
   province: string;
@@ -21,127 +42,32 @@ export interface RequestCertRequestPayload {
     value: string;
   }[];
 }
-export const requestCert = async (payload: RequestCertRequestPayload) => {
-  const req = {
-    headers: { "Content-Type": "application/json" },
+export const requestSslCert = (payload: RequestCertPayload) =>
+  callRestfulApi<ResponseCertDTO>({
     method: "POST",
-    body: JSON.stringify(payload)
-  } satisfies RequestInit;
+    baseUrl: "/api/v1/user/cert/ssl",
+    payload
+  });
 
-  const resp = await fetch("/api/v1/user/cert/cert", req);
-  if (!resp.ok) {
-    throw Error(`HTTP: ${resp.statusText} (${resp.status})`);
-  }
-
-  const json: ResultVO<ResponseCertDTO> = await resp.json();
-  if (json.code !== 200) {
-    throw Error(`${json.msg} (${json.code})`);
-  }
-
-  return json.data!;
-};
-
-export const renewCert = async (uuid: string, expiry: number) => {
-  const req = {
-    headers: { "Content-Type": "application/json" },
+export const renewSslCert = (uuid: string, expiry: number) =>
+  callRestfulApi<ResponseCertDTO>({
     method: "PUT",
-    body: JSON.stringify({ expiry })
-  } satisfies RequestInit;
+    baseUrl: "/api/v1/user/cert/ssl/{uuid}",
+    pathNames: { uuid },
+    payload: { expiry }
+  });
 
-  const resp = await fetch(`/api/v1/user/cert/cert/${uuid}`, req);
-  if (!resp.ok) {
-    throw Error(`HTTP: ${resp.statusText} (${resp.status})`);
-  }
-
-  const json: ResultVO<ResponseCertDTO> = await resp.json();
-  if (json.code !== 200) {
-    throw Error(`${json.msg} (${json.code})`);
-  }
-
-  return json.data!;
-};
-
-export const getCerts = async (
-  page: number,
-  limit: number,
-  keyword?: string
-) => {
-  const params = createURLSearchParams({ page, limit, keyword });
-  const resp = await fetch(`/api/v1/user/cert/cert?${params.toString()}`);
-  if (!resp.ok) {
-    throw Error(`${resp.statusText} (${resp.status})`);
-  }
-
-  const json: ResultVO<PaginationVO<CertInfoDTO>> = await resp.json();
-  if (json.code !== 200) {
-    throw Error(`${json.msg} (${json.code})`);
-  }
-
-  return json.data!;
-};
-
-export const getCert = async (uuid: string) => {
-  const resp = await fetch(`/api/v1/user/cert/cert/cer/${uuid}`);
-  if (!resp.ok) {
-    throw Error(`${resp.statusText} (${resp.status})`);
-  }
-
-  const json: ResultVO<string> = await resp.json();
-  if (json.code !== 200) {
-    throw Error(`${json.msg} (${json.code})`);
-  }
-
-  return json.data!;
-};
-
-export const getPrivKey = async (uuid: string, password: string) => {
-  const req = {
-    headers: { "Content-Type": "application/json" },
-    method: "POST",
-    body: JSON.stringify({ password })
-  } satisfies RequestInit;
-
-  const resp = await fetch(`/api/v1/user/cert/cert/privkey/${uuid}`, req);
-  if (!resp.ok) {
-    throw Error(`HTTP: ${resp.statusText} (${resp.status})`);
-  }
-
-  const json: ResultVO<string> = await resp.json();
-  if (json.code !== 200) {
-    throw Error(`${json.msg} (${json.code})`);
-  }
-
-  return json.data!;
-};
-
-export const updateCertComment = async (uuid: string, comment: string) => {
-  const req = {
-    headers: { "Content-Type": "application/json" },
+export const updateSslCertComment = (uuid: string, comment: string) =>
+  callRestfulApi({
     method: "PATCH",
-    body: JSON.stringify({ comment })
-  } satisfies RequestInit;
+    baseUrl: "/api/v1/user/cert/ssl/{uuid}/comment",
+    pathNames: { uuid },
+    payload: { comment }
+  });
 
-  const resp = await fetch(`/api/v1/user/cert/cert/comment/${uuid}`, req);
-  if (!resp.ok) {
-    throw Error(`HTTP: ${resp.statusText} (${resp.status})`);
-  }
-
-  const json: ResultVO = await resp.json();
-  if (json.code !== 200) {
-    throw Error(`${json.msg} (${json.code})`);
-  }
-};
-
-export const deleteCert = async (uuid: string) => {
-  const req = { method: "DELETE" } satisfies RequestInit;
-
-  const resp = await fetch(`/api/v1/user/cert/cert/${uuid}`, req);
-  if (!resp.ok) {
-    throw Error(`HTTP: ${resp.statusText} (${resp.status})`);
-  }
-
-  const json: ResultVO = await resp.json();
-  if (json.code !== 200) {
-    throw Error(`${json.msg} (${json.code})`);
-  }
-};
+export const deleteSslCert = (uuid: string) =>
+  callRestfulApi({
+    method: "DELETE",
+    baseUrl: "/api/v1/user/cert/ssl/{uuid}",
+    pathNames: { uuid }
+  });

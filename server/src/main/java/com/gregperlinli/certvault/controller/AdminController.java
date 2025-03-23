@@ -11,7 +11,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Base64;
+import java.util.List;
 
 /**
  * Admin Controller
@@ -77,12 +77,14 @@ public class AdminController {
     /**
      * Get a CA certificate
      *
+     * @deprecated Not implemented
      * @param uuid the uuid of the CA
      * @param isChain whether to get the certificate chain
      * @param request the request
      * @return the result
      */
     @GetMapping(value = "/cert/ca/cer/{uuid}")
+    @Deprecated(since = "0.4.0")
     public ResultVO<String> getCaCert(@PathVariable("uuid") String uuid,
                                       @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
                                       HttpServletRequest request) {
@@ -108,7 +110,7 @@ public class AdminController {
      * @return the result
      * @throws Exception if the decrypt is failed
      */
-    @PostMapping(value = "/cert/ca/privkey/{uuid}")
+    @PostMapping(value = "/cert/ca/{uuid}/privkey")
     public ResultVO<String> getCaPrivkey(@PathVariable("uuid") String uuid,
                                          @RequestBody JsonNode confirmPassword,
                                          HttpServletRequest request) throws Exception {
@@ -128,7 +130,7 @@ public class AdminController {
      * @param request the request
      * @return the result
      */
-    @PatchMapping(value = "/cert/ca/comment/{uuid}")
+    @PatchMapping(value = "/cert/ca/{uuid}/comment")
     public ResultVO<Void> updateCaComment(@PathVariable("uuid") String uuid,
                                           @RequestBody JsonNode updateComment,
                                           HttpServletRequest request) {
@@ -148,7 +150,7 @@ public class AdminController {
      * @param request the request
      * @return the result
      */
-    @PatchMapping(value = "/cert/ca/available/{uuid}")
+    @PatchMapping(value = "/cert/ca/{uuid}/available")
     public ResultVO<Boolean> modifyCaAvailable(@PathVariable("uuid") String uuid,
                                                HttpServletRequest request) {
         Boolean result = caService.modifyCaAvailability(uuid,
@@ -233,6 +235,22 @@ public class AdminController {
     }
 
     /**
+     * Bind CA certificate to users
+     *
+     * @param caBindingDTOs the CA binding DTOs
+     * @return the result
+     * @throws Exception if the decrypt is failed
+     */
+    @PostMapping(value = "/cert/ca/binds")
+    public ResultVO<Void> bindCasToUsers(@RequestBody List<CaBindingDTO> caBindingDTOs) throws Exception {
+        Boolean result = caBindingService.newBindings(caBindingDTOs);
+        if ( result ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Failed");
+    }
+
+    /**
      * Unbind a CA certificate from a user
      *
      * @param caBindingDTO the CA binding DTO
@@ -241,6 +259,22 @@ public class AdminController {
     @DeleteMapping(value = "/cert/ca/bind")
     public ResultVO<Void> unbindCaFromUser(@RequestBody CaBindingDTO caBindingDTO) {
         Boolean result = caBindingService.deleteBinding(caBindingDTO);
+        if ( result ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Failed");
+    }
+
+    /**
+     * Unbind CA certificate from users
+     *
+     * @param caBindingDTOs the CA binding DTOs
+     * @return the result
+     * @throws Exception if the decrypt is failed
+     */
+    @DeleteMapping(value = "/cert/ca/binds")
+    public ResultVO<Void> unbindCasFromUsers(@RequestBody List<CaBindingDTO> caBindingDTOs) throws Exception {
+        Boolean result = caBindingService.deleteBindings(caBindingDTOs);
         if ( result ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
         }
