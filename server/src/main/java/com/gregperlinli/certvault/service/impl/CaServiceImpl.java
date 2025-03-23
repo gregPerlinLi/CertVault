@@ -432,7 +432,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
         boolean result = this.update(ca, caUpdateWrapper);
         if ( result ) {
             genResponse.setPrivkey(null);
-            return new ResponseCaDTO(genResponse);
+            return new ResponseCaDTO(genResponse, ca.getParentCa(), ca.getAllowSubCa());
         }
         return null;
     }
