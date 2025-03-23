@@ -45,9 +45,11 @@ export interface CertDetailDTO {
   extensions: any;
 }
 
-export interface CAInfoDTO {
+export interface CaInfoDTO {
   uuid: string;
   owner: string;
+  parentCa: string | null;
+  allowSubCa: boolean | null;
   comment: string;
   available: boolean;
   notBefore: string;
@@ -61,6 +63,15 @@ export interface ResponseCertDTO {
   privkey: string | null;
   cert: string;
   caUuid: string;
+  notBefore: string;
+  notAfter: string;
+  comment: string;
+}
+
+export interface ResponseCaDTO {
+  uuid: string;
+  privkey: string | null;
+  cert: string;
   notBefore: string;
   notAfter: string;
   comment: string;
