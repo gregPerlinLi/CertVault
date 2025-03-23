@@ -110,8 +110,40 @@ public class CertAnalyzer {
                 }
                 return "SAN: " + String.join(", ", sanList);
             } else if (oid.equals(Extension.keyUsage.getId())) {
-                KeyUsage keyUsage = KeyUsage.getInstance(ASN1Primitive.fromByteArray(extValueBytes));
-                return "KeyUsage: " + keyUsage.toString();
+                try {
+                    // 1. 验证扩展值是否为 BIT STRING
+                    ASN1Primitive primitive = ASN1Primitive.fromByteArray(extValueBytes);
+                    if (!(primitive instanceof ASN1BitString)) {
+                        return "Parsing failed [2.5.29.15]: Invalid BIT STRING encoding";
+                    }
+
+                    // 2. 解析 KeyUsage
+                    KeyUsage keyUsage = KeyUsage.getInstance(primitive);
+
+                    List<String> usages = new ArrayList<>();
+
+                    // 使用 KeyUsage 的 hasUsages() 方法直接检查标志位
+                    Map<Integer, String> usageMap = new HashMap<>();
+                    usageMap.put(KeyUsage.digitalSignature, "Digital Signature");
+                    usageMap.put(KeyUsage.nonRepudiation, "Non Repudiation");
+                    usageMap.put(KeyUsage.keyEncipherment, "Key Encipherment");
+                    usageMap.put(KeyUsage.dataEncipherment, "Data Encipherment");
+                    usageMap.put(KeyUsage.keyAgreement, "Key Agreement");
+                    usageMap.put(KeyUsage.keyCertSign, "Certificate Sign");
+                    usageMap.put(KeyUsage.cRLSign, "CRL Sign");
+                    usageMap.put(KeyUsage.encipherOnly, "Encipher Only");
+                    usageMap.put(KeyUsage.decipherOnly, "Decipher Only");
+
+                    for (Map.Entry<Integer, String> entry : usageMap.entrySet()) {
+                        if (keyUsage.hasUsages(entry.getKey())) {
+                            usages.add(entry.getValue());
+                        }
+                    }
+
+                    return String.format("KeyUsage: %s", String.join(", ", usages));
+                } catch (Exception e) {
+                    return "Parsing failed [2.5.29.15]: " + e.getMessage();
+                }
             } else if (oid.equals(Extension.extendedKeyUsage.getId())) {
                 ASN1Primitive primitive = ASN1Primitive.fromByteArray(extValueBytes);
                 if (primitive instanceof ASN1Sequence) {
