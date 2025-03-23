@@ -93,14 +93,22 @@ public class UserController {
      * Get CA certificate
      *
      * @param uuid CA uuid
+     * @param isChain whether to get the certificate chain
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
     @GetMapping(value = "/cert/ca/cer/{uuid}")
     public ResultVO<String> getCaCert(@PathVariable("uuid") String uuid,
+                                      @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
                                       HttpServletRequest request) {
-        String result = caService.getCaCert(uuid,
-                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        String result = null;
+        if ( isChain ) {
+            result = caService.getCaCertChain(uuid,
+                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        } else {
+            result = caService.getCaCert(uuid,
+                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        }
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -134,14 +142,22 @@ public class UserController {
      * Get SSL certificate
      *
      * @param uuid Certificate uuid
+     * @param isChain whether to get the certificate chain
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
     @GetMapping(value = "/cert/cert/cer/{uuid}")
     public ResultVO<String> getCertificateCert(@PathVariable("uuid") String uuid,
+                                               @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
                                                HttpServletRequest request) {
-        String result = certificateService.getCertificateCert(uuid,
-                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        String result = null;
+        if ( isChain ) {
+            result = certificateService.getCertificateCertChain(uuid,
+                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        } else {
+            result = certificateService.getCertificateCert(uuid,
+                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        }
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -151,7 +167,7 @@ public class UserController {
     /**
      * Get SSL certificate private key
      *
-     * @param requestPrivkeyDTO {@link RequestPrivkeyDTO} Request private key entity
+     * @param uuid Certificate uuid
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      * @throws Exception e exception
