@@ -11,6 +11,8 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Base64;
+
 /**
  * Admin Controller
  *
@@ -76,14 +78,22 @@ public class AdminController {
      * Get a CA certificate
      *
      * @param uuid the uuid of the CA
+     * @param isChain whether to get the certificate chain
      * @param request the request
      * @return the result
      */
     @GetMapping(value = "/cert/ca/cer/{uuid}")
     public ResultVO<String> getCaCert(@PathVariable("uuid") String uuid,
+                                      @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
                                       HttpServletRequest request) {
-        String result = caService.getCaCert(uuid,
-                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        String result = null;
+        if ( isChain ) {
+            result = caService.getCaCertChain(uuid,
+                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        } else {
+            result = caService.getCaCert(uuid,
+                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        }
         if ( result != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -93,7 +103,7 @@ public class AdminController {
     /**
      * Get a CA private key
      *
-     * @param requestPrivkeyDTO the request private key DTO
+     * @param uuid the uuid of the CA
      * @param request the request
      * @return the result
      * @throws Exception if the decrypt is failed
@@ -114,7 +124,7 @@ public class AdminController {
     /**
      * Update a CA comment
      *
-     * @param updateCommentDTO the update comment DTO
+     * @param uuid the uuid of the CA
      * @param request the request
      * @return the result
      */
