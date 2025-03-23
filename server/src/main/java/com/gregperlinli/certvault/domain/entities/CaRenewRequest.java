@@ -26,6 +26,21 @@ public class CaRenewRequest {
     private String uuid;
 
     /**
+     * The parent CA
+     */
+    private String parentCa;
+
+    /**
+     * The parent CA's private key
+     */
+    private String parentCaPrivkey;
+
+    /**
+     * Whether to allow subordinate CA
+     */
+    private Boolean allowSubCa = false;
+
+    /**
      * The old private key
      */
     private String oldPrivkey;
@@ -47,6 +62,7 @@ public class CaRenewRequest {
 
     public CaRenewRequest(Ca ca, Integer newExpiry) throws Exception {
         this.uuid = ca.getUuid();
+        this.allowSubCa = ca.getAllowSubCa();
         this.oldPrivkey = EncryptAndDecryptUtils.decrypt(ca.getPrivkey());
         this.oldCert = ca.getCert();
         this.newExpiry = newExpiry;

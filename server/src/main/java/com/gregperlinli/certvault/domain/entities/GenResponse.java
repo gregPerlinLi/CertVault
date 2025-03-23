@@ -70,6 +70,25 @@ public class GenResponse {
         return ca;
     }
 
+    public Ca toIntCa(String parentCa, Boolean allowSubCa, Integer userId, LocalDateTime createdAt, LocalDateTime modifiedAt) throws Exception {
+        Ca ca = new Ca();
+        ca.setId(null);
+        ca.setUuid(this.getUuid());
+        ca.setPrivkey(EncryptAndDecryptUtils.encrypt(this.getPrivkey()));
+        ca.setCert(this.getCert());
+        ca.setParentCa(parentCa);
+        ca.setAllowSubCa(allowSubCa);
+        ca.setOwner(userId);
+        ca.setComment(this.getComment());
+        ca.setAvailable(true);
+        ca.setNotBefore(this.getNotBefore());
+        ca.setNotAfter(this.getNotAfter());
+        ca.setCreatedAt(createdAt);
+        ca.setModifiedAt(modifiedAt);
+        ca.setDeleted(false);
+        return ca;
+    }
+
     public Certificate toCert(String caUuid, Integer userId, LocalDateTime createdAt, LocalDateTime modifiedAt) throws Exception {
         Certificate certificate = new Certificate();
         certificate.setId(null);

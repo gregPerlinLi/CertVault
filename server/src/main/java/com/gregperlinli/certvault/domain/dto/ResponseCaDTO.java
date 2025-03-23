@@ -36,6 +36,16 @@ public class ResponseCaDTO {
     private String cert;
 
     /**
+     * Parent CA UUID
+     */
+    private String parentCa;
+
+    /**
+     * Whether to allow issue subordinate CA
+     */
+    private Boolean allowSubCa;
+
+    /**
      * Effective Date
      */
     private LocalDateTime notBefore;
@@ -54,6 +64,17 @@ public class ResponseCaDTO {
         this.uuid = response.getUuid();
         this.privkey = response.getPrivkey();
         this.cert = response.getCert();
+        this.notBefore = response.getNotBefore();
+        this.notAfter = response.getNotAfter();
+        this.comment = response.getComment();
+    }
+
+    public ResponseCaDTO(GenResponse response, String parentCa, Boolean allowSubCa) {
+        this.uuid = response.getUuid();
+        this.privkey = response.getPrivkey();
+        this.cert = response.getCert();
+        this.parentCa = parentCa;
+        this.allowSubCa = allowSubCa;
         this.notBefore = response.getNotBefore();
         this.notAfter = response.getNotAfter();
         this.comment = response.getComment();
