@@ -20,7 +20,7 @@ These guidelines help maintain project quality and ensure contributions align wi
 > "Even small contributions like typo fixes or documentation updates are valuable. Every contribution helps!"
 
 ### What we're not looking for
-[//]: # (- Support requests &#40;use our [GitHub Discussions]&#40;https://github.com/your-org/certvault/discussions&#41; instead&#41;)
+[//]: # (- Support requests &#40;use our [GitHub Discussions]&#40;https://github.com/gregperlinli/certvault/discussions&#41; instead&#41;)
 - Duplicate feature requests without prior discussion
 - Unscoped large-scale changes without proposal
 
