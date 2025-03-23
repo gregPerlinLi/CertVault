@@ -6,6 +6,7 @@ on:
       - dev
     paths:
       - server/**
+  workflow_dispatch:
 #  release:
 #    types:
 #      - created
