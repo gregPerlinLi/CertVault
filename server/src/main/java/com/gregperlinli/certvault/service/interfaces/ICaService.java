@@ -46,6 +46,15 @@ public interface ICaService extends IService<Ca> {
     String getCaCert(String uuid, String owner);
 
     /**
+     * Get ca certificate chain
+     *
+     * @param uuid ca certificate uuid
+     * @param owner owner of the ca certificate
+     * @return ca certificate chain
+     */
+    String getCaCertChain(String uuid, String owner);
+
+    /**
      * Get ca private key
      *
      * @param uuid              ca certificate uuid
