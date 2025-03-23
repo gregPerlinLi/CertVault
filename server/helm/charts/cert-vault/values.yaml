@@ -51,6 +51,12 @@ springBoot:
     # Path to heap dump file
     - "-XX:HeapDumpPath=./errorDump.hprof"
 
+## Initialization configuration
+## @param init.superadmin.username The username for the superadmin user
+## @param init.superadmin.displayName The display name for the superadmin user
+## @param init.superadmin.email The email address for the superadmin user
+## @param init.superadmin.password The password for the superadmin user
+##
 init:
   superadmin:
     username: "superadmin"
