@@ -11,6 +11,8 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Admin Controller
  *
@@ -233,6 +235,22 @@ public class AdminController {
     }
 
     /**
+     * Bind CA certificate to users
+     *
+     * @param caBindingDTOs the CA binding DTOs
+     * @return the result
+     * @throws Exception if the decrypt is failed
+     */
+    @PostMapping(value = "/cert/ca/binds")
+    public ResultVO<Void> bindCasToUsers(@RequestBody List<CaBindingDTO> caBindingDTOs) throws Exception {
+        Boolean result = caBindingService.newBindings(caBindingDTOs);
+        if ( result ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Failed");
+    }
+
+    /**
      * Unbind a CA certificate from a user
      *
      * @param caBindingDTO the CA binding DTO
@@ -241,6 +259,22 @@ public class AdminController {
     @DeleteMapping(value = "/cert/ca/bind")
     public ResultVO<Void> unbindCaFromUser(@RequestBody CaBindingDTO caBindingDTO) {
         Boolean result = caBindingService.deleteBinding(caBindingDTO);
+        if ( result ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Failed");
+    }
+
+    /**
+     * Unbind CA certificate from users
+     *
+     * @param caBindingDTOs the CA binding DTOs
+     * @return the result
+     * @throws Exception if the decrypt is failed
+     */
+    @DeleteMapping(value = "/cert/ca/binds")
+    public ResultVO<Void> unbindCasFromUsers(@RequestBody List<CaBindingDTO> caBindingDTOs) throws Exception {
+        Boolean result = caBindingService.deleteBindings(caBindingDTOs);
         if ( result ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
         }
