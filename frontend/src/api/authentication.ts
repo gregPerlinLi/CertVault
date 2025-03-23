@@ -1,35 +1,15 @@
-import type { ResultVO, UserProfileDTO } from "@/api/types";
+import type { UserProfileDTO } from "@/api/types";
+import { callRestfulApi } from "@/api";
 
-export const login = async (username: string, password: string) => {
-  const req = {
-    headers: { "Content-Type": "application/json" },
+export const login = (username: string, password: string) =>
+  callRestfulApi<UserProfileDTO>({
     method: "POST",
-    body: JSON.stringify({ username, password })
-  } satisfies RequestInit;
+    baseUrl: "/api/v1/auth/login",
+    payload: { username, password }
+  });
 
-  const resp = await fetch("/api/v1/auth/login", req);
-  if (!resp.ok) {
-    throw Error(`HTTP: ${resp.statusText} (${resp.status})`);
-  }
-
-  const json: ResultVO<UserProfileDTO> = await resp.json();
-  if (json.code !== 200) {
-    throw Error(`${json.msg} (${json.code})`);
-  }
-
-  return json.data!;
-};
-
-export const logout = async () => {
-  const req = { method: "DELETE" } satisfies RequestInit;
-
-  const resp = await fetch("/api/v1/auth/logout", req);
-  if (!resp.ok) {
-    throw Error(`${resp.statusText} (${resp.status})`);
-  }
-
-  const json: ResultVO = await resp.json();
-  if (json.code !== 200) {
-    throw Error(`${json.msg} (${json.code})`);
-  }
-};
+export const logout = () =>
+  callRestfulApi({
+    method: "DELETE",
+    baseUrl: "/api/v1/auth/logout"
+  });

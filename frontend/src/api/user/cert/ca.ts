@@ -1,35 +1,21 @@
-import type { CAInfoDTO, PaginationVO, ResultVO } from "@/api/types";
-import { createURLSearchParams } from "@/utils";
+import type { CaInfoDTO, PaginationVO } from "@/api/types";
+import { callRestfulApi } from "@/api";
 
-export const getAllBindedCAs = async (
+export const getAllBindedCaInfo = (
   page: number,
   limit: number,
   keyword?: string
-) => {
-  const params = createURLSearchParams({ page, limit, keyword });
-  const resp = await fetch(`/api/v1/user/cert/ca?${params.toString()}`);
-  if (!resp.ok) {
-    throw Error(`${resp.statusText} (${resp.status})`);
-  }
+) =>
+  callRestfulApi<PaginationVO<CaInfoDTO>>({
+    method: "GET",
+    baseUrl: "/api/v1/user/cert/ca",
+    searchParams: { page, limit, keyword }
+  });
 
-  const json: ResultVO<PaginationVO<CAInfoDTO>> = await resp.json();
-  if (json.code !== 200) {
-    throw Error(`${json.msg} (${json.code})`);
-  }
-
-  return json.data!;
-};
-
-export const getCACert = async (uuid: string) => {
-  const resp = await fetch(`/api/v1/user/cert/ca/cer/${uuid}`);
-  if (!resp.ok) {
-    throw Error(`${resp.statusText} (${resp.status})`);
-  }
-
-  const json: ResultVO<string> = await resp.json();
-  if (json.code !== 200) {
-    throw Error(`${json.msg} (${json.code})`);
-  }
-
-  return json.data!;
-};
+export const getCaCert = (uuid: string, isChain?: boolean) =>
+  callRestfulApi<string>({
+    method: "GET",
+    baseUrl: "/api/v1/user/cert/ca/cer",
+    pathNames: [uuid],
+    searchParams: { isChain }
+  });
