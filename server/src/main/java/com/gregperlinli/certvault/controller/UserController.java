@@ -43,7 +43,7 @@ public class UserController {
     public ResultVO<UserProfileDTO> getProfile(HttpServletRequest request) {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "success",
-                userService.getOwnProfile(request.getSession().getAttribute("username").toString()));
+                userService.getOwnProfile(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername()));
     }
 
     /**
