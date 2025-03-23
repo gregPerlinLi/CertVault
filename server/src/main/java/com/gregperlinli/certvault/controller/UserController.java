@@ -97,7 +97,7 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
-    @GetMapping(value = "/cert/ca/cer/{uuid}")
+    @GetMapping(value = "/cert/ca/{uuid}/cer")
     public ResultVO<String> getCaCert(@PathVariable("uuid") String uuid,
                                       @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
                                       HttpServletRequest request) {
@@ -146,7 +146,7 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
-    @GetMapping(value = "/cert/ssl/cer/{uuid}")
+    @GetMapping(value = "/cert/ssl/{uuid}/cer")
     public ResultVO<String> getCertificateCert(@PathVariable("uuid") String uuid,
                                                @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
                                                HttpServletRequest request) {
@@ -172,7 +172,7 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
-    @PostMapping(value = "/cert/ssl/privkey/{uuid}")
+    @PostMapping(value = "/cert/ssl/{uuid}/privkey")
     public ResultVO<String> getCertificatePrivkey(@PathVariable("uuid") String uuid,
                                                   @RequestBody JsonNode confirmPassword,
                                                   HttpServletRequest request) throws Exception {
@@ -193,7 +193,7 @@ public class UserController {
      * @param request       {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
-    @PatchMapping(value = "/cert/ssl/comment/{uuid}")
+    @PatchMapping(value = "/cert/ssl/{uuid}/comment")
     public ResultVO<Void> updateCertComment(@PathVariable("uuid") String uuid,
                                             @RequestBody JsonNode updateComment,
                                             HttpServletRequest request) {
