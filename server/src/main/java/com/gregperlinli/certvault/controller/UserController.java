@@ -1,7 +1,7 @@
 package com.gregperlinli.certvault.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.gregperlinli.certvault.certificate.CertDecoder;
+import com.gregperlinli.certvault.certificate.CertAnalyzer;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.*;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
@@ -276,7 +276,7 @@ public class UserController {
     public ResultVO<CertificateDetailsDTO> getCertificateDetails(@RequestBody JsonNode certBase64) throws Exception {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "success",
-                new CertificateDetailsDTO(CertDecoder.decodeCertificate(certBase64.get("cert").asText())));
+                new CertificateDetailsDTO(CertAnalyzer.analyzeCertificate(certBase64.get("cert").asText())));
     }
 
 }

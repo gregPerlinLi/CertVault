@@ -30,7 +30,7 @@ import static java.time.Instant.ofEpochMilli;
  * @className {@code CertDecoder}
  * @date 2025/3/15 16:01
  */
-public class CertDecoder {
+public class CertAnalyzer {
 
     static {
         Security.addProvider(new BouncyCastleProvider());
@@ -43,7 +43,7 @@ public class CertDecoder {
      * @return 证书详细信息对象
      * @throws Exception 解析异常
      */
-    public static CertificateDetails decodeCertificate(String certBase64) throws Exception {
+    public static CertificateDetails analyzeCertificate(String certBase64) throws Exception {
         // 1. 解析证书对象
         X509CertificateHolder certHolder = CertUtils.parseCertificate(certBase64);
         CertificateDetails details = new CertificateDetails();
