@@ -24,4 +24,8 @@ public class TestDTO implements Serializable {
 
     private String message;
 
+    private String version;
+
+    private String serverTimezone;
+
 }
