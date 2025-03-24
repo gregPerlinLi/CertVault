@@ -476,4 +476,31 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
         }
         throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The CA is not yours.");
     }
+
+    @Override
+    public Long countCa(String owner, Integer status) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("username", owner)
+                .eq("deleted", false);
+        User user = userService.getOne(userQueryWrapper);
+        if ( user == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
+        }
+        if ( status == 1 ) {
+            return this.count(new QueryWrapper<Ca>().eq("owner", user.getId()).eq("deleted", false).eq("available", true));
+        } else if ( status == 0 ) {
+            return this.count(new QueryWrapper<Ca>().eq("owner", user.getId()).eq("deleted", false).eq("available", false));
+        }
+        return this.count(new QueryWrapper<Ca>().eq("owner", user.getId()).eq("deleted", false));
+    }
+
+    @Override
+    public Long countAllCa(Integer status) {
+        if ( status == 1 ) {
+            return this.count(new QueryWrapper<Ca>().eq("deleted", false).eq("available", true));
+        } else if ( status == 0 ) {
+            return this.count(new QueryWrapper<Ca>().eq("deleted", false).eq("available", false));
+        }
+        return this.count(new QueryWrapper<Ca>().eq("deleted", false));
+    }
 }
