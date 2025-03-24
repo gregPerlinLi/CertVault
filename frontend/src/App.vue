@@ -8,6 +8,7 @@ const { initialized } = useUserStore();
 <template>
   <Toast
     :pt="{
+      root: { class: 'z-[500]' },
       summary: { class: 'leading-none' },
       detail: { class: 'leading-none' }
     }" />

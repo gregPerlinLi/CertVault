@@ -6,6 +6,9 @@ import {
 } from "@/api/user";
 import { type ToastServiceMethods } from "primevue";
 
+// Type
+export type Role = "User" | "Admin" | "Superadmin";
+
 // Export store
 export const useUserStore = createGlobalState(() => {
   // States
@@ -17,7 +20,7 @@ export const useUserStore = createGlobalState(() => {
   const innerRole = ref<1 | 2 | 3 | null>(null);
 
   // Getters
-  const role = computed((): string => {
+  const role = computed((): Role | "" => {
     switch (innerRole.value) {
       case 1:
         return "User";
