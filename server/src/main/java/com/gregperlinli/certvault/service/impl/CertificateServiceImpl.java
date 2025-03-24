@@ -10,6 +10,7 @@ import com.gregperlinli.certvault.domain.dto.*;
 import com.gregperlinli.certvault.domain.entities.*;
 import com.gregperlinli.certvault.domain.exception.LoginException;
 import com.gregperlinli.certvault.domain.exception.ParamValidateException;
+import com.gregperlinli.certvault.mapper.CaMapper;
 import com.gregperlinli.certvault.mapper.CertificateMapper;
 import com.gregperlinli.certvault.service.interfaces.ICaBindingService;
 import com.gregperlinli.certvault.service.interfaces.ICaService;
@@ -44,6 +45,9 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     @Resource
     ICaBindingService caBindingService;
 
+    @Resource
+    CaMapper caMapper;
+
     @Override
     public PageDTO<CertInfoDTO> getCertificates(String keyword, String owner, Integer page, Integer limit) {
         Page<Certificate> certificatePage = new Page<>(page, limit);
@@ -57,14 +61,53 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
         }
         QueryWrapper<Certificate> certificateQueryWrapper = new QueryWrapper<>();
         if ( keyword == null || keyword.isEmpty() ) {
-            certificateQueryWrapper.eq("owner", user.getId())
-                    .eq("deleted", false);
+            if ( Objects.equals(AccountTypeConstant.ADMIN.getAccountType(), user.getRole()) ) {
+                List<Object> uuids = caMapper.selectObjs(
+                        new QueryWrapper<Ca>()
+                                .select("uuid")
+                                .eq("owner", user.getId())
+                                .eq("deleted", false)
+                );
+                List<String> caUuids = uuids.stream().map(Object::toString).toList();
+                certificateQueryWrapper.or()
+                        .in("ca_uuid", caUuids)
+                        .eq("deleted", false);
+            } else if ( Objects.equals(AccountTypeConstant.SUPERADMIN.getAccountType(), user.getRole()) ) {
+                certificateQueryWrapper.eq("deleted", false);
+            } else {
+                certificateQueryWrapper.eq("owner", user.getId())
+                        .eq("deleted", false);
+            }
         } else {
-            certificateQueryWrapper.like("uuid", keyword)
-                    .or()
-                    .like("comment", keyword)
-                    .eq("owner", user.getId())
-                    .eq("deleted", false);
+            if ( Objects.equals( AccountTypeConstant.ADMIN.getAccountType(), user.getRole() ) ) {
+                List<Object> uuids = caMapper.selectObjs(
+                        new QueryWrapper<Ca>()
+                                .select("uuid")
+                                .eq("owner", user.getId())
+                                .eq("deleted", false)
+                );
+                List<String> caUuids = uuids.stream().map(Object::toString).toList();
+                certificateQueryWrapper.and(wrapper -> wrapper
+                                .like("uuid", keyword)
+                                .or()
+                                .like("comment", keyword)
+                                )
+                        .in("ca_uuid", caUuids)
+                        .eq("deleted", false);
+            } else if ( Objects.equals( AccountTypeConstant.SUPERADMIN.getAccountType(), user.getRole() ) ) {
+                certificateQueryWrapper.and(wrapper -> wrapper
+                                .like("uuid", keyword)
+                                .or()
+                                .like("comment", keyword))
+                        .eq("deleted", false);
+            } else {
+                certificateQueryWrapper.and(wrapper -> wrapper
+                                .like("uuid", keyword)
+                                .or()
+                                .like("comment", keyword))
+                        .eq("owner", user.getId())
+                        .eq("deleted", false);
+            }
         }
         resultPage = this.page(certificatePage, certificateQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {

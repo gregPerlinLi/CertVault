@@ -55,14 +55,27 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
         }
         QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
         if ( keyword == null || keyword.isEmpty() ) {
-            caQueryWrapper.eq("owner", user.getId())
-                    .eq("deleted", false);
+            if ( Objects.equals( AccountTypeConstant.SUPERADMIN.getAccountType(), user.getRole() ) ) {
+                caQueryWrapper.eq("deleted", false);
+            } else {
+                caQueryWrapper.eq("owner", user.getId())
+                        .eq("deleted", false);
+            }
         } else {
-            caQueryWrapper.like("uuid", keyword)
-                    .or()
-                    .like("comment", keyword)
-                    .eq("owner", user.getId())
-                    .eq("deleted", false);
+            if ( Objects.equals( AccountTypeConstant.SUPERADMIN.getAccountType(), user.getRole() ) ) {
+                caQueryWrapper.and(wrapper -> wrapper
+                                .like("uuid", keyword)
+                                .or()
+                                .like("comment", keyword))
+                        .eq("deleted", false);
+            } else {
+                caQueryWrapper.and(wrapper -> wrapper
+                                .like("uuid", keyword)
+                                .or()
+                                .like("comment", keyword))
+                        .eq("owner", user.getId())
+                        .eq("deleted", false);
+            }
         }
         resultPage = this.page(caPage, caQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
