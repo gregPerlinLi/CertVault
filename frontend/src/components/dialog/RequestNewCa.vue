@@ -178,7 +178,7 @@ const onSubmit = async (ev: Event) => {
           <InputText
             id="country"
             name="country"
-            placeholder="e.g. China"
+            placeholder="e.g. CN"
             size="small"
             :invalid="errIdx === 0"
             required />
