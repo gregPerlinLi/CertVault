@@ -92,4 +92,29 @@ public interface ICertificateService extends IService<Certificate> {
      */
     Boolean deleteCert(String uuid, String owner);
 
+    /**
+     * Count SSL Certificates
+     *
+     * @param owner Owner of the Certificate
+     * @return {@link Long}
+     */
+    Long countCertificates(String owner);
+
+    /**
+     * Count All SSL Certificates
+     *
+     * @return {@link Long}
+     */
+    Long countAllCertificates();
+
+    /**
+     * Count how many certificates have been signed by the specified CA certificate.
+     *
+     * @param owner owner of the ca certificates
+     * @param uuid ca certificate uuid
+     * @param caOrSsl true if count ca certificates, false if count ssl certificates
+     * @return ca certificates count
+     */
+    Long countCaSigned(String owner, String uuid, Boolean caOrSsl);
+
 }

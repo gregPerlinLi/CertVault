@@ -425,4 +425,50 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
         }
         throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The certificate is not yours.");
     }
+
+    @Override
+    public Long countCertificates(String owner) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("username", owner)
+                .eq("deleted", false);
+        User user = userService.getOne(userQueryWrapper);
+        if ( user == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
+        }
+        return this.count(new QueryWrapper<Certificate>().eq("owner", user.getId()).eq("deleted", false));
+    }
+
+    @Override
+    public Long countAllCertificates() {
+        return this.count(new QueryWrapper<Certificate>().eq("deleted", false));
+    }
+
+    @Override
+    public Long countCaSigned(String owner, String uuid, Boolean caOrSsl) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("username", owner)
+                .eq("deleted", false);
+        User user = userService.getOne(userQueryWrapper);
+        if ( user == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
+        }
+        QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
+        caQueryWrapper.eq("uuid", uuid)
+                .eq("deleted", false);
+        Ca ca = caService.getOne(caQueryWrapper);
+        if ( ca == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The CA does not exist.");
+        }
+        if (
+                Objects.equals( ca.getOwner(), user.getId() ) ||
+                        user.getRole() == AccountTypeConstant.SUPERADMIN.getAccountType()
+        ) {
+            if ( caOrSsl ) {
+                return caService.count(new QueryWrapper<Ca>().eq("parent_ca", uuid).eq("deleted", false));
+            } else {
+                return this.count(new QueryWrapper<Certificate>().eq("ca_uuid", uuid).eq("deleted", false));
+            }
+        }
+        throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The CA is not yours.");
+    }
 }
