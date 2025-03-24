@@ -18,7 +18,9 @@ useTitle("Certificates - CertVault");
       <TabPanel value="0">
         <CaCertManager />
       </TabPanel>
-      <TabPanel value="1">B</TabPanel>
+      <TabPanel value="1">
+        <SslCertMgr />
+      </TabPanel>
     </TabPanels>
   </Tabs>
 </template>
