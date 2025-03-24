@@ -216,4 +216,17 @@ public class CaBindingServiceImpl extends ServiceImpl<CaBindingMapper, CaBinding
 
         return true;
     }
+
+    @Override
+    public Long countBoundCa(String username) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("username", username)
+                .eq("deleted", false);
+        User user = userService.getOne(userQueryWrapper);
+        if ( user == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
+        }
+        return this.count(new QueryWrapper<CaBinding>().eq("uid", user.getId()));
+    }
+
 }

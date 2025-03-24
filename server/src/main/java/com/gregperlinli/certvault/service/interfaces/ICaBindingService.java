@@ -50,4 +50,13 @@ public interface ICaBindingService extends IService<CaBinding> {
      */
     Boolean deleteBindings(List<CaBindingDTO> caBindingDTOs) throws Exception;
 
+
+    /**
+     * Count all ca certificates bound to user
+     *
+     * @param username username
+     * @return ca certificates count
+     */
+    Long countBoundCa(String username);
+
 }
