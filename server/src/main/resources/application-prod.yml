@@ -8,6 +8,7 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://10.9.0.5:3306/cert_vault?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
     username: ${SPRING_DATASOURCE_USERNAME:cert_vault}
     password: ${SPRING_DATASOURCE_PASSWORD:cert_2025_vault}
+
   data:
     redis:
       host: ${SPRING_REDIS_HOST:10.9.0.4}
@@ -27,6 +28,11 @@ spring:
       key-prefix: "cache:"
       use-key-prefix: true
       time-to-live: 5m
+  sql:
+    init:
+      platform: mysql
+      mode: always
+      schema-locations: classpath:/sql/schema.sql
 
 logging:
   level:
