@@ -6,6 +6,7 @@ import com.gregperlinli.certvault.domain.dto.*;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
 import com.gregperlinli.certvault.service.interfaces.ICaBindingService;
 import com.gregperlinli.certvault.service.interfaces.ICaService;
+import com.gregperlinli.certvault.service.interfaces.ICertificateService;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,6 +34,9 @@ public class AdminController {
 
     @Resource
     ICaBindingService caBindingService;
+
+    @Resource
+    ICertificateService certificateService;
 
     /**
      * Get users
@@ -279,6 +283,48 @@ public class AdminController {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
         }
         return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Failed");
+    }
+
+    /**
+     * Count the number of user requested CA certificates
+     *
+     * @param condition the condition of the ca
+     * @param request the request
+     * @return the result
+     */
+    @GetMapping(value = "/cert/ca/count")
+    public ResultVO<Long> countRequestedCa(HttpServletRequest request,
+                                           @RequestParam(value = "condition", defaultValue = "none", required = false) String condition) {
+        if ( "available".equals(condition) ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                    "Success",
+                    caService.countCa(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), 1));
+        } else if ( "unavailable".equals(condition) ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                    "Success",
+                    caService.countCa(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), 0));
+        } else {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                    "Success",
+                    caService.countCa(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), -1));
+        }
+    }
+
+    /**
+     * Count the number of CA certificates signed by a CA certificate
+     *
+     * @param uuid the uuid of the CA
+     * @param caOrSsl the flag of the CA or SSL
+     * @param request the request
+     * @return the result
+     */
+    @GetMapping(value = "/cert/ca/{uuid}/count")
+    public ResultVO<Long> countCaSigned(@PathVariable("uuid") String uuid,
+                                        @RequestParam(value = "caOrSsl", defaultValue = "false", required = false) Boolean caOrSsl,
+                                        HttpServletRequest request) {
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                "Success",
+                certificateService.countCaSigned(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), uuid, caOrSsl));
     }
 
 }

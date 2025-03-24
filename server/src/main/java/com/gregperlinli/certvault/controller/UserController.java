@@ -5,6 +5,7 @@ import com.gregperlinli.certvault.certificate.CertAnalyzer;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.*;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
+import com.gregperlinli.certvault.service.interfaces.ICaBindingService;
 import com.gregperlinli.certvault.service.interfaces.ICaService;
 import com.gregperlinli.certvault.service.interfaces.ICertificateService;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
@@ -29,6 +30,9 @@ public class UserController {
 
     @Resource
     ICaService caService;
+
+    @Resource
+    ICaBindingService caBindingService;
 
     @Resource
     ICertificateService certificateService;
@@ -277,6 +281,32 @@ public class UserController {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "success",
                 new CertificateDetailsDTO(CertAnalyzer.analyzeCertificate(certBase64.get("cert").asText())));
+    }
+
+    /**
+     * Count bound CA
+     *
+     * @param request {@link HttpServletRequest} Request
+     * @return {@link ResultVO} Result
+     */
+    @GetMapping(value = "/cert/ca/count")
+    public ResultVO<Long> countBoundCa(HttpServletRequest request) {
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                "Success",
+                caBindingService.countBoundCa(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername()));
+    }
+
+    /**
+     * Count Count the number of user requested certificates
+     *
+     * @param request {@link HttpServletRequest} Request
+     * @return {@link ResultVO} Result
+     */
+    @GetMapping(value = "/cert/ssl/count")
+    public ResultVO<Long> countRequestedCertificates(HttpServletRequest request) {
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                "Success",
+                certificateService.countCertificates(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername()));
     }
 
 }

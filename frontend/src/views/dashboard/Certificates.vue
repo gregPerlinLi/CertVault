@@ -3,8 +3,24 @@ useTitle("Certificates - CertVault");
 </script>
 
 <template>
-  <h1 class="font-bold text-2xl">
+  <!-- Header -->
+  <h1 class="font-bold mb-4 text-2xl">
     <i class="mr-2 pi pi-verified text-xl"></i>Certificates
   </h1>
-  <hr class="border-2 border-neutral-200 dark:border-neutral-500 my-2" />
+
+  <!-- Main -->
+  <Tabs value="0">
+    <TabList class="text-sm">
+      <Tab value="0" class="py-2">CA Certificates</Tab>
+      <Tab value="1" class="py-2">SSL Certificates</Tab>
+    </TabList>
+    <TabPanels>
+      <TabPanel value="0">
+        <CaCertManager />
+      </TabPanel>
+      <TabPanel value="1">
+        <SslCertMgr />
+      </TabPanel>
+    </TabPanels>
+  </Tabs>
 </template>

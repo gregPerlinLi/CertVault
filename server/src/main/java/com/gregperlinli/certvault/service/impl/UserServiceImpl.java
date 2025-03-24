@@ -3,6 +3,7 @@ package com.gregperlinli.certvault.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gregperlinli.certvault.constant.AccountTypeConstant;
 import com.gregperlinli.certvault.constant.RedisKeyConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.*;
@@ -384,5 +385,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return true;
     }
 
-
+    @Override
+    public Long countAllUser(Integer role) {
+        if (
+                role == AccountTypeConstant.USER.getAccountType() ||
+                role == AccountTypeConstant.ADMIN.getAccountType() ||
+                role == AccountTypeConstant.SUPERADMIN.getAccountType()
+        ) {
+            QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+            userQueryWrapper.eq("role", role);
+            return count(userQueryWrapper);
+        } else {
+            return count();
+        }
+    }
 }

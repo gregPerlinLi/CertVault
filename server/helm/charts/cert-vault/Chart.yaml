@@ -2,6 +2,7 @@ apiVersion: v2
 name: cert-vault
 description: A Helm chart for CertVault self-signed SSL certificate management platform backend server.
 home: https://github.com/gregperlinli/cert-vault
+icon: https://raw.githubusercontent.com/gregPerlinLi/CertVault/refs/heads/main/frontend/public/favicon.svg
 keywords:
   - cert-vault
   - self-sign

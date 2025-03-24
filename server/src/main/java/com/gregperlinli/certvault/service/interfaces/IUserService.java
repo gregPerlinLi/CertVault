@@ -131,4 +131,12 @@ public interface IUserService extends IService<User> {
      */
     Boolean deleteUsers(List<String> usernames, String requestUser);
 
+    /**
+     * Count all users
+     *
+     * @param role role
+     * @return count result
+     */
+    Long countAllUser(Integer role);
+
 }

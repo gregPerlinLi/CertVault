@@ -5,6 +5,8 @@ import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.exception.*;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,6 +22,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
  * @date 2024/1/31 16:49
  */
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
@@ -60,14 +63,19 @@ public class GlobalExceptionHandler {
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.METHOD_NOT_ALLOWED.getResultCode()));
             return new ResultVO<>(ResultStatusCodeConstant.METHOD_NOT_ALLOWED.getResultCode(), msg);
         }
+        if ( e instanceof HttpMessageNotReadableException ) {
+            // response.setStatus(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION);
+            response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode()));
+            return new ResultVO<>(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), msg);
+        }
         if ( e instanceof ServerException) {
             // response.setStatus(ResultStatusCodeConstant.SERVER_ERROR);
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.SERVER_ERROR.getResultCode()));
             return new ResultVO<>(((ServerException) e).getCode(), msg);
         }
         // response.setStatus(ResultStatusCodeConstant.SERVER_ERROR);
-        e.printStackTrace();
+        log.error("Uncaught Internal Server Error: {}", e.getMessage());
         response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.SERVER_ERROR.getResultCode()));
-        return new ResultVO<>(ResultStatusCodeConstant.SERVER_ERROR.getResultCode(), "Internal Server Error");
+        return new ResultVO<>(ResultStatusCodeConstant.SERVER_ERROR.getResultCode(), "Uncaught Internal Server Error");
     }
 }

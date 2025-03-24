@@ -6,6 +6,8 @@ import com.gregperlinli.certvault.domain.dto.UpdateRoleDTO;
 import com.gregperlinli.certvault.domain.dto.UpdateUserProfileDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
+import com.gregperlinli.certvault.service.interfaces.ICaService;
+import com.gregperlinli.certvault.service.interfaces.ICertificateService;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +29,12 @@ public class SuperadminController {
 
     @Resource
     IUserService userService;
+
+    @Resource
+    ICaService caService;
+
+    @Resource
+    ICertificateService certificateService;
 
     /**
      * Create a new user
@@ -151,6 +159,54 @@ public class SuperadminController {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "delete success");
         }
         return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "delete failed");
+    }
+
+    /**
+     * Count all CA
+     *
+     * @param condition the condition of the CA
+     * @return count result
+     */
+    @GetMapping(value = "/cert/ca/count")
+    public ResultVO<Long> countAllCa(@RequestParam(value = "condition", defaultValue = "none", required = false) String condition) {
+        if ( "available".equals(condition) ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                    "Success",
+                    caService.countAllCa(1));
+        } else if ( "unavailable".equals(condition) ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                    "Success",
+                    caService.countAllCa(0));
+        } else {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                    "Success",
+                    caService.countAllCa(-1));
+        }
+    }
+
+    /**
+     * Count all ssl certificates
+     *
+     * @return count result
+     */
+    @GetMapping(value = "/cert/ssl/count")
+    public ResultVO<Long> countAllCertificate() {
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                "Success",
+                certificateService.countAllCertificates());
+    }
+
+    /**
+     * Count all users
+     *
+     * @param role the role of the user
+     * @return count result
+     */
+    @GetMapping(value = "/user/count")
+    public ResultVO<Long> countAllUser(@RequestParam(value = "role", defaultValue = "0", required = false) Integer role) {
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                "Success",
+                userService.countAllUser(role));
     }
 
 }

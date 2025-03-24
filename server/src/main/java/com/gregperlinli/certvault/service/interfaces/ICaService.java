@@ -114,4 +114,21 @@ public interface ICaService extends IService<Ca> {
      */
     Boolean deleteCa(String uuid, String owner);
 
+    /**
+     * Count ca certificates
+     *
+     * @param owner owner of the ca certificates
+     * @param status ca certificates status: 0 - unavailable 1 - available -1 - not query
+     * @return ca certificates count
+     */
+    Long countCa(String owner, Integer status);
+
+    /**
+     * Count all ca certificates
+     *
+     * @param status ca certificates status: 0 - unavailable 1 - available -1 - not query
+     * @return ca certificates count
+     */
+    Long countAllCa(Integer status);
+
 }

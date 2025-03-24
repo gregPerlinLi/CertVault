@@ -45,7 +45,7 @@ export const callRestfulApi = async <U = null>(
     opts.jsonParser === undefined
       ? await resp.json()
       : opts.jsonParser(await resp.text());
-  if (json.code !== 200) {
+  if (json.code < 200 || json.code >= 300) {
     throw Error(`${json.msg} (${json.code})`);
   }
 
