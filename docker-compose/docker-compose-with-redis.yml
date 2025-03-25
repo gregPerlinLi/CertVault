@@ -15,7 +15,7 @@ x-common-certvault: &common_certvault
     - SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT=${SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT}
     - SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK=${SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK}
 x-common-redis: &common_redis
-  image: redis:6.2.6-alpine
+  image: bitnami/redis:6.2.6-debian-10-r199
   environment:
     REDIS_PASSWORD: ${REDIS_PASSWORD}
     REDIS_DATABASE: ${REDIS_DATABASE}
