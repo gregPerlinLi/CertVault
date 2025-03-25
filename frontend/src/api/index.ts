@@ -16,7 +16,6 @@ export interface RestfulApiOption {
   pathNames?: Record<string, string>;
   searchParams?: Record<string, any>;
   payload?: any;
-  jsonParser?: typeof JSON.parse;
 }
 export const callRestfulApi = async <U = null>(
   opts: RestfulApiOption
@@ -43,13 +42,10 @@ export const callRestfulApi = async <U = null>(
     throw Error(`HTTP: ${resp.statusText} (${resp.status})`);
   }
 
-  const json: ResultVO<U> =
-    opts.jsonParser === undefined
-      ? await resp.json()
-      : opts.jsonParser(await resp.text());
+  const json: ResultVO<U> = await resp.json();
   if (json.code < 200 || json.code >= 300) {
     if (json.code === 401 && router.currentRoute.value.path !== "/") {
-      router.push("/");
+      router.replace("/");
     }
     throw Error(`${json.msg} (${json.code})`);
   }
