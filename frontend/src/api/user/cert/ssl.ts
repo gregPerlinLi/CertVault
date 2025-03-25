@@ -12,11 +12,12 @@ export const getAllSslCertInfo = (
     searchParams: { page, limit, keyword }
   });
 
-export const getSslCert = (uuid: string) =>
+export const getSslCert = (uuid: string, isChain?: boolean) =>
   callRestfulApi<string>({
     method: "GET",
     baseUrl: "/api/v1/user/cert/ssl/{uuid}/cer",
-    pathNames: { uuid }
+    pathNames: { uuid },
+    searchParams: { isChain }
   });
 
 export const getSslPrivKey = (uuid: string, password: string) =>

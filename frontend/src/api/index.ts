@@ -1,5 +1,4 @@
 import type { ResultVO } from "@/api/types";
-import router from "@/router";
 
 export const createURLSearchParams = (
   params: Record<string, any>
@@ -44,9 +43,6 @@ export const callRestfulApi = async <U = null>(
 
   const json: ResultVO<U> = await resp.json();
   if (json.code < 200 || json.code >= 300) {
-    if (json.code === 401 && router.currentRoute.value.path !== "/") {
-      router.replace("/");
-    }
     throw Error(`${json.msg} (${json.code})`);
   }
 
