@@ -385,6 +385,11 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
         ca.setModifiedAt(now);
         ca.setDeleted(false);
         if ( this.save(ca) ) {
+            CaBinding caBinding = new CaBinding();
+            caBinding.setUid(user.getId());
+            caBinding.setCaUuid(ca.getUuid());
+            caBinding.setCreatedAt(now);
+            caBindingService.save(caBinding);
             ca.setPrivkey(null);
             return new ResponseCaDTO(ca);
         }
