@@ -1,59 +1,127 @@
 <script setup lang="ts">
 import type { CertInfoDTO } from "@/api/types";
-import { getAllSslCertInfo } from "@/api/user/cert/ssl";
+import { deleteSslCert, getAllSslCertInfo } from "@/api/user/cert/ssl";
 import { useUserStore } from "@/stores/user";
-import { useToast } from "primevue";
+import { nanoid } from "nanoid";
+import { useConfirm, useToast } from "primevue";
 
 // Stores
 const { role } = useUserStore();
 
 // Reactives
+const confirm = useConfirm();
 const toast = useToast();
 
 const loading = ref(false);
+const searchKeyword = ref("");
 const selection = ref();
-const pageTotal = ref<number>();
-const pageData = ref<CertInfoDTO[]>();
-const pageFirst = ref(0);
-const pageLimit = ref(10);
+
+const pagination = reactive({
+  total: 0,
+  first: 0,
+  limit: 10,
+  data: [] as CertInfoDTO[]
+});
+const dialog = reactive({
+  reqNewCert: false,
+  showInfo: false,
+  exportCert: false,
+  renewCert: false,
+  editComment: false
+});
+
+// Non-reactives
+let currentRefreshTag = "";
 
 // Actions
 const refresh = async () => {
-  loading.value = true;
+  currentRefreshTag = nanoid();
+  const tag = currentRefreshTag;
 
   try {
+    loading.value = true;
     const page = await getAllSslCertInfo(
-      pageFirst.value / pageLimit.value + 1,
-      pageLimit.value
+      pagination.first / pagination.limit + 1,
+      pagination.limit,
+      searchKeyword.value.length === 0 ? undefined : searchKeyword.value
     );
-    pageTotal.value = page.total;
-    pageData.value = page.list ?? undefined;
+    pagination.total = page.total;
+    pagination.data = page.list ?? [];
   } catch (err: unknown) {
-    toast.add({
-      severity: "error",
-      summary: "Fail to Fetch Data",
-      detail: (err as Error).message,
-      life: 5000
-    });
+    if (tag === currentRefreshTag) {
+      toast.add({
+        severity: "error",
+        summary: "Fail to Fetch Data",
+        detail: (err as Error).message,
+        life: 5000
+      });
+    }
+  } finally {
+    if (tag === currentRefreshTag) {
+      loading.value = false;
+    }
   }
-
-  loading.value = false;
 };
 
 // Watches
-watch([pageFirst, pageLimit], () => refresh());
+watch(
+  () => [pagination.first, pagination.limit],
+  () => refresh()
+);
+watchDebounced(searchKeyword, () => refresh(), { debounce: 500 });
+
+// Actions
+const tryDelCert = (data: CertInfoDTO) => {
+  confirm.require({
+    header: "Delete Certificate",
+    message: "Are you sure to delete the certificate?",
+    icon: "pi pi-exclamation-triangle",
+    modal: true,
+    blockScroll: true,
+    acceptProps: { severity: "danger" },
+    rejectProps: { severity: "secondary" },
+    accept: async () => {
+      try {
+        toast.add({
+          severity: "info",
+          summary: "Info",
+          detail: "Deleting SSL certificate",
+          life: 3000
+        });
+        await deleteSslCert(data.uuid);
+        toast.add({
+          severity: "success",
+          summary: "Success",
+          detail: "Successfully deleted SSL certificate",
+          life: 3000
+        });
+      } catch (err: unknown) {
+        toast.add({
+          severity: "error",
+          summary: "Fail to Delete SSL certificate",
+          detail: (err as Error).message,
+          life: 5000
+        });
+      } finally {
+        await refresh();
+      }
+    }
+  });
+};
 
 // Hooks
-onBeforeMount(async () => {
-  await refresh();
-});
+onBeforeMount(() => refresh());
 </script>
 
 <template>
   <Toolbar class="border-none">
     <template #start>
       <div class="flex gap-4">
-        <Button icon="pi pi-plus" label="Request New" size="small"></Button>
+        <Button
+          icon="pi pi-plus"
+          label="Request New"
+          size="small"
+          @click="dialog.reqNewCert = true"></Button>
         <Button
           icon="pi pi-refresh"
           label="Refresh"
@@ -63,31 +131,33 @@ onBeforeMount(async () => {
       </div>
     </template>
     <template #end>
-      <form @submit.prevent="() => {}">
-        <IconField>
-          <InputIcon class="pi pi-search" />
-          <InputText name="search-keyword" placeholder="Search" size="small" />
-        </IconField>
-      </form>
+      <IconField>
+        <InputIcon class="pi pi-search" />
+        <InputText
+          v-model.trim="searchKeyword"
+          name="search-keyword"
+          placeholder="Search"
+          size="small" />
+      </IconField>
     </template>
   </Toolbar>
   <DataTable
-    v-model:first="pageFirst"
-    v-model:rows="pageLimit"
+    v-model:first="pagination.first"
+    v-model:rows="pagination.limit"
     v-model:selection="selection"
     data-key="uuid"
     size="small"
     :loading="loading"
     :row-class="() => 'group'"
     :rows-per-page-options="[10, 20, 50]"
-    :total-records="pageTotal"
-    :value="pageData"
+    :total-records="pagination.total"
+    :value="pagination.data"
     lazy
     paginator
     row-hover>
     <template #header>
       <p class="text-sm">
-        Found {{ pageTotal ?? 0 }} SSL certificate(s) in total
+        Found {{ pagination.total }} SSL certificate(s) in total
       </p>
     </template>
     <Column selectionMode="multiple" class="w-4"></Column>
@@ -121,7 +191,7 @@ onBeforeMount(async () => {
       </template>
     </Column>
     <Column>
-      <template #body>
+      <template #body="{ data }">
         <div class="gap-2 hidden justify-end group-hover:flex">
           <Button
             v-tooltip.top="{ value: 'Info', class: 'text-sm' }"
@@ -131,7 +201,8 @@ onBeforeMount(async () => {
             severity="info"
             size="small"
             variant="text"
-            rounded></Button>
+            rounded
+            @click="dialog.showInfo = true"></Button>
           <Button
             v-tooltip.top="{ value: 'Export', class: 'text-sm' }"
             aria-label="Export certificate"
@@ -140,7 +211,8 @@ onBeforeMount(async () => {
             severity="success"
             size="small"
             variant="text"
-            rounded></Button>
+            rounded
+            @click="dialog.exportCert = true"></Button>
           <Button
             v-tooltip.top="{ value: 'Renew', class: 'text-sm' }"
             aria-label="Renew certificate"
@@ -149,7 +221,8 @@ onBeforeMount(async () => {
             severity="secondary"
             size="small"
             variant="text"
-            rounded></Button>
+            rounded
+            @click="dialog.renewCert = true"></Button>
           <Button
             v-tooltip.top="{ value: 'Edit', class: 'text-sm' }"
             aria-label="Edit certificate information"
@@ -158,7 +231,8 @@ onBeforeMount(async () => {
             severity="help"
             size="small"
             variant="text"
-            rounded></Button>
+            rounded
+            @click="dialog.editComment = true"></Button>
           <Button
             v-tooltip.top="{ value: 'Delete', class: 'text-sm' }"
             aria-label="Delete certificate"
@@ -167,9 +241,11 @@ onBeforeMount(async () => {
             severity="danger"
             size="small"
             variant="text"
-            rounded></Button>
+            rounded
+            @click="tryDelCert(data)"></Button>
         </div>
       </template>
     </Column>
   </DataTable>
+  <ReqNewSslCertDlg v-model:visible="dialog.reqNewCert" @success="refresh" />
 </template>
