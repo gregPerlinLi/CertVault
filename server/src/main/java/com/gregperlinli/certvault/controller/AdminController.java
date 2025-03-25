@@ -166,6 +166,25 @@ public class AdminController {
     }
 
     /**
+     * Import a CA certificate
+     *
+     * @param importCertDTO the import certificate DTO
+     * @param request the request
+     * @return the result
+     * @throws Exception if the encryption is failed
+     */
+    @PostMapping(value = "/cert/ca/import")
+    public ResultVO<ResponseCaDTO> importCa(@RequestBody ImportCertDTO importCertDTO,
+                                            HttpServletRequest request) throws Exception {
+        ResponseCaDTO result = caService.importCa(importCertDTO,
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        if ( result != null ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Failed");
+    }
+
+    /**
      * Request a new CA certificate
      *
      * @param requestCertDTO the request certificate DTO
