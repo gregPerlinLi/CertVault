@@ -1,4 +1,5 @@
 import type { ResultVO } from "@/api/types";
+import router from "@/router";
 
 export const createURLSearchParams = (
   params: Record<string, any>
@@ -33,7 +34,8 @@ export const callRestfulApi = async <U = null>(
       opts.method !== "GET" && opts.method !== "DELETE"
         ? { "Content-Type": "application/json" }
         : undefined,
-    body: opts.payload !== undefined ? JSON.stringify(opts.payload) : undefined
+    body: opts.payload !== undefined ? JSON.stringify(opts.payload) : undefined,
+    signal: AbortSignal.timeout(10000)
   } satisfies RequestInit;
 
   const resp = await fetch(uri, req);
@@ -46,6 +48,9 @@ export const callRestfulApi = async <U = null>(
       ? await resp.json()
       : opts.jsonParser(await resp.text());
   if (json.code < 200 || json.code >= 300) {
+    if (json.code === 401 && router.currentRoute.value.path !== "/") {
+      router.push("/");
+    }
     throw Error(`${json.msg} (${json.code})`);
   }
 
