@@ -1,25 +1,25 @@
 version: '3'
-services:
-  x-common-certvault: &common_certvault
-    image: ghcr.io/gregperlinli/certvault:latest
-    ports:
-      - ${EXTERNAL_PORT}:1888
-    environment:
-      - TIME_ZONE=${TIME_ZONE}
-      - SUPERADMIN_USERNAME=${SUPERADMIN_USERNAME}
-      - SUPERADMIN_DISPLAY_NAME=${SUPERADMIN_DISPLAY_NAME}
-      - SUPERADMIN_EMAIL=${SUPERADMIN_EMAIL}
-      - SUPERADMIN_PASSWORD=${SUPERADMIN_PASSWORD}
-      - SPRING_RSA_PUBLIC_KEY=${RSA_PUBLIC_KEY}
-      - SPRING_RSA_PRIVATE_KEY=${RSA_PRIVATE_KEY}
-      - SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT=${SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT}
-      - SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK=${SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK}
-  x-common-redis: &common_redis
-    image: redis:6.2.6-alpine
-    command: redis-server --requirepass ${REDIS_PASSWORD} --databases ${REDIS_DATABASE}
-    volumes:
-      - ./redis_data:/data
+x-common-certvault: &common_certvault
+  image: ghcr.io/gregperlinli/certvault:latest
+  ports:
+    - ${EXTERNAL_PORT}:1888
+  environment:
+    - TIME_ZONE=${TIME_ZONE}
+    - SUPERADMIN_USERNAME=${SUPERADMIN_USERNAME}
+    - SUPERADMIN_DISPLAY_NAME=${SUPERADMIN_DISPLAY_NAME}
+    - SUPERADMIN_EMAIL=${SUPERADMIN_EMAIL}
+    - SUPERADMIN_PASSWORD=${SUPERADMIN_PASSWORD}
+    - SPRING_RSA_PUBLIC_KEY=${RSA_PUBLIC_KEY}
+    - SPRING_RSA_PRIVATE_KEY=${RSA_PRIVATE_KEY}
+    - SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT=${SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT}
+    - SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK=${SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK}
+x-common-redis: &common_redis
+  image: redis:6.2.6-alpine
+  command: redis-server --requirepass ${REDIS_PASSWORD} --databases ${REDIS_DATABASE}
+  volumes:
+    - ./redis_data:/data
 
+services:
   cert-vault:
     <<: *common_certvault
     depends_on:
