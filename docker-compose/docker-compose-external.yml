@@ -4,7 +4,7 @@ x-common-certvault: &common_certvault
   ports:
     - ${EXTERNAL_PORT}:1888
   restart: always
-  environment:
+  environment: &common_certvault_env
     TIME_ZONE: ${TIME_ZONE}
     SUPERADMIN_USERNAME: ${SUPERADMIN_USERNAME}
     SUPERADMIN_DISPLAY_NAME: ${SUPERADMIN_DISPLAY_NAME}
@@ -19,6 +19,7 @@ services:
   cert-vault:
     <<: *common_certvault
     environment:
+      <<: *common_certvault_env
       SPRING_DATASOURCE_URL: jdbc:mysql://${MYSQL_EXTERNAL_HOST}:${MYSQL_EXTERNAL_PORT}/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: ${MYSQL_EXTERNAL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_EXTERNAL_PASSWORD}
