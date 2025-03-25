@@ -19,6 +19,10 @@ sources:
   - https://github.com/gregperlinli/certvault-charts
 dependencies:
   - name: redis
-    version: 20.11.3
+    version: 20.11.4
     repository: https://charts.bitnami.com/bitnami
     condition: redis.internal
+  - name: mysql
+    version: 12.3.2
+    repository: https://charts.bitnami.com/bitnami
+    condition: mysql.internal
