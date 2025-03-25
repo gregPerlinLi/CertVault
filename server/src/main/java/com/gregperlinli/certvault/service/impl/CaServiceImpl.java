@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gregperlinli.certvault.certificate.CaGenerator;
+import com.gregperlinli.certvault.certificate.CertAnalyzer;
 import com.gregperlinli.certvault.constant.AccountTypeConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.*;
@@ -351,6 +352,43 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
             throw new ParamValidateException(ResultStatusCodeConstant.FAILED.getResultCode(), "Update failed.");
         }
         throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The CA is not yours.");
+    }
+
+    @Override
+    public ResponseCaDTO importCa(ImportCertDTO importCertDTO, String owner) throws Exception {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("username", owner)
+                .eq("deleted", false);
+        User user = userService.getOne(userQueryWrapper);
+        if ( user == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
+        }
+        if ( !CertAnalyzer.certVerify(importCertDTO.getPrivkey(), importCertDTO.getCertificate()) ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.FAILED.getResultCode(), "The certificate is invalid.");
+        }
+        if ( !CertAnalyzer.verifyIsCa(importCertDTO.getCertificate()) ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.FAILED.getResultCode(), "The certificate is not a CA.");
+        }
+        CertificateDetails certificateDetails = CertAnalyzer.analyzeCertificate(importCertDTO.getCertificate());
+        LocalDateTime now = LocalDateTime.now();
+        Ca ca = new Ca();
+        ca.setUuid(UUID.randomUUID().toString());
+        ca.setPrivkey(EncryptAndDecryptUtils.encrypt(importCertDTO.getPrivkey()));
+        ca.setCert(importCertDTO.getCertificate());
+        ca.setAllowSubCa(true);
+        ca.setOwner(user.getId());
+        ca.setComment(importCertDTO.getComment());
+        ca.setAvailable(true);
+        ca.setNotBefore(certificateDetails.getNotBefore());
+        ca.setNotAfter(certificateDetails.getNotAfter());
+        ca.setCreatedAt(now);
+        ca.setModifiedAt(now);
+        ca.setDeleted(false);
+        if ( this.save(ca) ) {
+            ca.setPrivkey(null);
+            return new ResponseCaDTO(ca);
+        }
+        return null;
     }
 
     @Override

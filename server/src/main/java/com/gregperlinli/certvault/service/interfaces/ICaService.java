@@ -85,6 +85,16 @@ public interface ICaService extends IService<Ca> {
     Boolean modifyCaAvailability(String uuid, String owner);
 
     /**
+     * Import an existing ca certificate
+     *
+     * @param importCertDTO ca certificate info
+     * @param owner        owner of the new ca certificate
+     * @return new ca certificate info
+     * @throws Exception encryption error
+     */
+    ResponseCaDTO importCa(ImportCertDTO importCertDTO, String owner) throws Exception;
+
+    /**
      * Request new ca certificate
      *
      * @param requestCertDTO new ca certificate info
