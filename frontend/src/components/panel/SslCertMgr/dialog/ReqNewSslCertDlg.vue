@@ -191,7 +191,7 @@ const onSubmit = async (ev: Event) => {
     toast.add({
       severity: "success",
       summary: "Success",
-      detail: "Successfully request new SSL Certificate",
+      detail: "Successfully requested",
       life: 3000
     });
     visible.value = false;
@@ -200,7 +200,7 @@ const onSubmit = async (ev: Event) => {
   } catch (err: unknown) {
     toast.add({
       severity: "error",
-      summary: "Fail to Request New SSL Certificate",
+      summary: "Fail to Request",
       detail: (err as Error).message,
       life: 5000
     });
@@ -310,9 +310,10 @@ const onSubmit = async (ev: Event) => {
             size="small"
             suffix=" day(s)"
             :default-value="30"
-            :max="356"
+            :max="365"
             :min="1"
-            required />
+            required
+            show-buttons />
         </section>
       </div>
       <section>
@@ -345,3 +346,20 @@ const onSubmit = async (ev: Event) => {
     </form>
   </Dialog>
 </template>
+
+<style scoped>
+@import "tailwindcss";
+
+section {
+  @apply flex flex-col gap-1 my-2;
+
+  label {
+    @apply font-bold;
+
+    &[required]::after {
+      @apply text-red-500;
+      content: "*";
+    }
+  }
+}
+</style>

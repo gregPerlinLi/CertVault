@@ -99,7 +99,7 @@ const onSubmitNewPassword = () => {
     v-model:new-password="newPassword" />
 </template>
 
-<style>
+<style scoped>
 @import "tailwindcss";
 
 section {

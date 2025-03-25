@@ -283,7 +283,7 @@ const onSubmit = async (ev: Event) => {
   </Dialog>
 </template>
 
-<style>
+<style scoped>
 @import "tailwindcss";
 
 section {
