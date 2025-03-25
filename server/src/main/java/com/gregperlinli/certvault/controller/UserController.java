@@ -103,12 +103,13 @@ public class UserController {
      */
     @GetMapping(value = "/cert/ca/{uuid}/cer")
     public ResultVO<String> getCaCert(@PathVariable("uuid") String uuid,
-                                      @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
+                                      @RequestParam(value = "isChain", defaultValue = "false", required = false) Boolean isChain,
+                                      @RequestParam(value = "needRootCa", defaultValue = "true", required = false) Boolean needRootCa,
                                       HttpServletRequest request) {
         String result = null;
         if ( isChain ) {
             result = caService.getCaCertChain(uuid,
-                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), needRootCa);
         } else {
             result = caService.getCaCert(uuid,
                     ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
@@ -152,12 +153,13 @@ public class UserController {
      */
     @GetMapping(value = "/cert/ssl/{uuid}/cer")
     public ResultVO<String> getCertificateCert(@PathVariable("uuid") String uuid,
-                                               @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
+                                               @RequestParam(value = "isChain", defaultValue = "false", required = false) Boolean isChain,
+                                               @RequestParam(value = "needRootCa", defaultValue = "true", required = false) Boolean needRootCa,
                                                HttpServletRequest request) {
         String result = null;
         if ( isChain ) {
             result = certificateService.getCertificateCertChain(uuid,
-                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), needRootCa);
         } else {
             result = certificateService.getCertificateCert(uuid,
                     ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
