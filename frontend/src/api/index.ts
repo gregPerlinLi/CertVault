@@ -33,7 +33,8 @@ export const callRestfulApi = async <U = null>(
       opts.method !== "GET" && opts.method !== "DELETE"
         ? { "Content-Type": "application/json" }
         : undefined,
-    body: opts.payload !== undefined ? JSON.stringify(opts.payload) : undefined
+    body: opts.payload !== undefined ? JSON.stringify(opts.payload) : undefined,
+    signal: AbortSignal.timeout(10000)
   } satisfies RequestInit;
 
   const resp = await fetch(uri, req);
