@@ -1,5 +1,29 @@
 version: '3'
 services:
+  x-common-certvault: &common_certvault
+    image: ghcr.io/gregperlinli/certvault:latest
+    ports:
+      - ${EXTERNAL_PORT}:1888
+    environment:
+      - TIME_ZONE=${TIME_ZONE}
+      - SUPERADMIN_USERNAME=${SUPERADMIN_USERNAME}
+      - SUPERADMIN_DISPLAY_NAME=${SUPERADMIN_DISPLAY_NAME}
+      - SUPERADMIN_EMAIL=${SUPERADMIN_EMAIL}
+      - SUPERADMIN_PASSWORD=${SUPERADMIN_PASSWORD}
+      - SPRING_RSA_PUBLIC_KEY=${RSA_PUBLIC_KEY}
+      - SPRING_RSA_PRIVATE_KEY=${RSA_PRIVATE_KEY}
+      - SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT=${SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT}
+      - SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK=${SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK}
+  x-common-mysql: &common_mysql
+    image: mysql:8.0.28
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+
   cert-vault:
     <<: *common_certvault
     depends_on:
@@ -11,6 +35,5 @@ services:
       - SPRING_REDIS_HOST=${EXTERNAL_REDIS_HOST}
       - SPRING_REDIS_PORT=${EXTERNAL_REDIS_PORT}
       - SPRING_REDIS_PASSWORD=${REDIS_PASSWORD}
-
   mysql:
     <<: *common_mysql
