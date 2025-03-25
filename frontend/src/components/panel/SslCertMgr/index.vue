@@ -125,6 +125,7 @@ onBeforeMount(async () => {
         <div class="gap-2 hidden justify-end group-hover:flex">
           <Button
             v-tooltip.top="{ value: 'Info', class: 'text-sm' }"
+            aria-label="Certificate information"
             class="h-6 w-6"
             icon="pi pi-info-circle"
             severity="info"
@@ -132,7 +133,17 @@ onBeforeMount(async () => {
             variant="text"
             rounded></Button>
           <Button
+            v-tooltip.top="{ value: 'Export', class: 'text-sm' }"
+            aria-label="Export certificate"
+            class="h-6 w-6"
+            icon="pi pi-file-export"
+            severity="success"
+            size="small"
+            variant="text"
+            rounded></Button>
+          <Button
             v-tooltip.top="{ value: 'Renew', class: 'text-sm' }"
+            aria-label="Renew certificate"
             class="h-6 w-6"
             icon="pi pi-sync"
             severity="secondary"
@@ -141,6 +152,7 @@ onBeforeMount(async () => {
             rounded></Button>
           <Button
             v-tooltip.top="{ value: 'Edit', class: 'text-sm' }"
+            aria-label="Edit certificate information"
             class="h-6 w-6"
             icon="pi pi-pen-to-square"
             severity="help"
@@ -149,6 +161,7 @@ onBeforeMount(async () => {
             rounded></Button>
           <Button
             v-tooltip.top="{ value: 'Delete', class: 'text-sm' }"
+            aria-label="Delete certificate"
             class="h-6 w-6"
             icon="pi pi-trash"
             severity="danger"
