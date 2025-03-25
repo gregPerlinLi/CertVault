@@ -4,7 +4,6 @@ import type { VirtualScrollerLazyEvent } from "primevue";
 import { getAllBindedCaInfo } from "@/api/user/cert/ca";
 import { requestSslCert } from "@/api/user/cert/ssl";
 import { useNotify } from "@/utils/composable";
-import YAML from "yaml";
 
 // Models
 const visible = defineModel<boolean>("visible");
@@ -108,23 +107,34 @@ const onSubmit = async (ev: Event) => {
       return undefined;
     }
 
-    try {
-      const data = YAML.parse(raw);
-      if (typeof data !== "object") {
-        throw Error();
-      }
+    const lines = raw
+      .split("\n")
+      .map((str) => str.trim())
+      .filter((str) => str.length > 0)
+      .map((str) => str.split("=", 2).map((str) => str.trim()));
 
-      return Object.entries(data).map(([type, value]) => {
-        if (typeof value !== "string") {
-          throw Error();
-        }
-        return { type, value };
-      });
-    } catch {
-      errField.value = "subject-alt-names";
-      error("Validation Error", "Invalid subject alternative names format");
-      return null;
+    const SAN_TYPE = [
+      "DNS_NAME",
+      "IP_ADDRESS",
+      "URI",
+      "EMAIL",
+      "DIRECTORY_NAME",
+      "EDI_PARTY_NAME"
+    ];
+    for (const pair of lines) {
+      if (!SAN_TYPE.includes(pair[0])) {
+        errField.value = "subject-alt-names";
+        error("Validation Error", "Invalid SAN type");
+        return null;
+      }
+      if (pair.length !== 2) {
+        errField.value = "subject-alt-names";
+        error("Validation Error", "Invalid SAN format");
+        return null;
+      }
     }
+
+    return lines.map(([type, value]) => ({ type, value }));
   })();
   if (subjectAltNames === null) {
     return;
@@ -169,7 +179,7 @@ const onSubmit = async (ev: Event) => {
     modal>
     <form @submit.prevent="onSubmit">
       <section>
-        <label for="ca-uuid" required>CA for Issuance</label>
+        <label required>CA for Issuance</label>
         <Select
           v-model="selectedCaUuid"
           option-label="uuid"
@@ -263,7 +273,7 @@ const onSubmit = async (ev: Event) => {
         <section class="w-1/3">
           <label for="expiry" required>Expiry</label>
           <InputNumber
-            id="expiry"
+            input-id="expiry"
             name="expiry"
             size="small"
             suffix=" day(s)"
@@ -277,9 +287,10 @@ const onSubmit = async (ev: Event) => {
       <section>
         <label for="subject-alt-names">Subject Alternative Names</label>
         <Textarea
+          class="min-h-24"
           id="subject-alt-names"
           name="subject-alt-names"
-          placeholder="Key-value pair each line, in YAML format"
+          :placeholder="'Each line is a key-value pair seperated by a \'=\'\ne.g. \'IP_ADDRESS=1.1.1.1\''"
           :invalid="errField === 'subject-alt-names'"
           size="small"></Textarea>
       </section>
