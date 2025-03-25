@@ -3,8 +3,7 @@ import type { CaInfoDTO } from "@/api/types";
 import type { VirtualScrollerLazyEvent } from "primevue";
 import { getAllBindedCaInfo } from "@/api/user/cert/ca";
 import { requestSslCert } from "@/api/user/cert/ssl";
-import { validateRequried } from "@/utils/validate";
-import { useToast } from "primevue/usetoast";
+import { useNotify } from "@/utils/composable";
 import YAML from "yaml";
 
 // Models
@@ -13,11 +12,12 @@ const visible = defineModel<boolean>("visible");
 // Emits
 const emits = defineEmits<{ success: [] }>();
 
-// Reactives
-const toast = useToast();
+// Services
+const { info, success, error } = useNotify();
 
+// Reactives
 const busy = ref(false);
-const errIdx = ref<number | null>(null);
+const errField = ref<string>();
 
 const loadingCa = ref(false);
 const caList = ref<CaInfoDTO[]>([]);
@@ -37,102 +37,74 @@ const onLazyLoadCa = async (ev: VirtualScrollerLazyEvent) => {
       caList.value = tmp;
     }
   } catch (err: unknown) {
-    toast.add({
-      severity: "error",
-      summary: "Fail to Get Binded CA List",
-      detail: (err as Error).message,
-      life: 5000
-    });
+    if (visible) {
+      error("Fail to Get Binded CA List", (err as Error).message);
+    }
   } finally {
     loadingCa.value = false;
   }
 };
 const onSubmit = async (ev: Event) => {
-  // Parse form data
+  errField.value = undefined;
   const formData = new FormData(ev.target as HTMLFormElement);
 
-  // Clear error index
-  errIdx.value = null;
-
-  // Validate data
   const caUuid = selectedCaUuid.value ?? null;
   if (caUuid === null) {
-    errIdx.value = 0;
-    toast.add({
-      severity: "error",
-      summary: "Validation Error",
-      detail: "CA is required",
-      life: 5000
-    });
+    errField.value = "ca-uuid";
+    error("Validation Error", "CA is required");
     return;
   }
 
-  const country = validateRequried(
-    formData,
-    "country",
-    toast,
-    "Country is required"
-  );
-  if (country === null) {
-    errIdx.value = 1;
+  const country = formData.get("country")!.toString().trim();
+  if (country.length === 0) {
+    errField.value = "country";
+    error("Validation Error", "Country is required");
     return;
   }
 
-  const province = validateRequried(
-    formData,
-    "province",
-    toast,
-    "Province is required"
-  );
-  if (province === null) {
-    errIdx.value = 2;
+  const province = formData.get("province")!.toString().trim();
+  if (province.length === 0) {
+    errField.value = "province";
+    error("Validation Error", "Province is required");
     return;
   }
 
-  const city = validateRequried(formData, "city", toast, "City is required");
-  if (city === null) {
-    errIdx.value = 3;
+  const city = formData.get("city")!.toString().trim();
+  if (city.length === 0) {
+    errField.value = "city";
+    error("Validation Error", "City is required");
     return;
   }
 
-  const organization = validateRequried(
-    formData,
-    "organization",
-    toast,
-    "Organization is required"
-  );
-  if (organization === null) {
-    errIdx.value = 4;
+  const organization = formData.get("organization")!.toString().trim();
+  if (organization.length === 0) {
+    errField.value = "organization";
+    error("Validation Error", "Organization is required");
     return;
   }
 
-  const organizationalUnit = validateRequried(
-    formData,
-    "organizational-unit",
-    toast,
-    "Organizational unit is required"
-  );
-  if (organizationalUnit === null) {
-    errIdx.value = 5;
+  const organizationalUnit = formData
+    .get("organizational-unit")!
+    .toString()
+    .trim();
+  if (organizationalUnit.length === 0) {
+    errField.value = "organizational-unit";
+    error("Validation Error", "Organizational unit is required");
     return;
   }
 
-  const commonName = validateRequried(
-    formData,
-    "common-name",
-    toast,
-    "Common name is required"
-  );
-  if (commonName === null) {
-    errIdx.value = 6;
+  const commonName = formData.get("common-name")!.toString().trim();
+  if (commonName.length === 0) {
+    errField.value = "common-name";
+    error("Validation Error", "Common name is required");
     return;
   }
 
   const expiry = parseInt(formData.get("expiry")!.toString().trim());
 
   const subjectAltNames = (() => {
-    const raw = formData.get("subject-alt-names")?.toString().trim();
-    if (raw === undefined || raw.length === 0) {
+    const raw = formData.get("subject-alt-names")!.toString().trim();
+    if (raw.length === 0) {
       return undefined;
     }
 
@@ -149,17 +121,12 @@ const onSubmit = async (ev: Event) => {
         return { type, value };
       });
     } catch {
-      toast.add({
-        severity: "error",
-        summary: "Validation Error",
-        detail: "Invalid subject alternative names format",
-        life: 5000
-      });
+      errField.value = "subject-alt-names";
+      error("Validation Error", "Invalid subject alternative names format");
       return null;
     }
   })();
   if (subjectAltNames === null) {
-    errIdx.value = 7;
     return;
   }
 
@@ -168,12 +135,7 @@ const onSubmit = async (ev: Event) => {
   // Try request
   try {
     busy.value = true;
-    toast.add({
-      severity: "info",
-      summary: "Info",
-      detail: "Requesting",
-      life: 3000
-    });
+    info("Info", "Requesting");
 
     await requestSslCert({
       caUuid,
@@ -188,22 +150,11 @@ const onSubmit = async (ev: Event) => {
       subjectAltNames
     });
 
-    toast.add({
-      severity: "success",
-      summary: "Success",
-      detail: "Successfully requested",
-      life: 3000
-    });
-    visible.value = false;
-
+    success("Success", "Successfully requested");
     emits("success");
+    visible.value = false;
   } catch (err: unknown) {
-    toast.add({
-      severity: "error",
-      summary: "Fail to Request",
-      detail: (err as Error).message,
-      life: 5000
-    });
+    error("Fail to Request", (err as Error).message);
   } finally {
     busy.value = false;
   }
@@ -225,6 +176,7 @@ const onSubmit = async (ev: Event) => {
           option-value="uuid"
           placeholder="Select a CA"
           size="small"
+          :invalid="errField === 'ca-uuid'"
           :options="caList"
           :virtual-scroller-options="{
             delay: 250,
@@ -254,6 +206,7 @@ const onSubmit = async (ev: Event) => {
             name="country"
             placeholder="e.g. CN"
             size="small"
+            :invalid="errField === 'country'"
             required />
         </section>
         <section class="w-1/3">
@@ -263,6 +216,7 @@ const onSubmit = async (ev: Event) => {
             name="province"
             placeholder="e.g. Guangdong"
             size="small"
+            :invalid="errField === 'province'"
             required />
         </section>
         <section class="w-1/3">
@@ -272,6 +226,7 @@ const onSubmit = async (ev: Event) => {
             name="city"
             placeholder="e.g. Guangzhou"
             size="small"
+            :invalid="errField === 'city'"
             required />
         </section>
       </div>
@@ -282,6 +237,7 @@ const onSubmit = async (ev: Event) => {
             id="organization"
             name="organization"
             size="small"
+            :invalid="errField === 'organization'"
             required />
         </section>
         <section class="w-1/2">
@@ -290,6 +246,7 @@ const onSubmit = async (ev: Event) => {
             id="organizational-unit"
             name="organizational-unit"
             size="small"
+            :invalid="errField === 'organizational-unit'"
             required />
         </section>
       </div>
@@ -300,6 +257,7 @@ const onSubmit = async (ev: Event) => {
             id="common-name"
             name="common-name"
             size="small"
+            :invalid="errField === 'common-name'"
             required />
         </section>
         <section class="w-1/3">
@@ -322,6 +280,7 @@ const onSubmit = async (ev: Event) => {
           id="subject-alt-names"
           name="subject-alt-names"
           placeholder="Key-value pair each line, in YAML format"
+          :invalid="errField === 'subject-alt-names'"
           size="small"></Textarea>
       </section>
       <section>
@@ -352,14 +311,5 @@ const onSubmit = async (ev: Event) => {
 
 section {
   @apply flex flex-col gap-1 my-2;
-
-  label {
-    @apply font-bold;
-
-    &[required]::after {
-      @apply text-red-500;
-      content: "*";
-    }
-  }
 }
 </style>

@@ -1,2 +1,11 @@
 @import "tailwindcss";
 @import "tailwindcss-primeui";
+
+label {
+  @apply font-bold;
+
+  &[required]::after {
+    @apply text-red-500;
+    content: "*";
+  }
+}

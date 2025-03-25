@@ -2,19 +2,21 @@
 import type { CertInfoDTO } from "@/api/types";
 import { deleteSslCert, getAllSslCertInfo } from "@/api/user/cert/ssl";
 import { useUserStore } from "@/stores/user";
+import { useNotify } from "@/utils/composable";
 import { nanoid } from "nanoid";
-import { useConfirm, useToast } from "primevue";
+import { useConfirm } from "primevue/useconfirm";
 
 // Stores
 const { role } = useUserStore();
 
-// Reactives
+// Services
 const confirm = useConfirm();
-const toast = useToast();
+const { info, success, error } = useNotify();
 
+// Reactives
 const loading = ref(false);
 const searchKeyword = ref("");
-const selection = ref();
+const targetCertData = ref<CertInfoDTO>();
 
 const pagination = reactive({
   total: 0,
@@ -31,33 +33,32 @@ const dialog = reactive({
 });
 
 // Non-reactives
-let currentRefreshTag = "";
+let nonce = nanoid();
 
 // Actions
 const refresh = async () => {
-  currentRefreshTag = nanoid();
-  const tag = currentRefreshTag;
+  nonce = nanoid();
+  const tag = nonce;
 
   try {
     loading.value = true;
+
     const page = await getAllSslCertInfo(
       pagination.first / pagination.limit + 1,
       pagination.limit,
       searchKeyword.value.length === 0 ? undefined : searchKeyword.value
     );
-    pagination.total = page.total;
-    pagination.data = page.list ?? [];
+
+    if (tag === nonce) {
+      pagination.total = page.total;
+      pagination.data = page.list ?? [];
+    }
   } catch (err: unknown) {
-    if (tag === currentRefreshTag) {
-      toast.add({
-        severity: "error",
-        summary: "Fail to Fetch Data",
-        detail: (err as Error).message,
-        life: 5000
-      });
+    if (tag === nonce) {
+      error("Fail to Fetch SSL Certificate Info", (err as Error).message);
     }
   } finally {
-    if (tag === currentRefreshTag) {
+    if (tag === nonce) {
       loading.value = false;
     }
   }
@@ -82,26 +83,11 @@ const tryDelCert = (data: CertInfoDTO) => {
     rejectProps: { severity: "secondary" },
     accept: async () => {
       try {
-        toast.add({
-          severity: "info",
-          summary: "Info",
-          detail: "Deleting SSL certificate",
-          life: 3000
-        });
+        info("Info", "Deleting SSL certificate");
         await deleteSslCert(data.uuid);
-        toast.add({
-          severity: "success",
-          summary: "Success",
-          detail: "Successfully deleted SSL certificate",
-          life: 3000
-        });
+        success("Success", "Successfully deleted SSL certificate");
       } catch (err: unknown) {
-        toast.add({
-          severity: "error",
-          summary: "Fail to Delete SSL certificate",
-          detail: (err as Error).message,
-          life: 5000
-        });
+        error("Fail to Delete SSL certificate", (err as Error).message);
       } finally {
         await refresh();
       }
@@ -144,7 +130,6 @@ onBeforeMount(() => refresh());
   <DataTable
     v-model:first="pagination.first"
     v-model:rows="pagination.limit"
-    v-model:selection="selection"
     data-key="uuid"
     size="small"
     :loading="loading"
@@ -160,21 +145,44 @@ onBeforeMount(() => refresh());
         Found {{ pagination.total }} SSL certificate(s) in total
       </p>
     </template>
-    <Column selectionMode="multiple" class="w-4"></Column>
     <Column header="Comment" class="w-0">
       <template #body="{ data }">
-        <p
-          v-tooltip.right="{ value: data.comment, class: 'text-sm' }"
-          class="overflow-x-hidden text-ellipsis whitespace-nowrap max-w-md">
-          {{ data.comment }}
-        </p>
+        <div class="flex gap-2">
+          <p
+            v-tooltip.bottom="{ value: data.comment, class: 'text-sm' }"
+            class="max-w-md overflow-x-hidden text-ellipsis whitespace-nowrap">
+            {{ data.comment }}
+          </p>
+          <Button
+            v-tooltip.top="{ value: 'Edit', class: 'text-sm' }"
+            aria-label="Edit certificate information"
+            class="h-6 opacity-0 w-6 group-hover:opacity-100"
+            icon="pi pi-pen-to-square"
+            severity="help"
+            size="small"
+            variant="text"
+            rounded
+            @click="
+              () => {
+                targetCertData = data;
+                dialog.editComment = true;
+              }
+            "></Button>
+        </div>
       </template>
     </Column>
     <Column
       v-if="role === 'Admin' || role === 'Superadmin'"
-      field="owner"
       header="Owner"
-      class="w-50"></Column>
+      class="w-50">
+      <template #body="{ data }">
+        <p
+          v-tooltip.bottom="{ value: data.owner, class: 'text-sm' }"
+          class="max-w-50 overflow-x-hidden text-ellipsis whitespace-nowrap w-fit">
+          {{ data.owner }}
+        </p>
+      </template>
+    </Column>
     <Column header="Status">
       <template #body="{ data }">
         <Badge
@@ -202,7 +210,12 @@ onBeforeMount(() => refresh());
             size="small"
             variant="text"
             rounded
-            @click="dialog.showInfo = true"></Button>
+            @click="
+              () => {
+                targetCertData = data;
+                dialog.showInfo = true;
+              }
+            "></Button>
           <Button
             v-tooltip.top="{ value: 'Export', class: 'text-sm' }"
             aria-label="Export certificate"
@@ -212,7 +225,12 @@ onBeforeMount(() => refresh());
             size="small"
             variant="text"
             rounded
-            @click="dialog.exportCert = true"></Button>
+            @click="
+              () => {
+                targetCertData = data;
+                dialog.exportCert = true;
+              }
+            "></Button>
           <Button
             v-tooltip.top="{ value: 'Renew', class: 'text-sm' }"
             aria-label="Renew certificate"
@@ -222,17 +240,13 @@ onBeforeMount(() => refresh());
             size="small"
             variant="text"
             rounded
-            @click="dialog.renewCert = true"></Button>
-          <Button
-            v-tooltip.top="{ value: 'Edit', class: 'text-sm' }"
-            aria-label="Edit certificate information"
-            class="h-6 w-6"
-            icon="pi pi-pen-to-square"
-            severity="help"
-            size="small"
-            variant="text"
-            rounded
-            @click="dialog.editComment = true"></Button>
+            @click="
+              () => {
+                targetCertData = data;
+                dialog.renewCert = true;
+              }
+            "></Button>
+
           <Button
             v-tooltip.top="{ value: 'Delete', class: 'text-sm' }"
             aria-label="Delete certificate"
@@ -247,5 +261,17 @@ onBeforeMount(() => refresh());
       </template>
     </Column>
   </DataTable>
+
+  <!-- Dialogs -->
   <ReqNewSslCertDlg v-model:visible="dialog.reqNewCert" @success="refresh" />
+  <SslCertInfoDlg v-model:visible="dialog.showInfo" :data="targetCertData" />
+  <ExportCertDlg v-model:visible="dialog.exportCert" :data="targetCertData" />
+  <RenewSslCertDlg
+    v-model:visible="dialog.renewCert"
+    :data="targetCertData"
+    @success="refresh" />
+  <EditSslCertDlg
+    v-model:visible="dialog.editComment"
+    :data="targetCertData"
+    @success="refresh" />
 </template>
