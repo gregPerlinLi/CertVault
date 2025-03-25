@@ -13,6 +13,7 @@
   "dependencies": {
     "@vueuse/core": "^13.0.0",
     "json-bigint": "^1.0.0",
+    "nanoid": "^5.1.5",
     "primeicons": "^7.0.0",
     "primevue": "^4.3.2",
     "tailwindcss": "^4.0.15",
