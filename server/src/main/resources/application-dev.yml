@@ -27,6 +27,11 @@ spring:
       key-prefix: "cache:"
       use-key-prefix: true
       time-to-live: 5m
+  sql:
+    init:
+      platform: mysql
+      mode: always
+      schema-locations: classpath:/sql/schema.sql
 
 logging:
   level:

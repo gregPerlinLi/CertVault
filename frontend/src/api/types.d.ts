@@ -35,8 +35,8 @@ export interface CertDetailDTO {
   notAfter: string;
   serialNumber: string;
   publicKey: {
-    modulus: bigint;
-    publicExponent: bigint;
+    modulus: string;
+    publicExponent: string;
     encoded: string;
     format: string;
     algorithm: string;

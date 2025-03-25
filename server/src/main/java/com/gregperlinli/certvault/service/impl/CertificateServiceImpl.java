@@ -164,7 +164,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     }
 
     @Override
-    public String getCertificateCertChain(String uuid, String owner) {
+    public String getCertificateCertChain(String uuid, String owner, Boolean needRootCa) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username", owner)
                 .eq("deleted", false);
@@ -234,6 +234,11 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
                 }
             }
             currentCaUuid = ca.getParentCa();
+        }
+        // 根据needRootCa参数决定是否移除根CA
+        if (!needRootCa && !certChain.isEmpty()) {
+            // 根CA是最后一个添加的证书，移除它
+            certChain.remove(certChain.size() - 1);
         }
         // 拼接证书链并Base64编码
         String chainContent = String.join("\n", certChain);

@@ -3,22 +3,28 @@ package com.gregperlinli.certvault.certificate;
 import com.gregperlinli.certvault.domain.entities.CertificateDetails;
 import com.gregperlinli.certvault.utils.CertUtils;
 import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 
+import java.io.StringReader;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
+import java.security.Signature;
+import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.time.Instant.ofEpochMilli;
 
@@ -81,6 +87,55 @@ public class CertAnalyzer {
         details.setExtensions(extensions);
 
         return details;
+    }
+
+    /**
+     * 验证证书私钥是否正确
+     *
+     * @param privkeyBase64 Base64编码的PEM私钥
+     * @param certBase64 Base64编码的PEM证书
+     * @return 验证结果
+     * @throws Exception 验证异常
+     */
+    public static Boolean certVerify(String privkeyBase64, String certBase64) throws Exception {
+        // 1. 解析证书公钥
+        X509Certificate certificate = new JcaX509CertificateConverter()
+                .setProvider("BC")
+                .getCertificate(CertUtils.parseCertificate(certBase64));
+        PublicKey publicKey = certificate.getPublicKey();
+
+        // 2. 解析私钥
+        PrivateKey privateKey = parsePrivateKey(privkeyBase64);
+
+        // 3. 签名验证
+        return verifyKeyPair(publicKey, privateKey);
+    }
+
+    /**
+     * 验证证书是否是CA证书
+     *
+     * @param certBase64 Base64编码的PEM证书
+     * @return 是否是CA证书
+     * @throws Exception 验证异常
+     */
+    public static Boolean verifyIsCa(String certBase64) throws Exception {
+        if (certBase64 == null || certBase64.trim().isEmpty()) {
+            throw new IllegalArgumentException("Certificate content cannot be empty");
+        }
+
+        X509CertificateHolder certHolder = CertUtils.parseCertificate(certBase64);
+        Extensions extensions = certHolder.getExtensions();
+
+        if (extensions != null) {
+            // 使用正确的 getExtension 方法，并传入 ASN1ObjectIdentifier 类型的 OID
+            Extension basicConstraintsExt = extensions.getExtension(Extension.basicConstraints);
+            if (basicConstraintsExt != null) {
+                BasicConstraints bc = BasicConstraints.getInstance(basicConstraintsExt.getParsedValue());
+                return bc.isCA();
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -246,6 +301,45 @@ public class CertAnalyzer {
             sb.append(String.format("%02X", b));
         }
         return "0x" + sb.toString();
+    }
+
+    private static PrivateKey parsePrivateKey(String privkeyBase64) throws Exception {
+        byte[] pemBytes = Base64.getDecoder().decode(privkeyBase64);
+        String pemContent = new String(pemBytes, StandardCharsets.UTF_8);
+
+        try (PEMParser pemParser = new PEMParser(new StringReader(pemContent))) {
+            Object obj = pemParser.readObject();
+
+            if (obj instanceof PEMKeyPair keyPair) {
+                // 处理 PEM 密钥对的情况
+                return new JcaPEMKeyConverter().setProvider("BC").getPrivateKey(keyPair.getPrivateKeyInfo());
+            } else if (obj instanceof PrivateKeyInfo pkcs8Key) {
+                // 处理 PKCS#8 格式的私钥
+                return new JcaPEMKeyConverter().setProvider("BC").getPrivateKey(pkcs8Key);
+            } else {
+                throw new IllegalArgumentException("Unsupported private key format");
+            }
+        }
+    }
+
+    private static boolean verifyKeyPair(PublicKey publicKey, PrivateKey privateKey) throws Exception {
+        // 使用证书公钥和私钥进行签名验证
+        String algorithm = "SHA256with" + publicKey.getAlgorithm();
+        Signature signature = Signature.getInstance(algorithm, "BC");
+
+        byte[] data = "CertVaultVerification".getBytes(StandardCharsets.UTF_8);
+
+        // 使用私钥签名
+        signature.initSign(privateKey);
+        signature.update(data);
+        byte[] signed = signature.sign();
+
+        // 使用公钥验证
+        signature.initVerify(publicKey);
+        signature.update(data);
+
+        return signature.verify(signed);
+
     }
 
 }

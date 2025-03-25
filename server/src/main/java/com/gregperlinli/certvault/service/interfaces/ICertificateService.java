@@ -37,9 +37,10 @@ public interface ICertificateService extends IService<Certificate> {
      *
      * @param uuid  Certificate UUID
      * @param owner Owner of the Certificate
+     * @param needRootCa  Whether to include the root CA certificate
      * @return {@link String} BASE64 SSL Certificate Chain
      */
-    String getCertificateCertChain(String uuid, String owner);
+    String getCertificateCertChain(String uuid, String owner, Boolean needRootCa);
 
     /**
      * Get SSL Certificate Private Key

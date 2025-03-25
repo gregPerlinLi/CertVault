@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.domain.dto;
 
+import com.gregperlinli.certvault.domain.entities.Ca;
 import com.gregperlinli.certvault.domain.entities.GenResponse;
 import lombok.*;
 
@@ -78,6 +79,17 @@ public class ResponseCaDTO {
         this.notBefore = response.getNotBefore();
         this.notAfter = response.getNotAfter();
         this.comment = response.getComment();
+    }
+
+    public ResponseCaDTO(Ca ca) {
+        this.uuid = ca.getUuid();
+        this.privkey = ca.getPrivkey();
+        this.cert = ca.getCert();
+        this.parentCa = ca.getParentCa();
+        this.allowSubCa = ca.getAllowSubCa();
+        this.notBefore = ca.getNotBefore();
+        this.notAfter = ca.getNotAfter();
+        this.comment = ca.getComment();
     }
 
 }

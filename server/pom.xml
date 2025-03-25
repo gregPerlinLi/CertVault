@@ -24,7 +24,7 @@
     </description>
     <groupId>com.gregperlinli</groupId>
     <artifactId>certvault</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.2</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

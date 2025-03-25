@@ -50,9 +50,10 @@ public interface ICaService extends IService<Ca> {
      *
      * @param uuid ca certificate uuid
      * @param owner owner of the ca certificate
+     * @param needRootCa whether to include root ca
      * @return ca certificate chain
      */
-    String getCaCertChain(String uuid, String owner);
+    String getCaCertChain(String uuid, String owner, Boolean needRootCa);
 
     /**
      * Get ca private key
@@ -83,6 +84,16 @@ public interface ICaService extends IService<Ca> {
      * @return the new ca availability
      */
     Boolean modifyCaAvailability(String uuid, String owner);
+
+    /**
+     * Import an existing ca certificate
+     *
+     * @param importCertDTO ca certificate info
+     * @param owner        owner of the new ca certificate
+     * @return new ca certificate info
+     * @throws Exception encryption error
+     */
+    ResponseCaDTO importCa(ImportCertDTO importCertDTO, String owner) throws Exception;
 
     /**
      * Request new ca certificate

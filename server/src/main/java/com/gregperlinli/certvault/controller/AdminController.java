@@ -90,12 +90,13 @@ public class AdminController {
     @GetMapping(value = "/cert/ca/cer/{uuid}")
     @Deprecated(since = "0.4.0")
     public ResultVO<String> getCaCert(@PathVariable("uuid") String uuid,
-                                      @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
+                                      @RequestParam(value = "isChain", defaultValue = "false", required = false) Boolean isChain,
+                                      @RequestParam(value = "needRootCa", defaultValue = "true", required = false) Boolean needRootCa,
                                       HttpServletRequest request) {
         String result = null;
         if ( isChain ) {
             result = caService.getCaCertChain(uuid,
-                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+                    ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), needRootCa);
         } else {
             result = caService.getCaCert(uuid,
                     ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
@@ -163,6 +164,25 @@ public class AdminController {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Enabled", true);
         }
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Disabled", false);
+    }
+
+    /**
+     * Import a CA certificate
+     *
+     * @param importCertDTO the import certificate DTO
+     * @param request the request
+     * @return the result
+     * @throws Exception if the encryption is failed
+     */
+    @PostMapping(value = "/cert/ca/import")
+    public ResultVO<ResponseCaDTO> importCa(@RequestBody ImportCertDTO importCertDTO,
+                                            HttpServletRequest request) throws Exception {
+        ResponseCaDTO result = caService.importCa(importCertDTO,
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
+        if ( result != null ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Failed");
     }
 
     /**

@@ -38,7 +38,11 @@ spec:
           command: ['sh', '-c', 'until nc -zv {{ ternary .Values.redis.external.host (ternary (printf "%s-redis-master" .Release.Name) "localhost" .Values.redis.internal) (not .Values.redis.internal) }} {{ ternary .Values.redis.external.port "6379" (not .Values.redis.internal) }}; do echo waiting for redis; sleep 2; done;']
         - name: wait-for-mysql
           image: mysql:5.7
-          command: [ 'sh', '-c', 'until mysqladmin ping -u {{ .Values.mysql.username }} -p{{ .Values.mysql.password }} -h {{ .Values.mysql.host }} -P {{ .Values.mysql.port }} --silent; do echo waiting for mysql; sleep 2; done;' ]
+          {{- if .Values.mysql.internal}}
+          command: [ 'sh', '-c', 'until mysqladmin ping -u {{ .Values.mysql.auth.username }} -p{{ .Values.mysql.auth.password }} -h {{ .Release.Name }}-mysql -P 3306 --silent; do echo waiting for mysql; sleep 2; done;' ]
+          {{- else }}
+          command: [ 'sh', '-c', 'until mysqladmin ping -u {{ .Values.mysql.external.username }} -p{{ .Values.mysql.external.password }} -h {{ .Values.mysql.external.host }} -P {{ .Values.mysql.external.port }} --silent; do echo waiting for mysql; sleep 2; done;' ]
+          {{- end}}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.Version }}"
@@ -57,17 +61,32 @@ spec:
             - name: SPRING_SERVER_PORT
               value: "{{ .Values.service.ports.business }}"
             {{- end }}
-            {{- if and .Values.mysql.host .Values.mysql.port .Values.mysql.database }}
+            {{- if .Values.mysql.internal }}
             - name: SPRING_DATASOURCE_URL
-              value: "jdbc:mysql://{{ .Values.mysql.host }}:{{ .Values.mysql.port }}/{{ .Values.mysql.database }}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+              value: "jdbc:mysql://{{ .Release.Name }}-mysql:3306/{{ .Values.mysql.auth.database }}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+            {{- else }}
+            {{- if and .Values.mysql.external.host .Values.mysql.external.port .Values.mysql.external.database }}
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://{{ .Values.mysql.external.host }}:{{ .Values.mysql.external.port }}/{{ .Values.mysql.external.database }}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
             {{- end }}
-            {{- if .Values.mysql.username }}
+            {{- end }}
+            {{- if .Values.mysql.internal}}
             - name: SPRING_DATASOURCE_USERNAME
-              value: "{{ .Values.mysql.username }}"
+              value: "{{ .Values.mysql.auth.username }}"
+            {{- else }}
+            {{- if .Values.mysql.external.username }}
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "{{ .Values.mysql.external.username }}"
             {{- end }}
-            {{- if .Values.mysql.password }}
+            {{- end }}
+            {{- if .Values.mysql.internal }}
             - name: SPRING_DATASOURCE_PASSWORD
-              value: "{{ .Values.mysql.password }}"
+              value: "{{ .Values.mysql.auth.password }}"
+            {{- else }}
+            {{- if .Values.mysql.external.password }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "{{ .Values.mysql.external.password }}"
+            {{- end }}
             {{- end }}
             {{- if ternary .Values.redis.external.host (ternary (printf "%s-redis-master" .Release.Name) "localhost" .Values.redis.internal) (not .Values.redis.internal) }}
             - name: SPRING_REDIS_HOST

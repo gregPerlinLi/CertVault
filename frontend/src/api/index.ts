@@ -15,7 +15,6 @@ export interface RestfulApiOption {
   pathNames?: Record<string, string>;
   searchParams?: Record<string, any>;
   payload?: any;
-  jsonParser?: typeof JSON.parse;
 }
 export const callRestfulApi = async <U = null>(
   opts: RestfulApiOption
@@ -33,7 +32,8 @@ export const callRestfulApi = async <U = null>(
       opts.method !== "GET" && opts.method !== "DELETE"
         ? { "Content-Type": "application/json" }
         : undefined,
-    body: opts.payload !== undefined ? JSON.stringify(opts.payload) : undefined
+    body: opts.payload !== undefined ? JSON.stringify(opts.payload) : undefined,
+    signal: AbortSignal.timeout(10000)
   } satisfies RequestInit;
 
   const resp = await fetch(uri, req);
@@ -41,10 +41,7 @@ export const callRestfulApi = async <U = null>(
     throw Error(`HTTP: ${resp.statusText} (${resp.status})`);
   }
 
-  const json: ResultVO<U> =
-    opts.jsonParser === undefined
-      ? await resp.json()
-      : opts.jsonParser(await resp.text());
+  const json: ResultVO<U> = await resp.json();
   if (json.code < 200 || json.code >= 300) {
     throw Error(`${json.msg} (${json.code})`);
   }

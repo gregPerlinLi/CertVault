@@ -11,10 +11,12 @@ image:
   pullPolicy: IfNotPresent
 
 ## Global configuration
-## @param global.storageClass [default: standard] The storage class to be used for persistent volumes
+## @param global.defaultStorageClass Global default StorageClass for Persistent Volume(s)
+## @param global.storageClass DEPRECATED: use global.defaultStorageClass instead
 ##
 global:
-  storageClass: "standard"
+  defaultStorageClass: "standard"
+  storageClass: ""
 
 ## Number of replicas for the deployment
 ## @param replicaCount [default: 1] The number of pod replicas to be created for the deployment
@@ -133,18 +135,32 @@ redis:
       password: "your-redis-password"
 
 ## MySQL configuration
-## @param mysql.host [default: localhost] Host of the MySQL instance
-## @param mysql.port [default: 3306] Port of the MySQL instance
-## @param mysql.database [default: certvault] Database name
-## @param mysql.username [default: user] Username for MySQL
-## @param mysql.password [default: password] Password for MySQL
+## @param mysql.internal [default: false] Whether to use an internal MySQL instance (true) or an external MySQL instance (false)
+## @param mysql.architecture [default: standalone] The architecture of the MySQL deployment (standalone or cluster)
+## @param mysql.auth.rootPassword [default: your-mysql-root-password] Root user password for internal MySQL deployment
+## @param mysql.auth.database [default: certvault] Database name to use (both internal and external)
+## @param mysql.auth.username [default: certvault] Username for MySQL access (used in internal deployment)
+## @param mysql.auth.password [default: your-mysql-password] Password for the MySQL user (used in internal deployment)
+## @param mysql.external.host [default: localhost] Hostname/IP of external MySQL instance
+## @param mysql.external.port [default: 3306] Port of external MySQL instance
+## @param mysql.external.database [default: certvault] Database name for external MySQL
+## @param mysql.external.username [default: certvault] Username for external MySQL access
+## @param mysql.external.password [default: password] Password for external MySQL user
 ##
 mysql:
-  host: localhost
-  port: 3306
-  database: certvault
-  username: user
-  password: password
+  internal: false
+  auth:
+    rootPassword: "your-mysql-root-password"
+    database: certvault
+    username: certvault
+    password: "your-mysql-password"
+  architecture: standalone
+  external:
+    host: localhost
+    port: 3306
+    database: certvault
+    username: certvault
+    password: password
 
 ## Ingress configuration
 ## @param ingress.enabled [default: false] Whether ingress is enabled
