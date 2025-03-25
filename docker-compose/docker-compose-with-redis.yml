@@ -1,0 +1,13 @@
+version: '3'
+services:
+  cert-vault:
+    <<: *common_certvault
+    depends_on:
+      - redis
+    environment:
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_REDIS_PASSWORD=${REDIS_PASSWORD}
+
+  redis:
+    <<: *common_redis

@@ -1,0 +1,11 @@
+version: '3'
+services:
+  cert-vault:
+    <<: *common_certvault
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://${MYSQL_EXTERNAL_HOST}:${MYSQL_EXTERNAL_PORT}/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_EXTERNAL_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_EXTERNAL_PASSWORD}
+      - SPRING_REDIS_HOST=${REDIS_EXTERNAL_HOST}
+      - SPRING_REDIS_PORT=${REDIS_EXTERNAL_PORT}
+      - SPRING_REDIS_PASSWORD=${REDIS_EXTERNAL_PASSWORD}
