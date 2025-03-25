@@ -8,6 +8,9 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+      - SPRING_REDIS_HOST=${EXTERNAL_REDIS_HOST}
+      - SPRING_REDIS_PORT=${EXTERNAL_REDIS_PORT}
+      - SPRING_REDIS_PASSWORD=${REDIS_PASSWORD}
 
   mysql:
     <<: *common_mysql

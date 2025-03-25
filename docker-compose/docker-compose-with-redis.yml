@@ -5,6 +5,7 @@ services:
     depends_on:
       - redis
     environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://${EXTERNAL_MYSQL_HOST}:${EXTERNAL_MYSQL_PORT}/${EXTERNAL_MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
       - SPRING_REDIS_PASSWORD=${REDIS_PASSWORD}
