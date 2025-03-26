@@ -1,6 +1,5 @@
 package com.gregperlinli.certvault.controller;
 
-import com.gregperlinli.certvault.constant.GeneralConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.LoginDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
@@ -8,7 +7,6 @@ import com.gregperlinli.certvault.domain.vo.ResultVO;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
