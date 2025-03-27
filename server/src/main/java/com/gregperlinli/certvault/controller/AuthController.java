@@ -5,9 +5,13 @@ import com.gregperlinli.certvault.domain.dto.LoginDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
+import com.gregperlinli.certvault.utils.AuthUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -43,6 +47,17 @@ public class AuthController {
             // request.getSession().setAttribute("username", loginDTO.getUsername());
             // request.getSession().setAttribute("account_type", loginResult.getRole());
             request.getSession().setAttribute("account", loginResult);
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                            loginResult.getUsername(),
+                            null,
+                            AuthorityUtils.createAuthorityList(
+                                    "ROLE_" +
+                                            AuthUtils.roleIdToRoleName(loginResult.getRole())
+                            )
+                    )
+            );
+            log.info("User: {}, Session ID: {} login", loginResult.getUsername(), request.getSession().getId());
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                     "Login Success!",
                     loginResult);
@@ -60,9 +75,10 @@ public class AuthController {
     @DeleteMapping(value = "/logout")
     public ResultVO<Void> logout(HttpServletRequest request) {
         if ( request.getSession().getAttribute("account") != null ) {
-            log.info("User {} logout", request.getSession().getAttribute("account").toString());
+            log.info("User: {}, Session ID: {} logout", request.getSession().getAttribute("account").toString(), request.getSession().getId());
             userService.logout(request.getSession().getId());
             request.getSession().invalidate();
+            SecurityContextHolder.clearContext();
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                     "Logout Success!");
         }
