@@ -59,7 +59,6 @@ management:
       application: "${spring.application.name}"
 
 mybatis-plus:
-  mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.gregperlinli.certvault.domain.entities
   configuration:
     map-underscore-to-camel-case: true
