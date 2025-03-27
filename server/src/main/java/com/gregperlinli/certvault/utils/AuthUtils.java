@@ -22,5 +22,14 @@ public class AuthUtils {
         return passwordEncoder.matches(rawPassword, encryptedPassword);
     }
 
+    public static String roleIdToRoleName(Integer roleId) {
+        return switch (roleId) {
+            case 1 -> "USER";
+            case 2 -> "ADMIN";
+            case 3 -> "SUPERADMIN";
+            default -> "GUEST";
+        };
+    }
+
 
 }
