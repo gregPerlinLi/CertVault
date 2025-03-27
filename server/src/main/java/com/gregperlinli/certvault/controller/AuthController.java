@@ -57,7 +57,10 @@ public class AuthController {
                             )
                     )
             );
-            log.info("User: {}, Session ID: {} login", loginResult.getUsername(), request.getSession().getId());
+            log.info("User: [{}|{}], Session ID: {} login",
+                    loginResult.getUsername(),
+                    AuthUtils.roleIdToRoleName(loginResult.getRole()),
+                    request.getSession().getId());
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                     "Login Success!",
                     loginResult);
@@ -75,7 +78,11 @@ public class AuthController {
     @DeleteMapping(value = "/logout")
     public ResultVO<Void> logout(HttpServletRequest request) {
         if ( request.getSession().getAttribute("account") != null ) {
-            log.info("User: {}, Session ID: {} logout", request.getSession().getAttribute("account").toString(), request.getSession().getId());
+            UserProfileDTO account = (UserProfileDTO) request.getSession().getAttribute("account");
+            log.info("User: [{}|{}], Session ID: {} logout",
+                    account.getUsername(),
+                    AuthUtils.roleIdToRoleName(account.getRole()),
+                    request.getSession().getId());
             userService.logout(request.getSession().getId());
             request.getSession().invalidate();
             SecurityContextHolder.clearContext();
