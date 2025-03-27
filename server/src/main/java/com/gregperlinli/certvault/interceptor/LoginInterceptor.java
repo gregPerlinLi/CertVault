@@ -23,7 +23,9 @@ import java.util.*;
  * @version 1.0.0
  * @className {@code LoginInterceptor}
  * @date 2025/3/10 17:28
+ * @deprecated Old login verification method with traditional session.
  */
+@Deprecated
 @Slf4j
 public class LoginInterceptor implements HandlerInterceptor {
 
