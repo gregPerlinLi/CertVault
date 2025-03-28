@@ -1,21 +1,23 @@
-version: '3'
+version: '3.9'
 x-common-certvault: &common_certvault
   image: ghcr.io/gregperlinli/certvault:latest
   ports:
     - ${EXTERNAL_PORT}:1888
-  environment:
-    - TIME_ZONE=${TIME_ZONE}
-    - SUPERADMIN_USERNAME=${SUPERADMIN_USERNAME}
-    - SUPERADMIN_DISPLAY_NAME=${SUPERADMIN_DISPLAY_NAME}
-    - SUPERADMIN_EMAIL=${SUPERADMIN_EMAIL}
-    - SUPERADMIN_PASSWORD=${SUPERADMIN_PASSWORD}
-    - SPRING_RSA_PUBLIC_KEY=${RSA_PUBLIC_KEY}
-    - SPRING_RSA_PRIVATE_KEY=${RSA_PRIVATE_KEY}
-    - SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT=${SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT}
-    - SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK=${SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK}
+  restart: always
+  environment: &common_certvault_env
+    TIME_ZONE: ${TIME_ZONE}
+    SUPERADMIN_USERNAME: ${SUPERADMIN_USERNAME}
+    SUPERADMIN_DISPLAY_NAME: ${SUPERADMIN_DISPLAY_NAME}
+    SUPERADMIN_EMAIL: ${SUPERADMIN_EMAIL}
+    SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD}
+    SPRING_RSA_PUBLIC_KEY: ${RSA_PUBLIC_KEY}
+    SPRING_RSA_PRIVATE_KEY: ${RSA_PRIVATE_KEY}
+    SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT: ${SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT}
+    SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK: ${SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK}
 x-common-redis: &common_redis
-  image: redis:6.2.6-alpine
-  command: redis-server --requirepass ${REDIS_PASSWORD} --databases ${REDIS_DATABASE}
+  image: bitnami/redis:6.2.6-debian-10-r199
+  environment:
+    REDIS_PASSWORD: ${REDIS_PASSWORD}
   volumes:
     - ./redis_data:/data
 
@@ -25,9 +27,10 @@ services:
     depends_on:
       - redis
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://${EXTERNAL_MYSQL_HOST}:${EXTERNAL_MYSQL_PORT}/${EXTERNAL_MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - SPRING_REDIS_HOST=redis
-      - SPRING_REDIS_PORT=6379
-      - SPRING_REDIS_PASSWORD=${REDIS_PASSWORD}
+      <<: *common_certvault_env
+      SPRING_DATASOURCE_URL: jdbc:mysql://${EXTERNAL_MYSQL_HOST}:${EXTERNAL_MYSQL_PORT}/${EXTERNAL_MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD}
   redis:
     <<: *common_redis

@@ -18,7 +18,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoginInterceptor())
-                .addPathPatterns("/api/*/user/**", "/api/*/admin/**", "/api/*/superadmin/**");
+        // Deprecated: Old login verification method with traditional session.
+        // registry.addInterceptor(new LoginInterceptor())
+        //        .addPathPatterns("/api/*/user/**", "/api/*/admin/**", "/api/*/superadmin/**");
     }
 }

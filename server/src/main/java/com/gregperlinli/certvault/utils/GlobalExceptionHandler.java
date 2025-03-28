@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.MethodNotAllowedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import javax.naming.AuthenticationException;
+import java.nio.file.AccessDeniedException;
+
 /**
  * 全局异常处理器
  *
@@ -78,4 +81,21 @@ public class GlobalExceptionHandler {
         response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.SERVER_ERROR.getResultCode()));
         return new ResultVO<>(ResultStatusCodeConstant.SERVER_ERROR.getResultCode(), "Uncaught Internal Server Error");
     }
+
+    @ExceptionHandler({AuthenticationException.class})
+    public ResultVO<?> handleAuthenticationException(AuthenticationException e) {
+        return new ResultVO<>(
+                ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(),
+                "Unauthorized"
+        );
+    }
+
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResultVO<?> handleAccessDeniedException(AccessDeniedException e) {
+        return new ResultVO<>(
+                ResultStatusCodeConstant.FORBIDDEN.getResultCode(),
+                "Insufficient permissions"
+        );
+    }
+
 }
