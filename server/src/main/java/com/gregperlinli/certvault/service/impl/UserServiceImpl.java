@@ -98,6 +98,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
+    public UserProfileDTO integrateOidcUser(String email, Map<String, Object> attributes) {
+        User user = this.getOne(new QueryWrapper<User>().eq("email", email));
+        if (user == null) {
+            user = new User();
+            user.setUsername((String) attributes.get("preferred_username"));
+            user.setEmail(email);
+            user.setDisplayName((String) attributes.get("name"));
+            user.setRole(1); // 默认角色
+            this.save(user);
+        }
+        return new UserProfileDTO(user);
+    }
+
+    @Override
+    public UserProfileDTO findByEmail(String email) {
+        if ( !GenericUtils.ofNullable(email) ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The parameter cannot be empty.");
+        }
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("email", email)
+                .eq("deleted", false);
+        User user = this.getOne(queryWrapper);
+        if ( user == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
+        }
+        return new UserProfileDTO(user);
+    }
+
+    @Override
     public Boolean updateUserProfile(String username, UpdateUserProfileDTO updateUserProfileDTO, boolean isSuperadmin) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
