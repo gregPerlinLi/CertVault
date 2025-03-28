@@ -101,12 +101,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public UserProfileDTO integrateOidcUser(String email, Map<String, Object> attributes) {
         User user = this.getOne(new QueryWrapper<User>().eq("email", email));
         if (user == null) {
+            LocalDateTime now = LocalDateTime.now();
             user = new User();
             user.setUsername((String) attributes.get("preferred_username"));
             user.setEmail(email);
             user.setDisplayName((String) attributes.get("name"));
-            user.setRole(1); // 默认角色
-            this.save(user);
+            user.setRole(AccountTypeConstant.USER.getAccountType()); // 默认角色
+            user.setCreatedAt(now);
+            user.setModifiedAt(now);
+            if ( !this.save(user) ) {
+                QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+                userQueryWrapper.eq("username", user.getEmail())
+                        .eq("deleted", true);
+                User exist = this.getOne(userQueryWrapper);
+                if ( exist != null ) {
+                    user.setId(exist.getId());
+                    user.setDeleted(false);
+                    if ( this.updateById(user) ) {
+                        return new UserProfileDTO(user);
+                    }
+                }
+            }
         }
         return new UserProfileDTO(user);
     }
@@ -186,12 +201,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return new UserProfileDTO(user);
         }
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", user.getUsername())
+        userQueryWrapper.eq("username", createUserDTO.getUsername())
                         .eq("deleted", true);
-        if ( this.getOne(userQueryWrapper) != null ) {
-            user = createUserDTO.updateUser(user);
-            if ( this.updateById(user) ) {
-                return new UserProfileDTO(user);
+        User exist = this.getOne(userQueryWrapper);
+        if ( exist != null ) {
+            exist = createUserDTO.updateUser(exist);
+            if ( this.updateById(exist) ) {
+                return new UserProfileDTO(exist);
             }
         }
         throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The user already exists.");
@@ -240,12 +256,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             if (existingDeletedUser != null) {
                 // Cover deleted users
                 User updateUser = dto.updateUser(existingDeletedUser);
-                updateUser.setModifiedAt(LocalDateTime.now());
                 usersToUpdate.add(updateUser);
             } else {
                 // New users
                 User newUser = dto.toUser();
-                newUser.setCreatedAt(LocalDateTime.now());
                 usersToInsert.add(newUser);
             }
         }
