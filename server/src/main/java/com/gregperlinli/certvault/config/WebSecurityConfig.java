@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gregperlinli.certvault.constant.AccountTypeConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
+import com.gregperlinli.certvault.domain.dto.CreateUserDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import com.gregperlinli.certvault.domain.entities.User;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
@@ -135,33 +136,29 @@ public class WebSecurityConfig {
 
             String clientName = request.getClientRegistration().getClientName();
             if ("oidc".equals(clientName)) {
-                return processOidcUser(oAuth2User);
+                try {
+                    return processOidcUser(oAuth2User);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             return oAuth2User;
         };
     }
 
-    private OAuth2User processOidcUser(OAuth2User oAuth2User) {
+    private OAuth2User processOidcUser(OAuth2User oAuth2User) throws Exception {
         Map<String, Object> attributes = oAuth2User.getAttributes();
         String email = (String) attributes.get("email");
 
         // 查找用户，如果不存在则创建
         UserProfileDTO userProfileDTO = userService.findByEmail(email);
         if ( userProfileDTO == null ) {
-            userProfileDTO = new UserProfileDTO();
-            userProfileDTO.setEmail(email);
-            userProfileDTO.setUsername((String) attributes.get("preferred_username"));
-            userProfileDTO.setRole(AccountTypeConstant.USER.getAccountType()); // 默认角色为USER
-            User user = new User();
-            LocalDateTime now = LocalDateTime.now();
-            user.setUsername(userProfileDTO.getUsername());
-            user.setDisplayName((String) attributes.get("name"));
-            user.setEmail(email);
-            user.setRole(userProfileDTO.getRole());
-            user.setCreatedAt(now);
-            user.setModifiedAt(now);
-            userService.save(user);
+            userService.createUser(new CreateUserDTO((String) attributes.get("preferred_username"),
+                    (String) attributes.get("name"),
+                    email,
+                    null,
+                    AccountTypeConstant.USER.getAccountType()));
         }
 
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("ROLE_" + AuthUtils.roleIdToRoleName(userProfileDTO.getRole()));
