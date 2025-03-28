@@ -116,6 +116,46 @@ spec:
               value: "{{ .Values.redis.external.auth.password }}"
             {{- end }}
             {{- end }}
+            {{- if .Values.server.baseUrl }}
+            - name: SERVER_BASE_URL
+              value: "{{ .Values.server.baseUrl }}"
+            {{- end }}
+            {{- if .Values.oidc.enabled }}
+            - name: ENABLE_OIDC
+              value: "{{ .Values.oidc.enabled }}"
+            {{- if .Values.oidc.provider.name}}
+            - name: OIDC_PROVIDER
+              value: "{{ .Values.oidc.provider.name }}"
+            {{- end }}
+            {{- if .Values.oidc.provider.clientId }}
+            - name: OIDC_CLIENT_ID
+              value: "{{ .Values.oidc.provider.clientId }}"
+            {{- end }}
+            {{- if .Values.oidc.provider.clientSecret }}
+            - name: OIDC_CLIENT_SECRET
+              value: "{{ .Values.oidc.provider.clientSecret }}"
+            {{- end }}
+            {{- if .Values.oidc.provider.authorizationUri }}
+            - name: OIDC_AUTHORIZATION_URI
+              value: "{{ .Values.oidc.provider.authorizationUri }}"
+            {{- end}}
+            {{- if .Values.oidc.provider.tokenUri }}
+            - name: OIDC_TOKEN_URI
+              value: "{{ .Values.oidc.provider.tokenUri }}"
+            {{- end }}
+            {{- if .Values.oidc.provider.userInfoUri}}
+            - name: OIDC_USER_INFO_URI
+              value: "{{ .Values.oidc.provider.userInfoUri }}"
+            {{- end }}
+            {{- if .Values.oidc.provider.jwkSetUri }}
+            - name: OIDC_JWK_SET_URI
+              value: "{{ .Values.oidc.provider.jwkSetUri }}"
+            {{- end }}
+            {{- if .Values.oidc.provider.usernameAttributes }}
+            - name: OIDC_USERNAME_ATTRIBUTE
+              value: "{{ .Values.oidc.provider.usernameAttributes }}"
+            {{- end }}
+            {{- end }}
             {{- if .Values.springBoot.logging.level.com_gregperlinli_certvault }}
             - name: SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT
               value: "{{ .Values.springBoot.logging.level.com_gregperlinli_certvault | default "debug" }}"

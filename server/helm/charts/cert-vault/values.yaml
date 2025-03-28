@@ -53,6 +53,35 @@ springBoot:
     # Path to heap dump file
     - "-XX:HeapDumpPath=./errorDump.hprof"
 
+## Server configuration
+## @param server.baseUrl The base URL of the server
+##
+server:
+  baseUrl: "http://127.0.0.1:1888"
+
+## OIDC configuration
+## @param oidc.enabled Whether OIDC authentication is enabled
+## @param oidc.provider.name The name of the OIDC provider
+## @param oidc.provider.clientId The client ID for OIDC authentication
+## @param oidc.provider.clientSecret The client secret for OIDC authentication
+## @param oidc.provider.authorizationUri The authorization endpoint URL
+## @param oidc.provider.tokenUri The token endpoint URL
+## @param oidc.provider.userInfoUri The user info endpoint URL
+## @param oidc.provider.jwkSetUri The JWK set endpoint URL
+## @param oidc.provider.usernameAttributes The attribute used to map username
+##
+oidc:
+  enabled: true
+  provider:
+    name: "oidc"
+    clientId: "oidc-client-id"
+    clientSecret: "oidc-client-secret"
+    authorizationUri: "https://oidc-provider.example.com/auth"
+    tokenUri: "https://oidc-provider.example.com/token"
+    userInfoUri: "https://oidc-provider.example.com/userinfo"
+    jwkSetUri: "https://oidc-provider.example.com/certs"
+    usernameAttributes: "preferred_username"
+
 ## Initialization configuration
 ## @param init.superadmin.username The username for the superadmin user
 ## @param init.superadmin.displayName The display name for the superadmin user
