@@ -37,7 +37,9 @@ public class CreateUserDTO {
         user.setUsername(this.username);
         user.setDisplayName(this.displayName);
         user.setEmail(this.email);
-        user.setPassword(AuthUtils.encryptPassword(this.password));
+        if ( this.password != null ) {
+            user.setPassword(AuthUtils.encryptPassword(this.password));
+        }
         user.setRole(this.role);
         user.setCreatedAt(now);
         user.setModifiedAt(now);
@@ -46,11 +48,13 @@ public class CreateUserDTO {
     }
 
     public User updateUser(User user) {
+        LocalDateTime now = LocalDateTime.now();
         user.setDisplayName(this.displayName);
         user.setEmail(this.email);
         user.setPassword(AuthUtils.encryptPassword(this.password));
         user.setRole(this.role);
-        user.setModifiedAt(LocalDateTime.now());
+        user.setCreatedAt(now);
+        user.setModifiedAt(now);
         user.setDeleted(false);
         return user;
     }
