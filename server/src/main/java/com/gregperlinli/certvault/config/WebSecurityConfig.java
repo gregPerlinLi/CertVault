@@ -1,12 +1,17 @@
 package com.gregperlinli.certvault.config;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gregperlinli.certvault.constant.AccountTypeConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
+import com.gregperlinli.certvault.domain.entities.User;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
 import com.gregperlinli.certvault.security.SessionAuthFilter;
+import com.gregperlinli.certvault.service.interfaces.IUserService;
 import com.gregperlinli.certvault.utils.AuthUtils;
 import io.jsonwebtoken.io.IOException;
+import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,13 +24,29 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Spring Security Config
@@ -53,6 +74,9 @@ public class WebSecurityConfig {
 //        return http.build();
 //    }
 
+    @Resource
+    IUserService userService;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -71,6 +95,14 @@ public class WebSecurityConfig {
                             .requestMatchers("/api/*/user/**").hasAnyRole("USER", "ADMIN", "SUPERADMIN")
                             .anyRequest().permitAll();
                 })
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/api/v1/auth/oauth/login")
+                        .defaultSuccessUrl("/api/v1/auth/oauth/success")
+                        .failureUrl("/api/v1/auth/oauth/failure")
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userAuthoritiesMapper(this.userAuthoritiesMapper())
+                        )
+                )
                 // 异常处理配置
                 .exceptionHandling(exceptionHandling -> {
                     exceptionHandling
@@ -93,6 +125,59 @@ public class WebSecurityConfig {
     @Bean
     public SessionAuthFilter sessionAuthFilter() {
         return new SessionAuthFilter();
+    }
+
+    @Bean
+    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
+        DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
+        return request -> {
+            OAuth2User oAuth2User = delegate.loadUser(request);
+
+            String clientName = request.getClientRegistration().getClientName();
+            if ("oidc".equals(clientName)) {
+                return processOidcUser(oAuth2User);
+            }
+
+            return oAuth2User;
+        };
+    }
+
+    private OAuth2User processOidcUser(OAuth2User oAuth2User) {
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+        String email = (String) attributes.get("email");
+
+        // 查找用户，如果不存在则创建
+        UserProfileDTO userProfileDTO = userService.findByEmail(email);
+        if ( userProfileDTO == null ) {
+            userProfileDTO = new UserProfileDTO();
+            userProfileDTO.setEmail(email);
+            userProfileDTO.setUsername((String) attributes.get("preferred_username"));
+            userProfileDTO.setRole(AccountTypeConstant.USER.getAccountType()); // 默认角色为USER
+            User user = new User();
+            LocalDateTime now = LocalDateTime.now();
+            user.setUsername(userProfileDTO.getUsername());
+            user.setDisplayName((String) attributes.get("name"));
+            user.setEmail(email);
+            user.setRole(userProfileDTO.getRole());
+            user.setCreatedAt(now);
+            user.setModifiedAt(now);
+            userService.save(user);
+        }
+
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("ROLE_" + AuthUtils.roleIdToRoleName(userProfileDTO.getRole()));
+        return new DefaultOAuth2User(authorities, attributes, "email");
+    }
+
+    private void successHandler(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException, java.io.IOException {
+
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        String email = (String) oAuth2User.getAttributes().get("email");
+
+        // 设置session
+        request.getSession().setAttribute("account", userService.findByEmail(email));
+
+        // 重定向到主页
+        response.sendRedirect("/");
     }
 
     @Component
@@ -120,6 +205,21 @@ public class WebSecurityConfig {
             response.setContentType("application/json");
             response.getWriter().write(new ObjectMapper().writeValueAsString(new ResultVO<Void>(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "Insufficient permissions.")));
         }
+    }
+
+    @Bean
+    public GrantedAuthoritiesMapper userAuthoritiesMapper() {
+        return authorities -> {
+            List<GrantedAuthority> mappedAuthorities = new ArrayList<>();
+            authorities.forEach(authority -> {
+                if (authority.getAuthority().startsWith("ROLE_")) {
+                    mappedAuthorities.add(authority);
+                } else {
+                    mappedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                }
+            });
+            return mappedAuthorities;
+        };
     }
 
 }
