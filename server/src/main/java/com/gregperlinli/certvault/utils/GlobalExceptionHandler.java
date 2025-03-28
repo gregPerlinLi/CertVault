@@ -7,7 +7,9 @@ import com.gregperlinli.certvault.domain.vo.ResultVO;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.MethodNotAllowedException;
@@ -36,10 +38,20 @@ public class GlobalExceptionHandler {
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode()));
             return new ResultVO<>(((LoginException) e).getCode(), msg);
         }
+        if ( e instanceof OAuth2AuthorizationException ) {
+            // response.setStatus(ResultStatus
+            response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode()));
+            return new ResultVO<>(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), msg);
+        }
         if ( e instanceof PermissionException) {
             // response.setStatus(ResultStatusCodeConstant.FORBIDDEN);
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.FORBIDDEN.getResultCode()));
             return new ResultVO<>(((PermissionException) e).getCode(), msg);
+        }
+        if ( e instanceof MissingServletRequestParameterException ) {
+            // response.setStatus(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION);
+            response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode()));
+            return new ResultVO<>(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), msg);
         }
         if ( e instanceof ParamValidateException) {
             // response.setStatus(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION);
@@ -78,6 +90,7 @@ public class GlobalExceptionHandler {
         }
         // response.setStatus(ResultStatusCodeConstant.SERVER_ERROR);
         log.error("Uncaught Internal Server Error: {}", e.getMessage());
+        e.printStackTrace();
         response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.SERVER_ERROR.getResultCode()));
         return new ResultVO<>(ResultStatusCodeConstant.SERVER_ERROR.getResultCode(), "Uncaught Internal Server Error");
     }
