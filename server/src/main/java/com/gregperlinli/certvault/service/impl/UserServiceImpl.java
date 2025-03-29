@@ -111,7 +111,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             user.setModifiedAt(now);
             if ( !this.save(user) ) {
                 QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-                userQueryWrapper.eq("username", user.getEmail())
+                userQueryWrapper.eq("email", user.getEmail())
                         .eq("deleted", true);
                 User exist = this.getOne(userQueryWrapper);
                 if ( exist != null ) {
