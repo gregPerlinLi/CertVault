@@ -33,6 +33,32 @@ spring:
       platform: mysql
       mode: always
       schema-locations: classpath:/sql/schema.sql
+  security:
+    oauth2:
+      client:
+        registration:
+          oidc:
+            client-id: ${OIDC_CLIENT_ID:cert-vault}
+            client-secret: ${OIDC_CLIENT_SECRET:changeme}
+            scope:
+              - openid
+              - email
+              - profile
+            redirect-uri: "${SERVER_BASE_URL:http://127.0.0.1:1888}/api/v1/auth/oauth/callback"
+            authorization-grant-type: authorization_code
+            provider: oidc
+            client-authentication-method: client_secret_basic
+        provider:
+          oidc:
+            token-uri: "${OIDC_TOKEN_URI:https://127.0.0.1:8443/realms/cert-vault/protocol/openid-connect/token}"
+            authorization-uri: "${OIDC_AUTHORIZATION_URI:https://127.0.0.1:8443/realms/cert-vault/protocol/openid-connect/auth}"
+            user-info-uri: "${OIDC_USER_INFO_URI:https://127.0.0.1:8443/realms/cert-vault/protocol/openid-connect/userinfo}"
+            jwk-set-uri: "${OIDC_JWK_SET_URI:https://127.0.0.1:8443/realms/cert-vault/protocol/openid-connect/certs}"
+            user-name-attribute: "${OIDC_USERNAME_ATTRIBUTE:preferred_username}"
+
+oidc:
+  enabled: ${ENABLE_OIDC:true}
+  provider: ${OIDC_PROVIDER:oidc}
 
 logging:
   level:

@@ -5,6 +5,7 @@ import com.gregperlinli.certvault.domain.entities.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -51,6 +52,23 @@ public interface IUserService extends IService<User> {
      * @param username username
      */
     UserProfileDTO getOwnProfile(String username);
+
+    /**
+     * Integrate oidc user
+     *
+     * @param email email address
+     * @param attributes attributes
+     * @return user profile
+     */
+    UserProfileDTO integrateOidcUser(String email, Map<String, Object> attributes);
+
+    /**
+     * Find user by email
+     *
+     * @param email email address
+     * @return user profile
+     */
+    UserProfileDTO findByEmail(String email);
 
     /**
      * update user profile
