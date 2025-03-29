@@ -90,7 +90,7 @@ public class GlobalExceptionHandler {
         }
         // response.setStatus(ResultStatusCodeConstant.SERVER_ERROR);
         log.error("Uncaught Internal Server Error: {}", e.getMessage());
-        e.printStackTrace();
+        log.error("Error Stack Trace: ", e);
         response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.SERVER_ERROR.getResultCode()));
         return new ResultVO<>(ResultStatusCodeConstant.SERVER_ERROR.getResultCode(), "Uncaught Internal Server Error");
     }
