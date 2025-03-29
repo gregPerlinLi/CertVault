@@ -53,7 +53,6 @@ public class CreateUserDTO {
         user.setEmail(this.email);
         user.setPassword(AuthUtils.encryptPassword(this.password));
         user.setRole(this.role);
-        user.setCreatedAt(now);
         user.setModifiedAt(now);
         user.setDeleted(false);
         return user;
