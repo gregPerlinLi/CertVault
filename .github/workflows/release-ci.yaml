@@ -49,8 +49,8 @@ jobs:
         run: |
           pnpm install
           pnpm run build
-          mkdir -p ../server/src/main/resources/static
-          cp -r dist/* ../server/src/main/resources/static/
+          mkdir -p server/src/main/resources/static
+          cp -r dist/* server/src/main/resources/static/
           cd ..
 
       # 使用 Maven 打包后端项目
