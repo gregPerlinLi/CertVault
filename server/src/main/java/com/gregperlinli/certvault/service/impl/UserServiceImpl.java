@@ -179,12 +179,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if ( keyword == null || keyword.isEmpty() ) {
             userQueryWrapper.eq("deleted", false);
         } else {
-            userQueryWrapper.like("username", keyword)
+            userQueryWrapper.and(wrapper -> wrapper.like("username", keyword)
                             .or()
                             .like("display_name", keyword)
                             .or()
                             .like("email", keyword)
-                            .eq("deleted", false);
+                    )
+                    .eq("deleted", false);
         }
         resultPage = this.page(userPage, userQueryWrapper);
         return new PageDTO<>(resultPage.getTotal(),

@@ -28,14 +28,38 @@ jobs:
     steps:
       # 检出代码
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # 设置 JDK 环境
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      # 移出前端文件
+      - name: Move files out
+        run: mv frontend/* . && rm -r frontend
+
+      # 设置 pnpm 环境
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+
+      # 设置 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/Jod
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      # 构建前端项目
+      - name: Build Frontend
+        run: |
+          pnpm install
+          pnpm run build
+          mkdir -p server/src/main/resources/static
+          cp -r dist/* server/src/main/resources/static/
 
       # 使用 Maven 打包后端项目
       - name: Build with Maven

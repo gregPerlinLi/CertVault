@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -49,7 +49,7 @@ public class ResultVO<T> {
      * @param message 错误信息
      */
     public ResultVO(Integer code, String message) {
-        this(code, message, null, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        this(code, message, null, OffsetDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
     }
 
     /**
@@ -60,7 +60,7 @@ public class ResultVO<T> {
      * @param data 返回数据
      */
     public ResultVO(Integer code, String message, T data) {
-        this(code, message, data, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        this(code, message, data, OffsetDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
     }
 
 }

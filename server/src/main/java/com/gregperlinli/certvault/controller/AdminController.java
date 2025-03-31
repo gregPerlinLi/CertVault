@@ -79,6 +79,33 @@ public class AdminController {
     }
 
     /**
+     * Get all user information bound to a ca
+     *
+     * @param uuid the uuid of the user
+     * @param keyword the keyword to search
+     * @param page the page number
+     * @param limit the limit of the page
+     * @param request the request
+     * @return the result
+     */
+    @GetMapping(value = "/cert/ca/{uuid}/bind")
+    public ResultVO<PageDTO<UserProfileDTO>> getCaBindUsers(@PathVariable("uuid") String uuid,
+                                                            @RequestParam(value = "keyword", required = false) String keyword,
+                                                            @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                            @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                            HttpServletRequest request) {
+        PageDTO<UserProfileDTO> result = caService.getBoundUsers(keyword,
+                uuid,
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
+                page,
+                limit);
+        if ( result != null && result.getList() != null ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "No data", result);
+    }
+
+    /**
      * Get a CA certificate
      *
      * @deprecated Not implemented
@@ -87,7 +114,7 @@ public class AdminController {
      * @param request the request
      * @return the result
      */
-    @GetMapping(value = "/cert/ca/cer/{uuid}")
+    @GetMapping(value = "/cert/ca/{uuid}/cer")
     @Deprecated(since = "0.4.0")
     public ResultVO<String> getCaCert(@PathVariable("uuid") String uuid,
                                       @RequestParam(value = "isChain", defaultValue = "false", required = false) Boolean isChain,
