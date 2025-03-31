@@ -4,7 +4,7 @@
 label {
   @apply font-bold;
 
-  &[required]::after {
+  &[required]:not([required="false"])::after {
     @apply text-red-500;
     content: "*";
   }

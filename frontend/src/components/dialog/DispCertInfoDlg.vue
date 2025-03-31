@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { CertDetailDTO, CertInfoDTO } from "@/api/types";
+import type { CaInfoDTO, CertDetailDTO, CertInfoDTO } from "@/api/types";
 import { analyzeCert } from "@/api/user/cert";
+import { getCaCert } from "@/api/user/cert/ca";
 import { getSslCert } from "@/api/user/cert/ssl";
 import { useNotify } from "@/utils/composable";
 import { nanoid } from "nanoid";
@@ -9,7 +10,10 @@ import { nanoid } from "nanoid";
 const visible = defineModel<boolean>("visible");
 
 // Properties
-const props = defineProps<{ data?: CertInfoDTO }>();
+const { variant, data } = defineProps<{
+  variant: "ca" | "ssl";
+  data?: CaInfoDTO | CertInfoDTO;
+}>();
 
 // Services
 const { error } = useNotify();
@@ -21,9 +25,12 @@ const canRetry = ref(false);
 // Non-reactive
 let nonce = nanoid();
 
+// Computed
+const getCertFn = computed(() => (variant === "ca" ? getCaCert : getSslCert));
+
 // Actions
 const fetchDetails = async () => {
-  if (props.data === undefined) {
+  if (data === undefined) {
     return;
   }
 
@@ -34,17 +41,17 @@ const fetchDetails = async () => {
   canRetry.value = false;
 
   try {
-    const cert = await getSslCert(props.data!.uuid);
+    const cert = await getCertFn.value(data!.uuid);
     if (tag !== nonce) {
       return;
     }
 
-    const data = await analyzeCert(cert);
+    const result = await analyzeCert(cert);
     if (tag !== nonce) {
       return;
     }
 
-    details.value = data;
+    details.value = result;
   } catch (err: unknown) {
     if (tag === nonce && visible) {
       canRetry.value = true;
@@ -56,6 +63,8 @@ const fetchDetails = async () => {
 // Watch
 watch(visible, async (v) => {
   if (v) {
+    details.value = undefined;
+    canRetry.value = false;
     await fetchDetails();
   }
 });
@@ -83,10 +92,16 @@ watch(visible, async (v) => {
                 <pre>{{ data?.owner }}</pre>
               </AccordionContent>
             </AccordionPanel>
-            <AccordionPanel value="ca-uuid">
+            <AccordionPanel v-if="variant === 'ssl'" value="ca-uuid">
               <AccordionHeader>CA UUID</AccordionHeader>
               <AccordionContent>
-                <pre>{{ data?.caUuid }}</pre>
+                <pre>{{ (data as CertInfoDTO).caUuid }}</pre>
+              </AccordionContent>
+            </AccordionPanel>
+            <AccordionPanel v-else value="parent-ca-uuid">
+              <AccordionHeader>Parent CA UUID</AccordionHeader>
+              <AccordionContent>
+                <pre>{{ (data as CaInfoDTO).parentCa ?? "null" }}</pre>
               </AccordionContent>
             </AccordionPanel>
             <AccordionPanel value="uuid">
