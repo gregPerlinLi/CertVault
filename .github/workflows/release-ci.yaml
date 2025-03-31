@@ -28,17 +28,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 设置 pnpm 环境
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v4
-
       # 设置 Node.js 环境
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: lts/Jod
           cache: pnpm
-          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      # 设置 pnpm 环境
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
 
       # 构建前端项目
       - name: Build Frontend
