@@ -79,8 +79,9 @@ jobs:
         run: |
           comments=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           "https://api.github.com/repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}" | jq '.body')
-          echo $comments
-          formatted_comments=$(echo $comments)
+          echo $comments > comments.txt
+          formatted_comments=$(cat comments.txt)
+          echo $formatted_comments
           echo "COMMENTS=$formatted_comments" >> $GITHUB_ENV
 
       - name: Create and Upload Release
