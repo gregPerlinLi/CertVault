@@ -79,13 +79,7 @@ jobs:
         run: |
           comments=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           "https://api.github.com/repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}" | jq '.body')
-          formatted_comments=$(echo $comments | 
-            sed -e '/^Commits:/,/^$/d' -e 's/### Pull Request Description//g' | 
-            sed '/^$/d' | 
-            sed 's/^\*\*//;s/\*\*$//' |
-            sed 's/  \+/ /g' | 
-            sed '/^$/d' | 
-            sed 's/^ \+//')
+          formatted_comments=$(echo $comments | sed 's/^"//; s/"$//')
           echo $formatted_comments
           echo "COMMENTS=$formatted_comments" >> $GITHUB_ENV
 
