@@ -69,6 +69,9 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
                                 .eq("deleted", false)
                 );
                 List<String> caUuids = uuids.stream().map(Object::toString).toList();
+                if ( caUuids.isEmpty() ) {
+                    throw new ParamValidateException(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "The admin user does not have any CA.");
+                }
                 certificateQueryWrapper.or()
                         .in("ca_uuid", caUuids)
                         .eq("deleted", false);
@@ -94,6 +97,9 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
                                 )
                         .in("ca_uuid", caUuids)
                         .eq("deleted", false);
+                if ( caUuids.isEmpty() ) {
+                    throw new ParamValidateException(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "The admin user does not have any CA.");
+                }
             } else if ( Objects.equals( AccountTypeConstant.SUPERADMIN.getAccountType(), user.getRole() ) ) {
                 certificateQueryWrapper.and(wrapper -> wrapper
                                 .like("uuid", keyword)

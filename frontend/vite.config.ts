@@ -3,6 +3,7 @@
 import { defineConfig, loadEnv } from "vite";
 
 // Vite plugins
+import { visualizer } from "rollup-plugin-visualizer";
 import autoImport from "unplugin-auto-import";
 import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
@@ -23,6 +24,10 @@ export default defineConfig(({ mode }) => {
       }),
       tailwindcss(),
       tsconfigPaths({ loose: true, projects: ["tsconfig.app.json"] }),
+      visualizer({
+        open: env.VITE_OPEN_VISUALIZER === "1",
+        filename: "visualizer.html"
+      }),
       vue(),
       vueComponents.vite({ dts: true, resolvers: [PrimeVueResolver()] })
     ],

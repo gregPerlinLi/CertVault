@@ -40,6 +40,11 @@ const onSubmit = async (ev: Event) => {
     error("Validation Error", "No changes found");
     return;
   }
+  if (comment.length === 0) {
+    invalid.value = true;
+    error("Validation Error", "Comment is required");
+    return;
+  }
 
   // Try update
   try {

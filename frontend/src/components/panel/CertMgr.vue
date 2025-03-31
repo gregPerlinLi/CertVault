@@ -12,6 +12,27 @@ import { useNotify } from "@/utils/composable";
 import { nanoid } from "nanoid";
 import { useConfirm } from "primevue/useconfirm";
 
+// Async components
+const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
+const AsyncReqNewCertDlg = defineAsyncComponent(
+  () => import("@/components/dialog/cert/ReqNewCertDlg.vue")
+);
+const AsyncImCaDlg = defineAsyncComponent(
+  () => import("@/components/dialog/cert/ImCaDlg.vue")
+);
+const AsyncEditCertCmtDlg = defineAsyncComponent(
+  () => import("@/components/dialog/cert/EditCertCmtDlg.vue")
+);
+const AsyncDispCertInfoDlg = defineAsyncComponent(
+  () => import("@/components/dialog/cert/DispCertInfoDlg.vue")
+);
+const AsyncExCertDlg = defineAsyncComponent(
+  () => import("@/components/dialog/cert/ExCertDlg.vue")
+);
+const AsyncRenewCertDlg = defineAsyncComponent(
+  () => import("@/components/dialog/cert/RenewCertDlg.vue")
+);
+
 // Properties
 const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 
@@ -35,6 +56,7 @@ const pagination = reactive({
 });
 const dialog = reactive({
   reqNewCert: false,
+  uplNewCert: false,
   showInfo: false,
   exportCert: false,
   renewCert: false,
@@ -157,10 +179,17 @@ onBeforeMount(() => refresh());
     <template #start>
       <div class="flex gap-4">
         <Button
+          v-if="variant === 'ssl' || role === 'Admin' || role === 'Superadmin'"
           icon="pi pi-plus"
           label="Request New"
           size="small"
           @click="dialog.reqNewCert = true"></Button>
+        <Button
+          v-if="variant === 'ca' && role !== 'User'"
+          icon="pi pi-upload"
+          label="Upload New"
+          size="small"
+          @click="dialog.uplNewCert = true"></Button>
         <Button
           icon="pi pi-refresh"
           label="Refresh"
@@ -181,7 +210,7 @@ onBeforeMount(() => refresh());
     </template>
   </Toolbar>
 
-  <DataTable
+  <AsyncDataTable
     v-model:first="pagination.first"
     v-model:rows="pagination.limit"
     data-key="uuid"
@@ -328,11 +357,11 @@ onBeforeMount(() => refresh());
               class: 'text-sm'
             }"
             class="h-6 w-6"
-            severity="danger"
             size="small"
             variant="text"
             :aria-label="data.available ? 'Disable' : 'Enable'"
             :icon="data.available ? 'pi pi-ban' : 'pi pi-check-circle'"
+            :severity="data.available ? 'danger' : 'success'"
             rounded
             @click="tryToggleCertAvailable(data)"></Button>
           <Button
@@ -348,27 +377,28 @@ onBeforeMount(() => refresh());
         </div>
       </template>
     </Column>
-  </DataTable>
+  </AsyncDataTable>
 
   <!-- Dialogs -->
-  <ReqNewCertDlg
+  <AsyncReqNewCertDlg
     v-model:visible="dialog.reqNewCert"
     :variant="variant"
     @success="refresh" />
-  <EditCertCmtDlg
+  <AsyncImCaDlg v-model:visible="dialog.uplNewCert" @success="refresh" />
+  <AsyncEditCertCmtDlg
     v-model:visible="dialog.editComment"
     :data="targetCertData"
     :variant="variant"
     @success="refresh" />
-  <DispCertInfoDlg
+  <AsyncDispCertInfoDlg
     v-model:visible="dialog.showInfo"
     :data="targetCertData"
     :variant="variant" />
-  <ExCertDlg
+  <AsyncExCertDlg
     v-model:visible="dialog.exportCert"
     :data="targetCertData"
     :variant="variant" />
-  <RenewCertDlg
+  <AsyncRenewCertDlg
     v-model:visible="dialog.renewCert"
     :data="targetCertData"
     :variant="variant"
