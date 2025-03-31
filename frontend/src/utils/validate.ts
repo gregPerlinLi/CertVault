@@ -1,4 +1,5 @@
 import type { ToastServiceMethods } from "primevue";
+import { Schema } from "zod";
 
 export const validateRequried = (
   data: FormData,
@@ -18,4 +19,10 @@ export const validateRequried = (
   }
 
   return value;
+};
+
+export const validateForm = (form: HTMLFormElement, schema: Schema) => {
+  const obj: Record<string, string> = {};
+  new FormData(form).forEach((v, k) => (obj[k] = v.toString().trim()));
+  return schema.safeParse(obj);
 };
