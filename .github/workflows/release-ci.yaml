@@ -28,9 +28,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 进入前端目录
-      - name: Enter frontend directory
-        run: cd frontend
+      # 移出前端文件
+      - name: Move files out
+        run: mv frontend/* . && rm -r frontend
 
       # 设置 pnpm 环境
       - name: Setup PNPM

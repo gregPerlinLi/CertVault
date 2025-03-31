@@ -37,9 +37,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 进入前端目录
-      - name: Enter frontend directory
-        run: cd frontend
+      # 移出前端文件
+      - name: Move files out
+        run: mv frontend/* . && rm -r frontend
 
       # 设置 pnpm 环境
       - name: Setup PNPM
@@ -60,7 +60,6 @@ jobs:
           pnpm run build
           mkdir -p ../server/src/main/resources/static
           cp -r dist/* ../server/src/main/resources/static/
-          cd ..
 
       # 使用 Maven 打包后端项目
       - name: Build with Maven
