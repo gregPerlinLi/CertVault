@@ -37,14 +37,6 @@ const menuModel = computed((): MenuItem[] =>
       command: (): void => {
         router.push("/dashboard/certificates");
       }
-    },
-    {
-      label: "Settings",
-      icon: "pi pi-cog",
-      only: ["Superadmin"],
-      command: (): void => {
-        router.push("/dashboard/settings");
-      }
     }
   ].filter(
     (itm: MenuItem & { only?: string[] }): boolean =>
