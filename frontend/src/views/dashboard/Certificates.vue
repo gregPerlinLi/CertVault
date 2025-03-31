@@ -1,5 +1,10 @@
 <script setup lang="ts">
 useTitle("Certificates - CertVault");
+
+// Async components
+const AsyncCertMgr = defineAsyncComponent(
+  () => import("@/components/panel/CertMgr.vue")
+);
 </script>
 
 <template>
@@ -16,10 +21,24 @@ useTitle("Certificates - CertVault");
     </TabList>
     <TabPanels>
       <TabPanel value="0">
-        <CertMgr variant="ca" />
+        <Suspense>
+          <AsyncCertMgr variant="ca" />
+          <template #fallback>
+            <div class="flex items-center justify-center py-12">
+              <ProgressSpinner aria-label="Loading" />
+            </div>
+          </template>
+        </Suspense>
       </TabPanel>
       <TabPanel value="1">
-        <CertMgr variant="ssl" />
+        <Suspense>
+          <AsyncCertMgr variant="ssl" />
+          <template #fallback>
+            <div class="flex items-center justify-center py-12">
+              <ProgressSpinner aria-label="Loading" />
+            </div>
+          </template>
+        </Suspense>
       </TabPanel>
     </TabPanels>
   </Tabs>
