@@ -15,22 +15,22 @@ import { useConfirm } from "primevue/useconfirm";
 // Async components
 const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
 const AsyncReqNewCertDlg = defineAsyncComponent(
-  () => import("@/components/dialog/ReqNewCertDlg.vue")
+  () => import("@/components/dialog/cert/ReqNewCertDlg.vue")
 );
 const AsyncImCaDlg = defineAsyncComponent(
-  () => import("@/components/dialog/ImCaDlg.vue")
+  () => import("@/components/dialog/cert/ImCaDlg.vue")
 );
 const AsyncEditCertCmtDlg = defineAsyncComponent(
-  () => import("@/components/dialog/EditCertCmtDlg.vue")
+  () => import("@/components/dialog/cert/EditCertCmtDlg.vue")
 );
 const AsyncDispCertInfoDlg = defineAsyncComponent(
-  () => import("@/components/dialog/DispCertInfoDlg.vue")
+  () => import("@/components/dialog/cert/DispCertInfoDlg.vue")
 );
 const AsyncExCertDlg = defineAsyncComponent(
-  () => import("@/components/dialog/ExCertDlg.vue")
+  () => import("@/components/dialog/cert/ExCertDlg.vue")
 );
 const AsyncRenewCertDlg = defineAsyncComponent(
-  () => import("@/components/dialog/RenewCertDlg.vue")
+  () => import("@/components/dialog/cert/RenewCertDlg.vue")
 );
 
 // Properties
@@ -357,11 +357,11 @@ onBeforeMount(() => refresh());
               class: 'text-sm'
             }"
             class="h-6 w-6"
-            severity="danger"
             size="small"
             variant="text"
             :aria-label="data.available ? 'Disable' : 'Enable'"
             :icon="data.available ? 'pi pi-ban' : 'pi pi-check-circle'"
+            :severity="data.available ? 'danger' : 'success'"
             rounded
             @click="tryToggleCertAvailable(data)"></Button>
           <Button
