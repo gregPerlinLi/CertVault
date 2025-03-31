@@ -81,7 +81,7 @@ jobs:
           "https://api.github.com/repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}" | jq '.body')
           formatted_comments=$(echo -e $comments | sed 's/^"//; s/"$//')
           echo -e $formatted_comments
-          echo "COMMENTS=$formatted_comments" >> $GITHUB_ENV
+          echo "COMMENTS='$formatted_comments'" >> $GITHUB_ENV
 
       - name: Create and Upload Release
         uses: softprops/action-gh-release@v2
