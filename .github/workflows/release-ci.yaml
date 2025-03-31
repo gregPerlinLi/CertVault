@@ -80,8 +80,8 @@ jobs:
           comments=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           "https://api.github.com/repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}" | jq '.body')
           formatted_comments=$(echo -e $comments | sed 's/^"//; s/"$//')
-          echo -e $formatted_comments
-          echo "COMMENTS='$formatted_comments'" >> $GITHUB_ENV
+          echo -e $formatted_comments > comments.md
+          cat comments.md
 
       - name: Create and Upload Release
         uses: softprops/action-gh-release@v2
@@ -91,5 +91,4 @@ jobs:
           draft: false
           prerelease: false
           files: server/target/certvault-v${{ env.VERSION }}.jar
-          body: |
-            ${{ env.COMMENTS }}
+          body_path: comments.md
