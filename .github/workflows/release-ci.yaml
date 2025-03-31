@@ -1,0 +1,89 @@
+name: CertVault Version Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+      # 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 设置 JDK 环境
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 设置 pnpm 环境
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+
+      # 设置 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/Jod
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      # 构建前端项目
+      - name: Build Frontend
+        run: |
+          cd frontend
+          pnpm install
+          pnpm run build
+          mkdir -p ../server/src/main/resources/static
+          cp -r dist/* ../server/src/main/resources/static/
+          cd ..
+
+      # 使用 Maven 打包后端项目
+      - name: Build with Maven
+        run: mvn clean package -f server/pom.xml -DskipTests
+
+      # 获取 Maven 版本并设置为环境变量
+      - name: Get Maven version
+        run: echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)" >> $GITHUB_ENV
+
+      - name: Rename JAR File
+        run: mv server/target/*.jar server/target/certvault-v${{ env.VERSION }}.jar
+
+      # 新增步骤：获取最后一次合并的 PR 号码
+      - name: Find Last Merged PR Number
+        id: find_pr
+        run: |          # 通过 GitHub API 查询最近合并的 PR（按时间排序）
+          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls?state=closed&sort=updated&direction=desc&per_page=1")
+          pr_number=$(echo $response | jq -r '.[0].number')
+          echo "::set-output name=pr_number::$pr_number"
+
+      # 新增步骤：获取 PR 的评论内容
+      - name: Get PR Comments
+        id: get_comments
+        run: |
+          formatted_comments=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/pulls/${{ steps.find_pr.outputs.pr_number }}" | jq '.body')
+          echo "::set-output name=comments::$formatted_comments"
+
+      - name: Create and Upload Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: Release v${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          files: server/target/certvault-v${{ env.VERSION }}.jar
+          body: ${{ steps.get_comments.outputs.comments }}
