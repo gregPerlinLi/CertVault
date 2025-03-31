@@ -24,7 +24,10 @@ export default defineConfig(({ mode }) => {
       }),
       tailwindcss(),
       tsconfigPaths({ loose: true, projects: ["tsconfig.app.json"] }),
-      visualizer({ filename: "visualizer.html" }),
+      visualizer({
+        open: env.VITE_OPEN_VISUALIZER === "1",
+        filename: "visualizer.html"
+      }),
       vue(),
       vueComponents.vite({ dts: true, resolvers: [PrimeVueResolver()] })
     ],
