@@ -62,7 +62,7 @@ export const updateCaComment = (uuid: string, comment: string) =>
     payload: { comment }
   });
 
-export const deleteCa = (uuid: string) =>
+export const deleteCaCert = (uuid: string) =>
   callRestfulApi({
     method: "DELETE",
     baseUrl: "/api/v1/admin/cert/ca/{uuid}",

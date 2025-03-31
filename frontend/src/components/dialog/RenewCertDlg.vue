@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { CertInfoDTO } from "@/api/types";
+import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
+import { renewCaCert } from "@/api/admin/ca";
 import { renewSslCert } from "@/api/user/cert/ssl";
 import { useNotify } from "@/utils/composable";
 
@@ -10,13 +11,21 @@ const visible = defineModel<boolean>("visible");
 const emits = defineEmits<{ success: [] }>();
 
 // Properties
-const props = defineProps<{ data?: CertInfoDTO }>();
+const { variant, data } = defineProps<{
+  variant: "ca" | "ssl";
+  data?: CaInfoDTO | CertInfoDTO;
+}>();
 
 // Services
 const { info, success, error } = useNotify();
 
 // Reactive
 const busy = ref(false);
+
+// Computed
+const renewCertFn = computed(() =>
+  variant === "ca" ? renewCaCert : renewSslCert
+);
 
 // Actions
 const onSubmit = async (ev: Event) => {
@@ -31,7 +40,7 @@ const onSubmit = async (ev: Event) => {
     busy.value = true;
     info("Info", "Requesting");
 
-    await renewSslCert(props.data!.uuid, expiry);
+    await renewCertFn.value(data!.uuid, expiry);
 
     success("Success", "Successfully renewed");
     emits("success");
@@ -42,13 +51,22 @@ const onSubmit = async (ev: Event) => {
     busy.value = false;
   }
 };
+
+// Watch
+watch(visible, (v) => {
+  if (v) {
+    busy.value = false;
+  }
+});
 </script>
 
 <template>
   <Dialog
     v-model:visible="visible"
-    header="Renew SSL Certificate"
     :closable="false"
+    :header="
+      variant === 'ca' ? 'Renew CA Certificate' : 'Renew SSL Certificate'
+    "
     modal>
     <form @submit.prevent="onSubmit">
       <section class="flex flex-col gap-1 my-2">

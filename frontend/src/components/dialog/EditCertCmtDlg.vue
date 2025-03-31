@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { CertInfoDTO } from "@/api/types";
+import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
+import { updateCaComment } from "@/api/admin/ca";
 import { updateSslCertComment } from "@/api/user/cert/ssl";
 import { useNotify } from "@/utils/composable";
 
@@ -10,7 +11,10 @@ const visible = defineModel<boolean>("visible");
 const emits = defineEmits<{ success: [] }>();
 
 // Properties
-const props = defineProps<{ data?: CertInfoDTO }>();
+const { variant, data } = defineProps<{
+  variant: "ca" | "ssl";
+  data?: CaInfoDTO | CertInfoDTO;
+}>();
 
 // Services
 const { info, success, error } = useNotify();
@@ -19,6 +23,11 @@ const { info, success, error } = useNotify();
 const busy = ref(false);
 const invalid = ref(false);
 
+// Computed
+const updCertCmtFn = computed(() =>
+  variant === "ca" ? updateCaComment : updateSslCertComment
+);
+
 // Actions
 const onSubmit = async (ev: Event) => {
   invalid.value = false;
@@ -26,7 +35,7 @@ const onSubmit = async (ev: Event) => {
 
   // Validate data
   const comment = formData.get("comment")?.toString().trim() ?? "";
-  if (comment === props.data!.comment) {
+  if (comment === data!.comment) {
     invalid.value = true;
     error("Validation Error", "No changes found");
     return;
@@ -37,7 +46,7 @@ const onSubmit = async (ev: Event) => {
     busy.value = true;
     info("Info", "Updating");
 
-    await updateSslCertComment(props.data!.uuid, comment);
+    await updCertCmtFn.value(data!.uuid, comment);
 
     success("Success", "Successfully updated comment");
     emits("success");
@@ -48,13 +57,25 @@ const onSubmit = async (ev: Event) => {
     busy.value = false;
   }
 };
+
+// Watch
+watch(visible, (v) => {
+  if (v) {
+    busy.value = false;
+    invalid.value = false;
+  }
+});
 </script>
 
 <template>
   <Dialog
     v-model:visible="visible"
-    header="Edit SSL Certificate Comment"
     :closable="false"
+    :header="
+      variant === 'ca'
+        ? 'Edit CA Certificate Comment'
+        : 'Edit SSL Certificate Comment'
+    "
     modal>
     <form @submit.prevent="onSubmit">
       <section class="flex flex-col gap-1 my-2">

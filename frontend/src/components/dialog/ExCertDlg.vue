@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import type { CertInfoDTO } from "@/api/types";
+import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
+import { getCaPrivKey } from "@/api/admin/ca";
+import { getCaCert } from "@/api/user/cert/ca";
 import { getSslCert, getSslPrivKey } from "@/api/user/cert/ssl";
 import { b64ToU8Arr, saveFile } from "@/utils";
 import { useNotify } from "@/utils/composable";
@@ -8,7 +10,10 @@ import { useNotify } from "@/utils/composable";
 const visible = defineModel<boolean>("visible");
 
 // Properties
-const props = defineProps<{ data?: CertInfoDTO }>();
+const { variant, data } = defineProps<{
+  variant: "ca" | "ssl";
+  data?: CaInfoDTO | CertInfoDTO;
+}>();
 
 // Services
 const { info, success, error } = useNotify();
@@ -24,6 +29,10 @@ const busy = reactive({
 const canClose = computed(
   () => !busy.exportCert && !busy.exportChain && !busy.exportPrivKey
 );
+const getCertFn = computed(() => (variant === "ca" ? getCaCert : getSslCert));
+const getPrivKeyFn = computed(() =>
+  variant === "ca" ? getCaPrivKey : getSslPrivKey
+);
 
 // Actions
 const exportCert = async (fullchain: boolean = false) => {
@@ -36,10 +45,10 @@ const exportCert = async (fullchain: boolean = false) => {
       info("Info", "Exporting");
     }
 
-    const cert = await getSslCert(props.data!.uuid, fullchain);
+    const cert = await getCertFn.value(data!.uuid, fullchain);
     const pem = new TextDecoder().decode(b64ToU8Arr(cert));
     const file = new Blob([pem], { type: "application/x-pem-file" });
-    saveFile(`${props.data!.uuid}.pem`, file);
+    saveFile(`${data!.uuid}.pem`, file);
 
     success(
       "Success",
@@ -63,10 +72,10 @@ const onSumbit = async (ev: Event) => {
     const formData = new FormData(ev.target as HTMLFormElement);
     const password = formData.get("password")!.toString();
 
-    const cert = await getSslPrivKey(props.data!.uuid, password);
+    const cert = await getPrivKeyFn.value(data!.uuid, password);
     const pem = new TextDecoder().decode(b64ToU8Arr(cert));
     const file = new Blob([pem], { type: "application/x-pem-file" });
-    saveFile(`${props.data!.uuid}.pem`, file);
+    saveFile(`${data!.uuid}.pem`, file);
 
     (ev.target as HTMLFormElement).querySelector("input")!.value = "";
     success("Success", "Successfully exported private key");
@@ -76,6 +85,15 @@ const onSumbit = async (ev: Event) => {
     busy.exportPrivKey = false;
   }
 };
+
+// Watch
+watch(visible, (v) => {
+  if (v) {
+    busy.exportCert = false;
+    busy.exportChain = false;
+    busy.exportPrivKey = false;
+  }
+});
 </script>
 
 <template>

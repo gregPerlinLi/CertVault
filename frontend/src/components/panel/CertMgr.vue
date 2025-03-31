@@ -1,10 +1,19 @@
 <script setup lang="ts">
-import type { CertInfoDTO } from "@/api/types";
+import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
+import {
+  deleteCaCert,
+  getAllCaInfo,
+  toggleCaAvailability
+} from "@/api/admin/ca";
+import { getAllBindedCaInfo } from "@/api/user/cert/ca";
 import { deleteSslCert, getAllSslCertInfo } from "@/api/user/cert/ssl";
 import { useUserStore } from "@/stores/user";
 import { useNotify } from "@/utils/composable";
 import { nanoid } from "nanoid";
 import { useConfirm } from "primevue/useconfirm";
+
+// Properties
+const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 
 // Stores
 const { role } = useUserStore();
@@ -16,13 +25,13 @@ const { info, success, error } = useNotify();
 // Reactives
 const loading = ref(false);
 const searchKeyword = ref("");
-const targetCertData = ref<CertInfoDTO>();
+const targetCertData = ref<CaInfoDTO | CertInfoDTO>();
 
 const pagination = reactive({
   total: 0,
   first: 0,
   limit: 10,
-  data: [] as CertInfoDTO[]
+  data: [] as CaInfoDTO[] | CertInfoDTO[]
 });
 const dialog = reactive({
   reqNewCert: false,
@@ -31,6 +40,22 @@ const dialog = reactive({
   renewCert: false,
   editComment: false
 });
+
+// Computed
+const getCertInfo = computed(() => {
+  if (variant === "ca") {
+    if (role.value === "User") {
+      return getAllBindedCaInfo;
+    } else {
+      return getAllCaInfo;
+    }
+  } else {
+    return getAllSslCertInfo;
+  }
+});
+const delCertFn = computed(() =>
+  variant === "ca" ? deleteCaCert : deleteSslCert
+);
 
 // Non-reactives
 let nonce = nanoid();
@@ -43,7 +68,7 @@ const refresh = async () => {
   try {
     loading.value = true;
 
-    const page = await getAllSslCertInfo(
+    const page = await getCertInfo.value(
       pagination.first / pagination.limit + 1,
       pagination.limit,
       searchKeyword.value.length === 0 ? undefined : searchKeyword.value
@@ -55,7 +80,12 @@ const refresh = async () => {
     }
   } catch (err: unknown) {
     if (tag === nonce) {
-      error("Fail to Fetch SSL Certificate Info", (err as Error).message);
+      error(
+        variant === "ca"
+          ? "Fail to Fetch CA Certificates List"
+          : "Fail to Fetch SSL Certificates List",
+        (err as Error).message
+      );
     }
   } finally {
     if (tag === nonce) {
@@ -72,6 +102,29 @@ watch(
 watchDebounced(searchKeyword, () => refresh(), { debounce: 500 });
 
 // Actions
+const tryToggleCertAvailable = (data: CaInfoDTO) => {
+  confirm.require({
+    header: "Toggle Certificate Availability",
+    message: "Are you sure to toggle the availability?",
+    icon: "pi pi-exclamation-triangle",
+    modal: true,
+    blockScroll: true,
+    acceptProps: { severity: "danger" },
+    rejectProps: { severity: "secondary" },
+    accept: async () => {
+      try {
+        info("Info", "Toggling availability");
+        await toggleCaAvailability(data.uuid);
+        success("Success", "Successfully toggled");
+      } catch (err: unknown) {
+        error("Fail to Delete", (err as Error).message);
+      } finally {
+        await refresh();
+      }
+    }
+  });
+};
+
 const tryDelCert = (data: CertInfoDTO) => {
   confirm.require({
     header: "Delete Certificate",
@@ -83,11 +136,11 @@ const tryDelCert = (data: CertInfoDTO) => {
     rejectProps: { severity: "secondary" },
     accept: async () => {
       try {
-        info("Info", "Deleting SSL certificate");
-        await deleteSslCert(data.uuid);
-        success("Success", "Successfully deleted SSL certificate");
+        info("Info", "Deleting");
+        await delCertFn.value(data.uuid);
+        success("Success", "Successfully deleted");
       } catch (err: unknown) {
-        error("Fail to Delete SSL certificate", (err as Error).message);
+        error("Fail to Delete", (err as Error).message);
       } finally {
         await refresh();
       }
@@ -127,6 +180,7 @@ onBeforeMount(() => refresh());
       </IconField>
     </template>
   </Toolbar>
+
   <DataTable
     v-model:first="pagination.first"
     v-model:rows="pagination.limit"
@@ -185,17 +239,38 @@ onBeforeMount(() => refresh());
     </Column>
     <Column header="Status">
       <template #body="{ data }">
-        <Badge
-          v-if="new Date(data.notBefore).getTime() > Date.now()"
-          severity="warn"
-          size="small"
-          value="Not In Effect"></Badge>
-        <Badge
-          v-else-if="new Date(data.notAfter).getTime() < Date.now()"
-          severity="warn"
-          size="small"
-          value="Expired"></Badge>
-        <Badge v-else severity="success" size="small" value="In Effect"></Badge>
+        <div class="flex gap-2">
+          <Badge
+            v-if="variant === 'ca' && !data.available"
+            severity="danger"
+            size="small"
+            value="Disabled" />
+          <Badge
+            v-if="variant === 'ca' && data.parentCa === null"
+            severity="info"
+            size="small"
+            value="Root" />
+          <Badge
+            v-if="variant === 'ca' && !data.allowSubCa"
+            severity="warn"
+            size="small"
+            value="Leaf" />
+          <Badge
+            v-if="new Date(data.notBefore).getTime() > Date.now()"
+            severity="warn"
+            size="small"
+            value="Not In Effect"></Badge>
+          <Badge
+            v-else-if="new Date(data.notAfter).getTime() < Date.now()"
+            severity="warn"
+            size="small"
+            value="Expired"></Badge>
+          <Badge
+            v-else
+            severity="success"
+            size="small"
+            value="In Effect"></Badge>
+        </div>
       </template>
     </Column>
     <Column>
@@ -246,7 +321,20 @@ onBeforeMount(() => refresh());
                 dialog.renewCert = true;
               }
             "></Button>
-
+          <Button
+            v-if="variant === 'ca'"
+            v-tooltip.top="{
+              value: data.available ? 'Disable' : 'Enable',
+              class: 'text-sm'
+            }"
+            class="h-6 w-6"
+            severity="danger"
+            size="small"
+            variant="text"
+            :aria-label="data.available ? 'Disable' : 'Enable'"
+            :icon="data.available ? 'pi pi-ban' : 'pi pi-check-circle'"
+            rounded
+            @click="tryToggleCertAvailable(data)"></Button>
           <Button
             v-tooltip.top="{ value: 'Delete', class: 'text-sm' }"
             aria-label="Delete certificate"
@@ -263,15 +351,26 @@ onBeforeMount(() => refresh());
   </DataTable>
 
   <!-- Dialogs -->
-  <ReqNewSslCertDlg v-model:visible="dialog.reqNewCert" @success="refresh" />
-  <SslCertInfoDlg v-model:visible="dialog.showInfo" :data="targetCertData" />
-  <ExportCertDlg v-model:visible="dialog.exportCert" :data="targetCertData" />
-  <RenewSslCertDlg
-    v-model:visible="dialog.renewCert"
-    :data="targetCertData"
+  <ReqNewCertDlg
+    v-model:visible="dialog.reqNewCert"
+    :variant="variant"
     @success="refresh" />
-  <EditSslCertDlg
+  <EditCertCmtDlg
     v-model:visible="dialog.editComment"
     :data="targetCertData"
+    :variant="variant"
+    @success="refresh" />
+  <DispCertInfoDlg
+    v-model:visible="dialog.showInfo"
+    :data="targetCertData"
+    :variant="variant" />
+  <ExCertDlg
+    v-model:visible="dialog.exportCert"
+    :data="targetCertData"
+    :variant="variant" />
+  <RenewCertDlg
+    v-model:visible="dialog.renewCert"
+    :data="targetCertData"
+    :variant="variant"
     @success="refresh" />
 </template>
