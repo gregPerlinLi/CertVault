@@ -93,7 +93,13 @@ const onSubmit = async (ev: Event) => {
   } = validateForm(ev.target as HTMLFormElement, reqNewCertSchema);
   if (!validateOk) {
     error("Validation Error", validateErr!.issues[0].message);
-    errField.value = validateErr!.issues[0].label;
+    errField.value = validateErr!.issues[0].path[0].key;
+    return;
+  }
+
+  if (variant === "ssl" && caUuid.value === null) {
+    errField.value = "ca-uuid";
+    error("Validation Error", "CA is required");
     return;
   }
 
@@ -165,6 +171,7 @@ watch(caUuid, (v) => {
               onLazyLoad: onLazyLoadCaList,
               showLoader: true
             }"
+            @focus="clearErr('ca-uuid')"
             checkmark>
             <template #option="slotProps">
               <p

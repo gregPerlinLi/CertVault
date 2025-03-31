@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    '(feat(ca)': add support for importing CA certificates)
     Accordion: typeof import('primevue/accordion')['default']
     AccordionContent: typeof import('primevue/accordioncontent')['default']
     AccordionHeader: typeof import('primevue/accordionheader')['default']
@@ -29,7 +30,7 @@ declare module 'vue' {
     ExCertDlg: typeof import('./src/components/dialog/ExCertDlg.vue')['default']
     FileUpload: typeof import('primevue/fileupload')['default']
     IconField: typeof import('primevue/iconfield')['default']
-    ImCaDlg: typeof import('./src/components/dialog/cert/ImCaDlg.vue')['default']
+    ImCaDlg: typeof import('./src/components/dialog/ImCaDlg.vue')['default']
     InputIcon: typeof import('primevue/inputicon')['default']
     InputNumber: typeof import('primevue/inputnumber')['default']
     InputText: typeof import('primevue/inputtext')['default']

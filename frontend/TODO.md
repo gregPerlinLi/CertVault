@@ -1,4 +1,4 @@
-- [ ] Import CA
+- [x] Import CA
 - [ ] User management
 - [ ] Bind/Unbind CA/SSL to user
 - [ ] Dashboard

@@ -10,7 +10,8 @@ export const reqNewCertSchema = v.pipe(
     "common-name": v.pipe(v.string(), v.trim(), v.nonEmpty()),
     expiry: v.pipe(
       v.string(),
-      v.transform(Number),
+      v.trim(),
+      v.transform(parseInt),
       v.number(),
       v.minValue(1),
       v.maxValue(365)

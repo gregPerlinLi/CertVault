@@ -39,6 +39,17 @@ export const requestCaCert = (payload: RequestCaCertPayload) =>
     payload
   });
 
+export const importCa = (
+  certificate: string,
+  privkey: string,
+  comment: string
+) =>
+  callRestfulApi<ResponseCaDTO>({
+    method: "POST",
+    baseUrl: "/api/v1/admin/cert/ca/import",
+    payload: { certificate, privkey, comment }
+  });
+
 export const renewCaCert = (uuid: string, expiry: number) =>
   callRestfulApi<ResponseCaDTO>({
     method: "PUT",

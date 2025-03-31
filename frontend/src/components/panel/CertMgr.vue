@@ -13,14 +13,15 @@ import { nanoid } from "nanoid";
 import { useConfirm } from "primevue/useconfirm";
 
 // Async components
-const AsyncDataTable = defineAsyncComponent(
-  () => import("primevue/datatable")
-);
+const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
 const AsyncReqNewCertDlg = defineAsyncComponent(
   () => import("@/components/dialog/ReqNewCertDlg.vue")
 );
+const AsyncImCaDlg = defineAsyncComponent(
+  () => import("@/components/dialog/ImCaDlg.vue")
+);
 const AsyncEditCertCmtDlg = defineAsyncComponent(
-  () => import("@/components/dialog/ReqNewCertDlg.vue")
+  () => import("@/components/dialog/EditCertCmtDlg.vue")
 );
 const AsyncDispCertInfoDlg = defineAsyncComponent(
   () => import("@/components/dialog/DispCertInfoDlg.vue")
@@ -55,6 +56,7 @@ const pagination = reactive({
 });
 const dialog = reactive({
   reqNewCert: false,
+  uplNewCert: false,
   showInfo: false,
   exportCert: false,
   renewCert: false,
@@ -177,10 +179,17 @@ onBeforeMount(() => refresh());
     <template #start>
       <div class="flex gap-4">
         <Button
+          v-if="variant === 'ssl' || role === 'Admin' || role === 'Superadmin'"
           icon="pi pi-plus"
           label="Request New"
           size="small"
           @click="dialog.reqNewCert = true"></Button>
+        <Button
+          v-if="variant === 'ca' && role !== 'User'"
+          icon="pi pi-upload"
+          label="Upload New"
+          size="small"
+          @click="dialog.uplNewCert = true"></Button>
         <Button
           icon="pi pi-refresh"
           label="Refresh"
@@ -375,6 +384,7 @@ onBeforeMount(() => refresh());
     v-model:visible="dialog.reqNewCert"
     :variant="variant"
     @success="refresh" />
+  <AsyncImCaDlg v-model:visible="dialog.uplNewCert" @success="refresh" />
   <AsyncEditCertCmtDlg
     v-model:visible="dialog.editComment"
     :data="targetCertData"
