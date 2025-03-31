@@ -1,5 +1,6 @@
 import type { ToastServiceMethods } from "primevue";
-import { Schema } from "zod";
+import type { ValiError } from "valibot";
+import * as v from "valibot";
 
 export const validateRequried = (
   data: FormData,
@@ -21,8 +22,13 @@ export const validateRequried = (
   return value;
 };
 
-export const validateForm = (form: HTMLFormElement, schema: Schema) => {
+export const validateForm = (form: HTMLFormElement, schema: any) => {
   const obj: Record<string, string> = {};
   new FormData(form).forEach((v, k) => (obj[k] = v.toString().trim()));
-  return schema.safeParse(obj);
+
+  try {
+    return { success: true, data: v.parse(schema, obj), error: undefined };
+  } catch (err: unknown) {
+    return { success: false, data: undefined, error: err as ValiError<any> };
+  }
 };

@@ -92,8 +92,8 @@ const onSubmit = async (ev: Event) => {
     error: validateErr
   } = validateForm(ev.target as HTMLFormElement, reqNewCertSchema);
   if (!validateOk) {
-    error("Validation Error", validateErr.issues[0].message);
-    errField.value = validateErr.issues[0].path[0] as string;
+    error("Validation Error", validateErr!.issues[0].message);
+    errField.value = validateErr!.issues[0].label;
     return;
   }
 

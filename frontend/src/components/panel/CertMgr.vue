@@ -12,6 +12,26 @@ import { useNotify } from "@/utils/composable";
 import { nanoid } from "nanoid";
 import { useConfirm } from "primevue/useconfirm";
 
+// Async components
+const AsyncDataTable = defineAsyncComponent(
+  () => import("primevue/datatable")
+);
+const AsyncReqNewCertDlg = defineAsyncComponent(
+  () => import("@/components/dialog/ReqNewCertDlg.vue")
+);
+const AsyncEditCertCmtDlg = defineAsyncComponent(
+  () => import("@/components/dialog/ReqNewCertDlg.vue")
+);
+const AsyncDispCertInfoDlg = defineAsyncComponent(
+  () => import("@/components/dialog/DispCertInfoDlg.vue")
+);
+const AsyncExCertDlg = defineAsyncComponent(
+  () => import("@/components/dialog/ExCertDlg.vue")
+);
+const AsyncRenewCertDlg = defineAsyncComponent(
+  () => import("@/components/dialog/RenewCertDlg.vue")
+);
+
 // Properties
 const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 
@@ -181,7 +201,7 @@ onBeforeMount(() => refresh());
     </template>
   </Toolbar>
 
-  <DataTable
+  <AsyncDataTable
     v-model:first="pagination.first"
     v-model:rows="pagination.limit"
     data-key="uuid"
@@ -348,27 +368,27 @@ onBeforeMount(() => refresh());
         </div>
       </template>
     </Column>
-  </DataTable>
+  </AsyncDataTable>
 
   <!-- Dialogs -->
-  <ReqNewCertDlg
+  <AsyncReqNewCertDlg
     v-model:visible="dialog.reqNewCert"
     :variant="variant"
     @success="refresh" />
-  <EditCertCmtDlg
+  <AsyncEditCertCmtDlg
     v-model:visible="dialog.editComment"
     :data="targetCertData"
     :variant="variant"
     @success="refresh" />
-  <DispCertInfoDlg
+  <AsyncDispCertInfoDlg
     v-model:visible="dialog.showInfo"
     :data="targetCertData"
     :variant="variant" />
-  <ExCertDlg
+  <AsyncExCertDlg
     v-model:visible="dialog.exportCert"
     :data="targetCertData"
     :variant="variant" />
-  <RenewCertDlg
+  <AsyncRenewCertDlg
     v-model:visible="dialog.renewCert"
     :data="targetCertData"
     :variant="variant"
