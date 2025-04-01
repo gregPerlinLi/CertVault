@@ -4,7 +4,7 @@ import { getCaPrivKey } from "@/api/admin/ca";
 import { getCaCert } from "@/api/user/cert/ca";
 import { getSslCert, getSslPrivKey } from "@/api/user/cert/ssl";
 import { b64ToU8Arr, saveFile } from "@/utils";
-import { useNotify } from "@/utils/composable";
+import { useNotify, useRole } from "@/utils/composable";
 
 // Models
 const visible = defineModel<boolean>("visible");
@@ -17,6 +17,7 @@ const { variant, data } = defineProps<{
 
 // Services
 const { info, success, error } = useNotify();
+const { aboveUser } = useRole();
 
 // Reactive
 const busy = reactive({
@@ -119,7 +120,7 @@ watch(visible, (v) => {
           @click="exportCert(true)"></Button>
       </div>
     </section>
-    <section class="mt-8">
+    <section v-if="variant === 'ssl' || aboveUser" class="mt-8">
       <h1 class="font-bold my-2 text-lg">Private Key</h1>
       <form class="flex flex-col gap-2" @submit.prevent="onSumbit">
         <Password

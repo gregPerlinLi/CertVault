@@ -713,8 +713,8 @@ packages:
   estree-walker@3.0.3:
     resolution: {integrity: sha512-7RUKfXgSMMkzt6ZuXmqapOurLGPPfgj6l9uRZ7lRGolvk0y2yocc35LdcxKC5PQZdn2DMqioAQ2NoWcrTKmm6g==}
 
-  expect-type@1.2.0:
-    resolution: {integrity: sha512-80F22aiJ3GLyVnS/B3HzgR6RelZVumzj9jkL0Rhz4h0xYbNW9PjlQz5h3J/SShErbXBc295vseR4/MIbVmUbeA==}
+  expect-type@1.2.1:
+    resolution: {integrity: sha512-/kP8CAwxzLVEeFrMm4kMmy4CCDlpipyA7MYLVrdJIkV0fYF0UaigQHRsxHiuY/GEea+bh4KSv3TIlgr+2UL6bw==}
     engines: {node: '>=12.0.0'}
 
   exsolve@1.0.4:
@@ -1771,7 +1771,7 @@ snapshots:
     dependencies:
       '@types/estree': 1.0.7
 
-  expect-type@1.2.0: {}
+  expect-type@1.2.1: {}
 
   exsolve@1.0.4: {}
 
@@ -2170,7 +2170,7 @@ snapshots:
       '@vitest/utils': 3.1.1
       chai: 5.2.0
       debug: 4.4.0
-      expect-type: 1.2.0
+      expect-type: 1.2.1
       magic-string: 0.30.17
       pathe: 2.0.3
       std-env: 3.8.1
