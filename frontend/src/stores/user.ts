@@ -31,6 +31,13 @@ export const useUserStore = createGlobalState(() => {
   });
 
   // Actions
+  const clearSignedInfo = () => {
+    signedIn.value = false;
+    username.value = null;
+    displayName.value = null;
+    email.value = null;
+    innerRole.value = null;
+  };
   const init = async (toast?: ToastServiceMethods) => {
     if (initialized.value) {
       return;
@@ -104,11 +111,7 @@ export const useUserStore = createGlobalState(() => {
 
       return err as Error;
     } finally {
-      signedIn.value = false;
-      username.value = null;
-      displayName.value = null;
-      email.value = null;
-      innerRole.value = null;
+      clearSignedInfo();
     }
   };
   const syncFromRemote = async (toast?: ToastServiceMethods) => {
@@ -172,6 +175,7 @@ export const useUserStore = createGlobalState(() => {
     displayName,
     email,
     role,
+    clearSignedInfo,
     init,
     signIn,
     signOut,
