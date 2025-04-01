@@ -2,14 +2,14 @@
     <img src="docs/img/Logo.svg" width="240" alt="Logo">
     <br/>
     <p style="font-size: large"><strong>自签名 SSL 证书颁发与管理平台</strong></p>
-    <a href="https://github.com/gregPerlinLi/CertVault/releases"><img src="https://img.shields.io/github/v/release/gregPerlinLi/CertVault" alt="最新版本" /></a>
-    <a href="https://github.com/gregPerlinLi/CertVault/actions/workflows/backend-ci.yaml"><img src="https://img.shields.io/github/actions/workflow/status/gregPerlinLi/CertVault/backend-ci.yaml?branch=dev" alt="持续集成状态" /></a>
-    <a href="github.com/gregPerlinLi/CertVault/blob/main/LICENSE"><img src="https://img.shields.io/github/license/gregPerlinLi/CertVault" alt="许可证" /></a>
-    <a href="https://github.com/gregPerlinLi/CertVault/issues"><img src="https://img.shields.io/github/issues/gregPerlinLi/CertVault" alt="问题" /></a>
-    <a href="https://github.com/gregPerlinLi/CertVault/contributors"><img src="https://img.shields.io/github/contributors/gregPerlinLi/CertVault" alt="贡献者" /> </a>
-    <a href="https://github.com/gregPerlinLi/CertVault/languages"><img src="https://img.shields.io/github/issues-closed/gregPerlinLi/CertVault" alt="已关闭问题" /></a>
-    <a href="https://github.com/gregPerlinLi/CertVault/stargazers"><img src="https://img.shields.io/github/stars/gregPerlinLi/CertVault" alt="星标数" /></a>
-    <a href="https://github.com/gregPerlinLi/CertVault/releases"><img src="https://img.shields.io/github/downloads/gregPerlinLi/CertVault/total" alt="GitHub 下载量"></a>
+    <a href="https://github.com/gregPerlinLi/CertVault/releases"><img src="https://img.shields.io/github/v/release/gregPerlinLi/CertVault" alt="Latest release" /></a>
+    <a href="https://github.com/gregPerlinLi/CertVault/actions/workflows/backend-ci.yaml"><img src="https://img.shields.io/github/actions/workflow/status/gregPerlinLi/CertVault/backend-ci.yaml?branch=dev" alt="CI status" /></a>
+    <a href="https://github.com/gregPerlinLi/CertVault/blob/main/LICENSE"><img src="https://img.shields.io/github/license/gregPerlinLi/CertVault" alt="License" /></a>
+    <a href="https://github.com/gregPerlinLi/CertVault/issues"><img src="https://img.shields.io/github/issues/gregPerlinLi/CertVault?color=f85149" alt="Issues" /></a>
+    <a href="https://github.com/gregPerlinLi/CertVault/issues?q=is%3Aissue%20state%3Aclosed"><img src="https://img.shields.io/github/issues-closed/gregPerlinLi/CertVault?color=ab7df8" alt="Closed issues" /></a>
+    <a href="https://github.com/gregPerlinLi/CertVault/contributors"><img src="https://img.shields.io/github/contributors/gregPerlinLi/CertVault" alt="Contributors" /> </a>
+    <a href="https://github.com/gregPerlinLi/CertVault/stargazers"><img src="https://img.shields.io/github/stars/gregPerlinLi/CertVault" alt="Stars" /></a>
+    <a href="https://github.com/gregPerlinLi/CertVault/releases"><img src="https://img.shields.io/github/downloads/gregPerlinLi/CertVault/total" alt="GitHub Downloads"></a>
 </div>
 
 ---
