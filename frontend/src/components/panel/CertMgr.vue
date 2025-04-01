@@ -229,10 +229,15 @@ onBeforeMount(() => refresh());
     <!-- Comment column -->
     <Column header="Comment" class="w-0">
       <template #body="{ data }">
-        <div class="flex gap-2">
+        <div class="flex gap-2 min-w-md">
           <p
             v-tooltip.bottom="{ value: data.comment, class: 'text-sm' }"
-            class="max-w-md overflow-x-hidden text-ellipsis whitespace-nowrap">
+            class="overflow-x-hidden text-ellipsis whitespace-nowrap"
+            :class="
+              variant === 'ssl' || aboveUser
+                ? 'max-w-[calc(var(--container-md)-32px)]'
+                : 'max-w-md'
+            ">
             {{ data.comment }}
           </p>
           <Button
