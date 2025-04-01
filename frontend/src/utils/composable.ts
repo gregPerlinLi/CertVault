@@ -1,3 +1,4 @@
+import { useUserStore } from "@/stores/user";
 import { useToast } from "primevue/usetoast";
 
 export const useNotify = () => {
@@ -11,4 +12,15 @@ export const useNotify = () => {
     toast.add({ severity: "error", summary, detail, life: 5000 });
 
   return { toast, info, success, error };
+};
+
+export const useRole = () => {
+  const { role } = useUserStore();
+
+  const isUser = computed(() => role.value === "User");
+  const isAdmin = computed(() => role.value === "Admin");
+  const isSuperadmin = computed(() => role.value === "Superadmin");
+  const aboveUser = computed(() => isAdmin.value || isSuperadmin.value);
+
+  return { role, isUser, isAdmin, isSuperadmin, aboveUser };
 };

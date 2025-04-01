@@ -4,8 +4,7 @@ import type { VirtualScrollerLazyEvent } from "primevue";
 import { getAllCaInfo, requestCaCert } from "@/api/admin/ca";
 import { getAllBindedCaInfo } from "@/api/user/cert/ca";
 import { requestSslCert } from "@/api/user/cert/ssl";
-import { useUserStore } from "@/stores/user";
-import { useNotify } from "@/utils/composable";
+import { useNotify, useRole } from "@/utils/composable";
 import { reqNewCertSchema } from "@/utils/schema";
 import { validateForm } from "@/utils/validate";
 import { nanoid } from "nanoid";
@@ -19,11 +18,9 @@ const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 // Emits
 const emits = defineEmits<{ success: [] }>();
 
-// Stores
-const { role } = useUserStore();
-
 // Services
 const { info, success, error } = useNotify();
+const { isUser } = useRole();
 
 // Reactives
 const busy = ref(false);
@@ -57,10 +54,9 @@ const onLazyLoadCaList = async (ev: VirtualScrollerLazyEvent) => {
   try {
     loadingCaList.value = true;
 
-    const page =
-      role.value === "User"
-        ? await getAllBindedCaInfo(Math.trunc(ev.first / 30) + 1, 30)
-        : await getAllCaInfo(Math.trunc(ev.first / 30) + 1, 30);
+    const page = isUser.value
+      ? await getAllBindedCaInfo(Math.trunc(ev.first / 30) + 1, 30)
+      : await getAllCaInfo(Math.trunc(ev.first / 30) + 1, 30);
     if (tag === nonce && page.list !== null) {
       const tmp = caList.value.slice();
       for (let i = ev.first; i < ev.first + page.list.length; i++) {

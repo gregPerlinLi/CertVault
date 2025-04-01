@@ -1,47 +1,46 @@
 <script setup lang="ts">
-import { useUserStore } from "@/stores/user";
 import type { MenuItem } from "primevue/menuitem";
+import { useRole } from "@/utils/composable";
 
-// Reactive
+// Services
 const router = useRouter();
-const { role } = useUserStore();
+const { role, aboveUser } = useRole();
 
 // Computed
-const menuModel = computed((): MenuItem[] =>
-  [
-    {
-      label: "Dashboard",
-      icon: "pi pi-gauge",
-      command: (): void => {
-        router.push("/dashboard");
+const menuModel = computed(() =>
+  (
+    [
+      {
+        label: "Dashboard",
+        icon: "pi pi-gauge",
+        command: (): void => {
+          router.push("/dashboard");
+        }
+      },
+      {
+        label: "My Profile",
+        icon: "pi pi-user",
+        command: (): void => {
+          router.push("/dashboard/profile");
+        }
+      },
+      {
+        label: "Users",
+        icon: "pi pi-users",
+        show: aboveUser.value,
+        command: (): void => {
+          router.push("/dashboard/users");
+        }
+      },
+      {
+        label: "Certificates",
+        icon: "pi pi-verified",
+        command: (): void => {
+          router.push("/dashboard/certificates");
+        }
       }
-    },
-    {
-      label: "My Profile",
-      icon: "pi pi-user",
-      command: (): void => {
-        router.push("/dashboard/profile");
-      }
-    },
-    {
-      label: "Users",
-      icon: "pi pi-users",
-      only: ["Admin", "Superadmin"],
-      command: (): void => {
-        router.push("/dashboard/users");
-      }
-    },
-    {
-      label: "Certificates",
-      icon: "pi pi-verified",
-      command: (): void => {
-        router.push("/dashboard/certificates");
-      }
-    }
-  ].filter(
-    (itm: MenuItem & { only?: string[] }): boolean =>
-      itm?.only?.includes(role.value) ?? true
-  )
+    ] satisfies MenuItem[]
+  ).filter((itm: MenuItem & { only?: string[] }): boolean => itm?.show ?? true)
 );
 </script>
 
