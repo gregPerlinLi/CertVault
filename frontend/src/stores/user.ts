@@ -1,10 +1,7 @@
+import type { UpdateProfileRequestPayload } from "@/api/user";
+import type { ToastServiceMethods } from "primevue";
 import { login, logout } from "@/api/authentication";
-import {
-  getProfile,
-  updateProfile,
-  type UpdateProfileRequestPayload
-} from "@/api/user";
-import { type ToastServiceMethods } from "primevue";
+import { getProfile, updateProfile } from "@/api/user";
 
 // Type
 export type Role = "User" | "Admin" | "Superadmin";

@@ -1,6 +1,6 @@
 import { useUserStore } from "@stores/user";
 import { createRouter, createWebHashHistory } from "vue-router";
-import { useToast } from "primevue";
+import { useToast } from "primevue/usetoast";
 
 // Create router
 const router = createRouter({
@@ -8,7 +8,8 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      component: () => import("@views/SignIn.vue")
+      component: () => import("@views/SignIn.vue"),
+      meta: { title: "CertVault" }
     },
     {
       path: "/dashboard",
@@ -16,19 +17,23 @@ const router = createRouter({
       children: [
         {
           path: "",
-          component: () => import("@views/dashboard/Index.vue")
+          component: () => import("@views/dashboard/Index.vue"),
+          meta: { title: "Dashboard - CertVault" }
         },
         {
           path: "profile",
-          component: () => import("@views/dashboard/Profile.vue")
+          component: () => import("@views/dashboard/Profile.vue"),
+          meta: { title: "Profile - CertVault" }
         },
         {
           path: "users",
-          component: () => import("@views/dashboard/Users.vue")
+          component: () => import("@views/dashboard/Users.vue"),
+          meta: { title: "Users - CertVault" }
         },
         {
           path: "certificates",
-          component: () => import("@views/dashboard/Certificates.vue")
+          component: () => import("@views/dashboard/Certificates.vue"),
+          meta: { title: "Certificates - CertVault" }
         }
       ]
     }
@@ -39,6 +44,9 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const { signedIn, init } = useUserStore();
   const toast = useToast();
+
+  // Set title
+  useTitle(to.meta.title as string);
 
   // Initialize user
   await init(to.path === "/" ? undefined : toast);

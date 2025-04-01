@@ -2,8 +2,6 @@
 import { useUserStore } from "@/stores/user";
 import { useToast } from "primevue/usetoast";
 
-useTitle("My Profile - CertVault");
-
 // Stores
 const { username, displayName, email, role } = useUserStore();
 
