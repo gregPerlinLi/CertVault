@@ -256,8 +256,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The certificate does not exist.");
         }
         if ( !Objects.equals( currentCa.getOwner(), user.getId() ) &&
-                !( user.getRole() == AccountTypeConstant.ADMIN.getAccountType() &&
-                        caBindingService.exists( new QueryWrapper<CaBinding>()
+                !(caBindingService.exists( new QueryWrapper<CaBinding>()
                                 .eq("ca_uuid", currentCa.getParentCa())
                                 .eq("uid", user.getId())) ) &&
                 user.getRole() != AccountTypeConstant.SUPERADMIN.getAccountType()
