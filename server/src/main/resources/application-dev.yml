@@ -4,7 +4,7 @@ server:
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER:com.mysql.cj.jdbc.Driver}
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://127.0.0.1:3306/cert_vault?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
     username: ${SPRING_DATASOURCE_USERNAME:cert_vault}
     password: ${SPRING_DATASOURCE_PASSWORD:cert_2025_vault}
@@ -29,9 +29,9 @@ spring:
       time-to-live: 5m
   sql:
     init:
-      platform: mysql
+      platform: ${DATABASE_TYPE:mysql}
       mode: always
-      schema-locations: classpath:/sql/schema.sql
+      schema-locations: classpath:/sql/schema-${DATABASE_TYPE:mysql}.sql
   security:
     oauth2:
       client:
@@ -57,7 +57,7 @@ spring:
 
 oidc:
   enabled: ${ENABLE_OIDC:true}
-  provider: "${OIDC_PROVIDER:GDUTNIC 统一身份认证}"
+  provider: "${OIDC_PROVIDER:OpenID Connect}"
 
 logging:
   level:
