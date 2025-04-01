@@ -26,3 +26,7 @@ dependencies:
     version: 12.3.2
     repository: https://charts.bitnami.com/bitnami
     condition: mysql.internal
+  - name: postgresql
+    version: 16.6.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.internal
