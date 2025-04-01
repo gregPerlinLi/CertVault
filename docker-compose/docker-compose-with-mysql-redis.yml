@@ -22,13 +22,13 @@ x-common-mysql: &common_mysql
     MYSQL_USER: ${MYSQL_USER}
     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
   volumes:
-    - ./mysql_data:/var/lib/mysql
+    - ./mysql_data:/bitnami/mysql/data
 x-common-redis: &common_redis
   image: bitnami/redis:6.2.6-debian-10-r199
   environment:
     REDIS_PASSWORD: ${REDIS_PASSWORD}
   volumes:
-    - ./redis_data:/data
+    - ./redis_data:/bitnami/redis/data
 
 services:
   cert-vault:
@@ -38,6 +38,8 @@ services:
       - redis
     environment:
       <<: *common_certvault_env
+      DATABASE_TYPE: mysql
+      SPRING_DATASOURCE_DRIVER: com.mysql.cj.jdbc.Driver
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}

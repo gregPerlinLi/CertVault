@@ -14,28 +14,18 @@ x-common-certvault: &common_certvault
     SPRING_RSA_PRIVATE_KEY: ${RSA_PRIVATE_KEY}
     SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT: ${SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT}
     SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK: ${SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK}
-x-common-mysql: &common_mysql
-  image: bitnami/mysql:8.0.28
-  environment:
-    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    MYSQL_DATABASE: ${MYSQL_DATABASE}
-    MYSQL_USER: ${MYSQL_USER}
-    MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-  volumes:
-    - ./mysql_data:/var/lib/mysql
 
 services:
   cert-vault:
     <<: *common_certvault
-    depends_on:
-      - mysql
     environment:
       <<: *common_certvault_env
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
-      SPRING_REDIS_HOST: ${EXTERNAL_REDIS_HOST}
-      SPRING_REDIS_PORT: ${EXTERNAL_REDIS_PORT}
-      SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD}
-  mysql:
-    <<: *common_mysql
+      DATABASE_TYPE: mysql
+      SPRING_DATASOURCE_DRIVER: com.mysql.cj.jdbc.Driver
+      SPRING_DATASOURCE_URL: jdbc:mysql://${MYSQL_EXTERNAL_HOST}:${MYSQL_EXTERNAL_PORT}/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_EXTERNAL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_EXTERNAL_PASSWORD}
+      SPRING_REDIS_HOST: ${REDIS_EXTERNAL_HOST}
+      SPRING_REDIS_PORT: ${REDIS_EXTERNAL_PORT}
+      SPRING_REDIS_DATABASE: ${REDIS_EXTERNAL_DATABASE}
+      SPRING_REDIS_PASSWORD: ${REDIS_EXTERNAL_PASSWORD}
