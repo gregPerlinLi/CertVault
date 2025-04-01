@@ -81,7 +81,7 @@ public class AdminController {
     /**
      * Get all user information bound to a ca
      *
-     * @param uuid the uuid of the user
+     * @param uuid the uuid of the ca
      * @param keyword the keyword to search
      * @param page the page number
      * @param limit the limit of the page
