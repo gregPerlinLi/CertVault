@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 
-useTitle("Dashboard - CertVault");
-
 // Reactive
 const { displayName, role } = useUserStore();
 </script>

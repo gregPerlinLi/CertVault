@@ -1,4 +1,6 @@
 import type { ResultVO } from "@/api/types";
+import { useUserStore } from "@/stores/user";
+import router from "@/router";
 
 export const createURLSearchParams = (
   params: Record<string, any>
@@ -43,6 +45,12 @@ export const callRestfulApi = async <U = null>(
 
   const json: ResultVO<U> = await resp.json();
   if (json.code < 200 || json.code >= 300) {
+    const { signedIn, clearSignedInfo } = useUserStore();
+    if (json.code === 401 && signedIn.value) {
+      clearSignedInfo();
+      router.push("/");
+    }
+
     throw Error(`${json.msg} (${json.code})`);
   }
 

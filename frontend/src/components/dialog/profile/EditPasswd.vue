@@ -1,23 +1,22 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
-import { useToast } from "primevue/usetoast";
+import { useNotify } from "@/utils/composable";
 
 // Models
 const visible = defineModel<boolean>("visible");
-
-// Properties
-const props = defineProps<{ value: string }>();
+const newPassword = defineModel<string>("new-password");
 
 // Stores
 const { syncToRemote } = useUserStore();
 
-// Reactive
-const toast = useToast();
+// Services
+const { toast, info, error } = useNotify();
 
+// Reactive
 const invalid = ref(false);
 const busy = ref(false);
 
-const newDisplayName = ref(props.value);
+const oldPassword = ref("");
 
 // Actions
 const submit = async () => {
@@ -25,38 +24,22 @@ const submit = async () => {
   invalid.value = false;
 
   // Validate
-  if (newDisplayName.value.length === 0) {
+  if (oldPassword.value.length === 0) {
     invalid.value = true;
-    toast.add({
-      severity: "error",
-      summary: "Validation Error",
-      detail: "New display name is required",
-      life: 5000
-    });
-    return;
-  }
-  if (newDisplayName.value === props.value) {
-    invalid.value = true;
-    toast.add({
-      severity: "error",
-      summary: "Validation Error",
-      detail: "No changes found",
-      life: 5000
-    });
+    error("Validation Error", "Old password is required");
     return;
   }
 
   // Try update
   busy.value = true;
-  toast.add({
-    severity: "info",
-    summary: "Info",
-    detail: "Updating",
-    life: 3000
-  });
+  info("Info", "Updating");
 
-  const err = await syncToRemote({ displayName: newDisplayName.value }, toast);
+  const err = await syncToRemote(
+    { oldPassword: oldPassword.value, newPassword: newPassword.value },
+    toast
+  );
   if (err === null) {
+    newPassword.value = "";
     visible.value = false;
   }
   busy.value = false;
@@ -66,14 +49,14 @@ const submit = async () => {
 <template>
   <Dialog
     v-model:visible="visible"
-    header="Edit Display Name"
+    header="Confirm Old Password"
     :closable="false"
     modal>
     <form @submit.prevent="submit">
       <InputText
-        v-model.trim="newDisplayName"
+        v-model="oldPassword"
         class="mb-4 w-full"
-        type="text"
+        type="password"
         :disabled="busy"
         :invalid="invalid" />
       <div class="flex justify-end gap-2">
@@ -83,9 +66,14 @@ const submit = async () => {
           size="small"
           type="button"
           :disabled="busy"
-          @click="visible = false"></Button>
+          @click="
+            () => {
+              newPassword = '';
+              visible = false;
+            }
+          "></Button>
         <Button
-          label="Save"
+          label="Confirm"
           size="small"
           type="submit"
           :disabled="busy"

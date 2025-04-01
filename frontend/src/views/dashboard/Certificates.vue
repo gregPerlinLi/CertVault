@@ -1,6 +1,4 @@
 <script setup lang="ts">
-useTitle("Certificates - CertVault");
-
 // Async components
 const AsyncCertMgr = defineAsyncComponent(
   () => import("@/components/panel/CertMgr.vue")

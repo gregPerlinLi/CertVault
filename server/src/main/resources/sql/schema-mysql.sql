@@ -1,3 +1,4 @@
+-- CA Table
 create table if not exists ca
 (
     id           int auto_increment comment 'CA ID'
@@ -20,6 +21,7 @@ create table if not exists ca
 )
     comment 'CA列表';
 
+-- CA Binding Table
 create table if not exists ca_binding
 (
     id         int auto_increment comment '分配ID'
@@ -32,6 +34,7 @@ create table if not exists ca_binding
 )
     comment '分配 CA 用户';
 
+-- Certificate Table
 create table if not exists certificate
 (
     id          int auto_increment comment 'ID'
@@ -52,6 +55,7 @@ create table if not exists certificate
 )
     comment 'SSL证书';
 
+-- Role Table
 create table if not exists role
 (
     id        int auto_increment comment '权限ID'
@@ -62,6 +66,7 @@ create table if not exists role
 )
     comment '权限';
 
+-- Role Binding Table
 create table if not exists role_binding
 (
     id         int auto_increment comment 'id'
@@ -74,6 +79,7 @@ create table if not exists role_binding
 )
     comment '权限绑定';
 
+-- User Table
 create table if not exists user
 (
     id           int auto_increment comment 'user_id'

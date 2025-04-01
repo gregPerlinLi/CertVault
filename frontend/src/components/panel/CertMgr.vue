@@ -7,8 +7,7 @@ import {
 } from "@/api/admin/ca";
 import { getAllBindedCaInfo } from "@/api/user/cert/ca";
 import { deleteSslCert, getAllSslCertInfo } from "@/api/user/cert/ssl";
-import { useUserStore } from "@/stores/user";
-import { useNotify } from "@/utils/composable";
+import { useNotify, useRole } from "@/utils/composable";
 import { nanoid } from "nanoid";
 import { useConfirm } from "primevue/useconfirm";
 
@@ -36,12 +35,10 @@ const AsyncRenewCertDlg = defineAsyncComponent(
 // Properties
 const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 
-// Stores
-const { role } = useUserStore();
-
 // Services
 const confirm = useConfirm();
 const { info, success, error } = useNotify();
+const { isUser, aboveUser } = useRole();
 
 // Reactives
 const loading = ref(false);
@@ -66,7 +63,7 @@ const dialog = reactive({
 // Computed
 const getCertInfo = computed(() => {
   if (variant === "ca") {
-    if (role.value === "User") {
+    if (isUser.value) {
       return getAllBindedCaInfo;
     } else {
       return getAllCaInfo;
@@ -179,13 +176,13 @@ onBeforeMount(() => refresh());
     <template #start>
       <div class="flex gap-4">
         <Button
-          v-if="variant === 'ssl' || role === 'Admin' || role === 'Superadmin'"
+          v-if="variant === 'ssl' || aboveUser"
           icon="pi pi-plus"
           label="Request New"
           size="small"
           @click="dialog.reqNewCert = true"></Button>
         <Button
-          v-if="variant === 'ca' && role !== 'User'"
+          v-if="variant === 'ca' && aboveUser"
           icon="pi pi-upload"
           label="Upload New"
           size="small"
@@ -228,15 +225,23 @@ onBeforeMount(() => refresh());
         Found {{ pagination.total }} SSL certificate(s) in total
       </p>
     </template>
+
+    <!-- Comment column -->
     <Column header="Comment" class="w-0">
       <template #body="{ data }">
-        <div class="flex gap-2">
+        <div class="flex gap-2 min-w-md">
           <p
             v-tooltip.bottom="{ value: data.comment, class: 'text-sm' }"
-            class="max-w-md overflow-x-hidden text-ellipsis whitespace-nowrap">
+            class="overflow-x-hidden text-ellipsis whitespace-nowrap"
+            :class="
+              variant === 'ssl' || aboveUser
+                ? 'max-w-[calc(var(--container-md)-32px)]'
+                : 'max-w-md'
+            ">
             {{ data.comment }}
           </p>
           <Button
+            v-if="variant === 'ssl' || aboveUser"
             v-tooltip.top="{ value: 'Edit', class: 'text-sm' }"
             aria-label="Edit certificate information"
             class="h-6 opacity-0 w-6 group-hover:opacity-100"
@@ -254,10 +259,9 @@ onBeforeMount(() => refresh());
         </div>
       </template>
     </Column>
-    <Column
-      v-if="role === 'Admin' || role === 'Superadmin'"
-      header="Owner"
-      class="w-50">
+
+    <!-- Owner column -->
+    <Column v-if="variant === 'ca' || aboveUser" header="Owner" class="w-50">
       <template #body="{ data }">
         <p
           v-tooltip.bottom="{ value: data.owner, class: 'text-sm' }"
@@ -266,6 +270,8 @@ onBeforeMount(() => refresh());
         </p>
       </template>
     </Column>
+
+    <!-- Status column -->
     <Column header="Status">
       <template #body="{ data }">
         <div class="flex gap-2">
@@ -302,6 +308,8 @@ onBeforeMount(() => refresh());
         </div>
       </template>
     </Column>
+
+    <!-- Operations column -->
     <Column>
       <template #body="{ data }">
         <div class="gap-2 hidden justify-end group-hover:flex">
@@ -336,6 +344,7 @@ onBeforeMount(() => refresh());
               }
             "></Button>
           <Button
+            v-if="variant === 'ssl' || aboveUser"
             v-tooltip.top="{ value: 'Renew', class: 'text-sm' }"
             aria-label="Renew certificate"
             class="h-6 w-6"
@@ -351,7 +360,7 @@ onBeforeMount(() => refresh());
               }
             "></Button>
           <Button
-            v-if="variant === 'ca'"
+            v-if="variant === 'ca' && aboveUser"
             v-tooltip.top="{
               value: data.available ? 'Disable' : 'Enable',
               class: 'text-sm'
@@ -365,6 +374,7 @@ onBeforeMount(() => refresh());
             rounded
             @click="tryToggleCertAvailable(data)"></Button>
           <Button
+            v-if="variant === 'ssl' || aboveUser"
             v-tooltip.top="{ value: 'Delete', class: 'text-sm' }"
             aria-label="Delete certificate"
             class="h-6 w-6"
