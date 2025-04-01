@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
-import { useToast } from "primevue/usetoast";
+import { useNotify } from "@/utils/composable";
 
 // Models
 const visible = defineModel<boolean>("visible");
@@ -11,13 +11,14 @@ const props = defineProps<{ value: string }>();
 // Stores
 const { syncToRemote } = useUserStore();
 
-// Reactive
-const toast = useToast();
+// Services
+const { toast, info, error } = useNotify();
 
+// Reactive
 const invalid = ref(false);
 const busy = ref(false);
 
-const newEmail = ref(props.value);
+const newDisplayName = ref(props.value);
 
 // Actions
 const submit = async () => {
@@ -25,37 +26,22 @@ const submit = async () => {
   invalid.value = false;
 
   // Validate
-  if (newEmail.value.length === 0) {
+  if (newDisplayName.value.length === 0) {
     invalid.value = true;
-    toast.add({
-      severity: "error",
-      summary: "Validation Error",
-      detail: "New email is required",
-      life: 5000
-    });
+    error("Validation Error", "New display name is required");
     return;
   }
-  if (newEmail.value === props.value) {
+  if (newDisplayName.value === props.value) {
     invalid.value = true;
-    toast.add({
-      severity: "error",
-      summary: "Validation Error",
-      detail: "No changes found",
-      life: 5000
-    });
+    error("Validation Error", "No changes found");
     return;
   }
 
   // Try update
   busy.value = true;
-  toast.add({
-    severity: "info",
-    summary: "Info",
-    detail: "Updating",
-    life: 3000
-  });
+  info("Info", "Updating");
 
-  const err = await syncToRemote({ email: newEmail.value }, toast);
+  const err = await syncToRemote({ displayName: newDisplayName.value }, toast);
   if (err === null) {
     visible.value = false;
   }
@@ -64,12 +50,16 @@ const submit = async () => {
 </script>
 
 <template>
-  <Dialog v-model:visible="visible" header="Edit Email" :closable="false" modal>
+  <Dialog
+    v-model:visible="visible"
+    header="Edit Display Name"
+    :closable="false"
+    modal>
     <form @submit.prevent="submit">
       <InputText
-        v-model.trim="newEmail"
+        v-model.trim="newDisplayName"
         class="mb-4 w-full"
-        type="email"
+        type="text"
         :disabled="busy"
         :invalid="invalid" />
       <div class="flex justify-end gap-2">

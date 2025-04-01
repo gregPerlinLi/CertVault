@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
+import { useNotify } from "@/utils/composable";
 import { useConfirm } from "primevue/useconfirm";
-import { useToast } from "primevue/usetoast";
 
-// Reactive
+// Services
 const router = useRouter();
-const toast = useToast();
 const confirm = useConfirm();
+const { toast, info } = useNotify();
+
+// Stores
 const { displayName, signOut } = useUserStore();
 
 // Actions
@@ -24,12 +26,7 @@ const signOutOnClick = (): void => {
       variant: "outlined"
     },
     accept: async () => {
-      toast.add({
-        severity: "info",
-        summary: "Info",
-        detail: "Signing out",
-        life: 3000
-      });
+      info("Info", "Signing out");
       await signOut(toast);
       router.push("/");
     }

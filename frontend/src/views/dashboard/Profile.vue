@@ -1,32 +1,42 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
-import { useToast } from "primevue/usetoast";
+import { useNotify } from "@/utils/composable";
+
+// Async components
+const AsyncEditDispName = defineAsyncComponent(
+  () => import("@/components/dialog/profile/EditDispName.vue")
+);
+const AsyncEditEmail = defineAsyncComponent(
+  () => import("@/components/dialog/profile/EditEmail.vue")
+);
+const AsyncEditPasswd = defineAsyncComponent(
+  () => import("@/components/dialog/profile/EditPasswd.vue")
+);
 
 // Stores
 const { username, displayName, email, role } = useUserStore();
 
+// Services
+const { error } = useNotify();
+
 // Reactive
-const toast = useToast();
-
-const showEditDisplayName = ref(false);
-const showEditEmail = ref(false);
-const showEditPassword = ref(false);
-
 const newPassword = ref("");
+const invalid = ref(false);
+
+const dialog = reactive({
+  editDispName: false,
+  editEmail: false,
+  editPasswd: false
+});
 
 // Action
 const onSubmitNewPassword = () => {
   if (newPassword.value.length === 0) {
-    toast.add({
-      severity: "error",
-      summary: "Validation Error",
-      detail: "New password is required",
-      life: 5000
-    });
+    invalid.value = true;
+    error("Validation Error", "New password is required");
     return;
   }
-
-  showEditPassword.value = true;
+  dialog.editPasswd = true;
 };
 </script>
 
@@ -52,7 +62,7 @@ const onSubmitNewPassword = () => {
         size="small"
         type="button"
         variant="text"
-        @click="showEditDisplayName = true"></Button>
+        @click="dialog.editDispName = true"></Button>
     </p>
   </section>
   <section>
@@ -65,7 +75,7 @@ const onSubmitNewPassword = () => {
         size="small"
         type="button"
         variant="text"
-        @click="showEditEmail = true"></Button>
+        @click="dialog.editEmail = true"></Button>
     </p>
   </section>
   <section>
@@ -77,7 +87,11 @@ const onSubmitNewPassword = () => {
     <form
       class="flex gap-2 items-center mt-1"
       @submit.prevent="onSubmitNewPassword">
-      <Password v-model:model-value="newPassword" size="small" />
+      <Password
+        v-model:model-value="newPassword"
+        size="small"
+        :invalid="invalid"
+        @change="invalid = false" />
       <Button
         icon="pi pi-check"
         severity="help"
@@ -88,12 +102,12 @@ const onSubmitNewPassword = () => {
   </section>
 
   <!-- Dialogs -->
-  <EditDisplayName
-    v-model:visible="showEditDisplayName"
+  <AsyncEditDispName
+    v-model:visible="dialog.editDispName"
     :value="displayName ?? ''" />
-  <EditEmail v-model:visible="showEditEmail" :value="email ?? ''" />
-  <EditPassword
-    v-model:visible="showEditPassword"
+  <AsyncEditEmail v-model:visible="dialog.editEmail" :value="email ?? ''" />
+  <AsyncEditPasswd
+    v-model:visible="dialog.editPasswd"
     v-model:new-password="newPassword" />
 </template>
 

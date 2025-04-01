@@ -1,6 +1,6 @@
 import { useUserStore } from "@stores/user";
+import { useNotify } from "@/utils/composable";
 import { createRouter, createWebHashHistory } from "vue-router";
-import { useToast } from "primevue/usetoast";
 
 // Create router
 const router = createRouter({
@@ -43,7 +43,7 @@ const router = createRouter({
 // Set guards
 router.beforeEach(async (to) => {
   const { signedIn, init } = useUserStore();
-  const toast = useToast();
+  const { toast } = useNotify();
 
   // Set title
   useTitle(to.meta.title as string);

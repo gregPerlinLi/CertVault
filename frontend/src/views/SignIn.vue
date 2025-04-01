@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
-import { useToast } from "primevue/usetoast";
+import { useNotify } from "@/utils/composable";
+
+// Services
+const router = useRouter();
+const { toast, info, error } = useNotify();
 
 // Reactive
-const router = useRouter();
-const toast = useToast();
 const { signIn } = useUserStore();
 const errIdx = ref<number | null>(null);
 
@@ -20,12 +22,7 @@ async function trySignIn(ev: Event): Promise<void> {
   const username = formData.get("username")!.toString().trim();
   if (username.length === 0) {
     errIdx.value = 0;
-    toast.add({
-      severity: "error",
-      summary: "Validation Error",
-      detail: "Username is required",
-      life: 5000
-    });
+    error("Validation Error", "Username is required");
     return;
   }
 
@@ -33,23 +30,13 @@ async function trySignIn(ev: Event): Promise<void> {
   const passowrd = formData.get("password")!.toString().trim();
   if (passowrd.length === 0) {
     errIdx.value = 1;
-    toast.add({
-      severity: "error",
-      summary: "Validation Error",
-      detail: "Password is required",
-      life: 5000
-    });
+    error("Validation Error", "Password is required");
     return;
   }
 
   // Try sign in
   ((ev as SubmitEvent).submitter! as HTMLButtonElement).disabled = true;
-  toast.add({
-    severity: "info",
-    summary: "Info",
-    detail: "Signing in",
-    life: 3000
-  });
+  info("Info", "Signing in");
 
   const err = await signIn(username, passowrd, toast);
   if (err === null) {
