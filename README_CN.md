@@ -1,7 +1,7 @@
 <div align="center">
     <img src="docs/img/Logo.svg" width="240" alt="Logo">
     <br/>
-    <p style="font-size: large"><strong>自签名 SSL 证书颁发与管理平台</strong></p>
+    <p style="font-size: large"><strong>自签署 SSL 证书颁发与管理平台</strong></p>
     <a href="https://github.com/gregPerlinLi/CertVault/releases"><img src="https://img.shields.io/github/v/release/gregPerlinLi/CertVault" alt="Latest release" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/actions/workflows/backend-ci.yaml"><img src="https://img.shields.io/github/actions/workflow/status/gregPerlinLi/CertVault/backend-ci.yaml?branch=dev" alt="CI status" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/blob/main/LICENSE"><img src="https://img.shields.io/github/license/gregPerlinLi/CertVault" alt="License" /></a>
@@ -19,7 +19,7 @@
 ## 🌍 CertVault 是什么
 
 
-CertVault 是一个专注于自签名 SSL 证书签发与管理的平台，提供了一套可扩展、可配置的解决方案。它通过模块化设计实现了证书全生命周期管理，支持自签名 CA 证书创建、SSL 证书签发、证书详情查看、评论编辑、导出及自动续期功能。平台采用前后端分离架构（Vue.js 3 + Spring Boot 3），支持 MySQL/PostgreSQL 双数据库适配，并通过 Helm Chart 和 Docker Compose 实现多环境部署。集成 Prometheus 监控与 OIDC 认证体系，确保系统可观测性和高安全性。
+CertVault 是一个专注于自签署 SSL 证书签发与管理的平台，提供了一套可扩展、可配置的解决方案。它通过模块化设计实现了证书全生命周期管理，支持自签署 CA 证书创建、SSL 证书签发、证书详情查看、评论编辑、导出及自动续期功能。平台采用前后端分离架构（Vue.js 3 + Spring Boot 3），支持 MySQL/PostgreSQL 双数据库适配，并通过 Helm Chart 和 Docker Compose 实现多环境部署。集成 Prometheus 监控与 OIDC 认证体系，确保系统可观测性和高安全性。
 
 
 <table>
@@ -43,7 +43,7 @@ CertVault 是一个专注于自签名 SSL 证书签发与管理的平台，提�
 
 ## 🎯 设计初衷
 
-随着企业级应用对 HTTPS 安全性的要求提升，自签名证书在开发测试、私有化部署等场景中广泛应用。但传统手动管理方式存在以下痛点：
+随着企业级应用对 HTTPS 安全性的要求提升，自签署证书在开发测试、私有化部署等场景中广泛应用。但传统手动管理方式存在以下痛点：
 1. **管理低效**：证书有效期跟踪、权限分配、版本迭代等操作依赖人工记录，易出现证书过期或权限失控
 2. **安全性不足**：缺乏统一密钥管理体系，敏感数据存储和传输存在泄露风险
 3. **扩展性差**：无法适配不同环境（开发/生产）的数据库和部署需求
@@ -62,7 +62,7 @@ CertVault 的设计目标是：
 
 ### 核心功能
 - 🔐 **证书管理**  
-  支持自签名 CA 创建、SSL 证书签发、证书详情查看、评论编辑、导出和续期
+  支持自签署 CA 创建、SSL 证书签发、证书详情查看、评论编辑、导出和续期
 - 🛠 **用户权限**  
   基于 RBAC 的访问控制、角色绑定、用户角色管理及审计日志
 - 🌐 **多环境部署**  
