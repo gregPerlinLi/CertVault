@@ -163,6 +163,11 @@ redis:
       enabled: true
       password: "your-redis-password"
 
+## Database configuration
+## @param database.type [default: mysql] The type of database to use (mysql, postgresql)
+database:
+  type: postgresql
+
 ## MySQL configuration
 ## @param mysql.internal [default: false] Whether to use an internal MySQL instance (true) or an external MySQL instance (false)
 ## @param mysql.architecture [default: standalone] The architecture of the MySQL deployment (standalone or cluster)
@@ -177,7 +182,7 @@ redis:
 ## @param mysql.external.password [default: password] Password for external MySQL user
 ##
 mysql:
-  internal: false
+  internal: true
   auth:
     rootPassword: "your-mysql-root-password"
     database: certvault
@@ -187,6 +192,32 @@ mysql:
   external:
     host: localhost
     port: 3306
+    database: certvault
+    username: certvault
+    password: password
+
+## PostgreSQL configuration
+## @param postgresql.internal [default: false] Whether to use an internal PostgreSQL instance (true) or an external PostgreSQL instance (false)
+## @param postgresql.auth.postgresPassword [default: your-postgres-password] PostgreSQL root user password for internal PostgreSQL deployment
+## @param postgresql.auth.database [default: certvault] Database name to use (both internal and external)
+## @param postgresql.auth.username [default: certvault] Username for PostgreSQL access (used in internal deployment)
+## @param postgresql.auth.password [default: your-postgres-password] Password for the PostgreSQL user (used in internal deployment)
+## @param postgresql.external.host [default: localhost] Hostname/IP of external PostgreSQL instance
+## @param postgresql.external.port [default: 5432] Port of external PostgreSQL instance
+## @param postgresql.external.database [default: certvault] Database name for external PostgreSQL
+## @param postgresql.external.username [default: certvault] Username for PostgreSQL access (used in internal deployment)
+## @param postgresql.external.password [default: password] Password for PostgreSQL user (used in internal deployment)
+postgresql:
+  internal: true
+  auth:
+    postgresPassword: "your-postgres-password"
+    database: certvault
+    username: certvault
+    password: "your-postgres-password"
+  architecture: standalone
+  external:
+    host: localhost
+    port: 5432
     database: certvault
     username: certvault
     password: password
