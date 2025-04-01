@@ -182,7 +182,7 @@ database:
 ## @param mysql.external.password [default: password] Password for external MySQL user
 ##
 mysql:
-  internal: true
+  internal: false
   auth:
     rootPassword: "your-mysql-root-password"
     database: certvault
@@ -194,7 +194,7 @@ mysql:
     port: 3306
     database: certvault
     username: certvault
-    password: password
+    password: "password"
 
 ## PostgreSQL configuration
 ## @param postgresql.internal [default: false] Whether to use an internal PostgreSQL instance (true) or an external PostgreSQL instance (false)
@@ -208,7 +208,7 @@ mysql:
 ## @param postgresql.external.username [default: certvault] Username for PostgreSQL access (used in internal deployment)
 ## @param postgresql.external.password [default: password] Password for PostgreSQL user (used in internal deployment)
 postgresql:
-  internal: true
+  internal: false
   auth:
     postgresPassword: "your-postgres-password"
     database: certvault
@@ -220,7 +220,7 @@ postgresql:
     port: 5432
     database: certvault
     username: certvault
-    password: password
+    password: "password"
 
 ## Ingress configuration
 ## @param ingress.enabled [default: false] Whether ingress is enabled
