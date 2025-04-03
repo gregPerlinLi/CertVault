@@ -89,6 +89,17 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
 
+springdoc:
+  api-docs:
+    enabled: ${SPRING_API_DOCS_ENABLED:true}
+    path: /api/docs
+  swagger-ui:
+    path: /devcenter-api
+  packages-to-scan:
+    - com.gregperlinli.certvault.controller
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+
 init:
   superadmin:
     username: ${SUPERADMIN_USERNAME:superadmin}
