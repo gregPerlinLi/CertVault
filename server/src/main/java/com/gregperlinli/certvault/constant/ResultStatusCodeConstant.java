@@ -22,6 +22,14 @@ public enum ResultStatusCodeConstant {
      */
     NOT_FIND(204, "Not find"),
     /**
+     * 重定向
+     */
+    REDIRECT(302, "Redirect"),
+    /**
+     * 请求参数错误
+     */
+    PARAM_ERROR(400, "Bad request"),
+    /**
      * 未登录
      */
     UNAUTHORIZED(401, "Unauthorized"),
