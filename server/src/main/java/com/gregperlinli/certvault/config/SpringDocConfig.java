@@ -48,7 +48,7 @@ public class SpringDocConfig {
                         .email("lihaolin13@outlook.com"))
                 .license(new License()
                         .name("Apache 2.0")
-                        .url("https://github.com/gregPerlinLi/CertVault/blob/main/LICENSE"))
+                        .url("https://www.apache.org/licenses/LICENSE-2.0"))
                 .summary("CertVault RESTful API Doc")
                 .version(appVersion);
     }
