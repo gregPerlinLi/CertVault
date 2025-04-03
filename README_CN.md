@@ -122,4 +122,4 @@ docker compose -f docker-compose-with-postgres-redis.yml up -d
 更多信息请参见 [SECURITY.md](SECURITY.md)。
 
 ## 📝 许可证
-本项目基于 Apache 许可证发布 - 具体信息请参见 [LICENSE](LICENSE) 文件。
+本项目基于 Apache 2.0 许可证发布 - 具体信息请参见 [LICENSE](LICENSE) 文件。
