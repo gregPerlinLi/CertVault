@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.domain.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serializable;
@@ -12,6 +13,18 @@ import java.io.Serializable;
  * @className {@code TestDTO}
  * @date 2024/2/2 17:34
  */
+@Schema(
+        name = "Test DTO",
+        description = "Data transfer object for testing API responses and system status",
+        example = """
+        {
+            "method": "GET",
+            "message": "success getting",
+            "version": "1.1.3",
+            "serverTimezone": "+08:00"
+        }
+        """
+)
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
@@ -20,12 +33,40 @@ import java.io.Serializable;
 @Data
 public class TestDTO implements Serializable {
 
+    @Schema(
+            name = "Method",
+            description = "HTTP method used for the request",
+            example = "GET",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "String"
+    )
     private String method;
 
+    @Schema(
+            name = "Message",
+            description = "Response message",
+            example = "success getting",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "String"
+    )
     private String message;
 
+    @Schema(
+            name = "Version",
+            description = "Version of the Server",
+            example = "1.1.3",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "String"
+    )
     private String version;
 
+    @Schema(
+            name = "Timezone",
+            description = "Timezone of the Server",
+            example = "+08:00",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "String"
+    )
     private String serverTimezone;
 
 }
