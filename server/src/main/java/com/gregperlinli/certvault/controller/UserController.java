@@ -9,8 +9,14 @@ import com.gregperlinli.certvault.service.interfaces.ICaBindingService;
 import com.gregperlinli.certvault.service.interfaces.ICaService;
 import com.gregperlinli.certvault.service.interfaces.ICertificateService;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -21,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
  * @className {@code UserController}
  * @date 2025/3/10 20:37
  */
+@Tag(name = "User", description = "Common User API")
 @RequestMapping("/api/v1/user")
 @RestController
 public class UserController {
@@ -43,6 +50,13 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
+    @Operation(
+            summary = "Get User Profile",
+            description = "Retrieve user's own personal information",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success")
+            }
+    )
     @GetMapping(value = "/profile")
     public ResultVO<UserProfileDTO> getProfile(HttpServletRequest request) {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
@@ -57,8 +71,17 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
+    @Operation(
+            summary = "Update User Profile",
+            description = "Update user's own personal information\nWrite the specific part that needs to be modified, do not include any part that does not need to be changed in the body (including keys and values).",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Update Success"),
+                    @ApiResponse(responseCode = "444", description = "Update Failed")
+            }
+    )
     @PatchMapping(value = "/profile")
-    public ResultVO<Void> updateProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO,
+    public ResultVO<Void> updateProfile(@Parameter(name = "UpdateUserProfileDTO", description = "Update user profile entity")
+                                            @RequestBody UpdateUserProfileDTO updateUserProfileDTO,
                                         HttpServletRequest request) {
         if (
                 userService.updateUserProfile(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
@@ -78,10 +101,21 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
+    @Operation(
+            summary = "Get User CA List",
+            description = "Retrieve all CA information bound to your own account (paged retrieval)",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "204", description = "Not Find")
+            }
+    )
     @GetMapping(value = "/cert/ca")
-    public ResultVO<PageDTO<CaInfoDTO>> getCas(@RequestParam(value = "keyword", required = false) String keyword,
-                                               @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                               @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+    public ResultVO<PageDTO<CaInfoDTO>> getCas(@Parameter(name = "keyword", description = "Search keywords (Can be UUID, comments)")
+                                                   @RequestParam(value = "keyword", required = false) String keyword,
+                                               @Parameter(name = "page", description = "Page number")
+                                                   @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                               @Parameter(name = "limit", description = "Page limit")
+                                                   @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                                HttpServletRequest request) {
         PageDTO<CaInfoDTO> result = caService.getBoundCas(keyword,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
@@ -101,10 +135,21 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
+    @Operation(
+            summary = "Get CA Certificate",
+            description = "Obtain the CA certificate allocated to the user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "204", description = "No Data")
+            }
+    )
     @GetMapping(value = "/cert/ca/{uuid}/cer")
-    public ResultVO<String> getCaCert(@PathVariable("uuid") String uuid,
-                                      @RequestParam(value = "isChain", defaultValue = "false", required = false) Boolean isChain,
-                                      @RequestParam(value = "needRootCa", defaultValue = "true", required = false) Boolean needRootCa,
+    public ResultVO<String> getCaCert(@Parameter(name = "uuid", description = "CA UUID")
+                                          @PathVariable("uuid") String uuid,
+                                      @Parameter(name = "isChain", description = "Whether to get the certificate chain")
+                                          @RequestParam(value = "isChain", defaultValue = "false", required = false) Boolean isChain,
+                                      @Parameter(name = "needRootCa", description = "Whether to get the root CA certificate in the chain")
+                                          @RequestParam(value = "needRootCa", defaultValue = "true", required = false) Boolean needRootCa,
                                       HttpServletRequest request) {
         String result = null;
         if ( isChain ) {
@@ -128,10 +173,21 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
+    @Operation(
+            summary = "Get User Certificate List",
+            description = "Retrieve all certificate information for the user (paged retrieval)",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "204", description = "Not Find")
+            }
+    )
     @GetMapping(value = "/cert/ssl")
-    public ResultVO<PageDTO<CertInfoDTO>> getCerts(@RequestParam(value = "keyword", required = false) String keyword,
-                                                   @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                                   @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+    public ResultVO<PageDTO<CertInfoDTO>> getCerts(@Parameter(name = "keyword", description = "Search keywords (Can be UUID, comments)")
+                                                       @RequestParam(value = "keyword", required = false) String keyword,
+                                                   @Parameter(name = "page", description = "Page number")
+                                                       @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                   @Parameter(name = "limit", description = "Page limit")
+                                                       @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                                    HttpServletRequest request) {
         PageDTO<CertInfoDTO> result = certificateService.getCertificates(keyword,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
@@ -151,10 +207,21 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
+    @Operation(
+            summary = "Get SSL Certificate",
+            description = "Retrieve the SSL certificate allocated to the user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "204", description = "No Data")
+            }
+    )
     @GetMapping(value = "/cert/ssl/{uuid}/cer")
-    public ResultVO<String> getCertificateCert(@PathVariable("uuid") String uuid,
-                                               @RequestParam(value = "isChain", defaultValue = "false", required = false) Boolean isChain,
-                                               @RequestParam(value = "needRootCa", defaultValue = "true", required = false) Boolean needRootCa,
+    public ResultVO<String> getCertificateCert(@Parameter(name = "uuid", description = "SSL certificate UUID")
+                                                   @PathVariable("uuid") String uuid,
+                                               @Parameter(name = "isChain", description = "Whether to get the certificate chain")
+                                                   @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
+                                               @Parameter(name = "needRootCa", description = "Whether to get the root CA certificate in the chain")
+                                                   @RequestParam(value = "needRootCa", defaultValue = "true", required = false) Boolean needRootCa,
                                                HttpServletRequest request) {
         String result = null;
         if ( isChain ) {
@@ -178,9 +245,22 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
+    @Operation(
+            summary = "Get SSL Certificate Private Key",
+            description = "Retrieve the private key of the SSL certificate (Need user password verify)",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "204", description = "No Data"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
     @PostMapping(value = "/cert/ssl/{uuid}/privkey")
-    public ResultVO<String> getCertificatePrivkey(@PathVariable("uuid") String uuid,
-                                                  @RequestBody JsonNode confirmPassword,
+    public ResultVO<String> getCertificatePrivkey(@Parameter(name = "uuid", description = "SSL certificate UUID")
+                                                      @PathVariable("uuid") String uuid,
+                                                  @Parameter(name = "confirmPassword", description = "Confirm password", schema = @Schema(
+                                                          type = "application/json", example = "{\"password\": \"123456\"}"
+                                                  ))
+                                                      @RequestBody JsonNode confirmPassword,
                                                   HttpServletRequest request) throws Exception {
         String result = certificateService.getCertificatePrivkey(uuid,
                 confirmPassword.path("password").asText(),
@@ -199,9 +279,21 @@ public class UserController {
      * @param request       {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
+    @Operation(
+            summary = "Update Certificate Comment",
+            description = "Update the comment of the certificate",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Update Success"),
+                    @ApiResponse(responseCode = "444", description = "Update Failed")
+            }
+    )
     @PatchMapping(value = "/cert/ssl/{uuid}/comment")
-    public ResultVO<Void> updateCertComment(@PathVariable("uuid") String uuid,
-                                            @RequestBody JsonNode updateComment,
+    public ResultVO<Void> updateCertComment(@Parameter(name = "uuid", description = "SSL certificate UUID")
+                                                @PathVariable("uuid") String uuid,
+                                            @Parameter(name = "updateComment", description = "Update comment entity", schema = @Schema(
+                                                    type = "application/json", example = "{\"comment\": \"new comment of the cert\"}"
+                                            ))
+                                                @RequestBody JsonNode updateComment,
                                             HttpServletRequest request) {
         Boolean result = certificateService.updateCertComment(uuid,
                 updateComment.get("comment").asText(), ((UserProfileDTO)
@@ -220,8 +312,17 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
+    @Operation(
+            summary = "Request Certificate",
+            description = "Request a new SSL certificate",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Request Success"),
+                    @ApiResponse(responseCode = "444", description = "Request Failed")
+            }
+    )
     @PostMapping(value = "/cert/ssl")
-    public ResultVO<ResponseCertDTO> requestCert(@RequestBody RequestCertDTO requestCertDTO,
+    public ResultVO<ResponseCertDTO> requestCert(@Parameter(name = "RequestCertDTO", description = "Request certificate entity")
+                                                     @RequestBody RequestCertDTO requestCertDTO,
                                                  HttpServletRequest request) throws Exception {
         ResponseCertDTO result = certificateService.requestCert(requestCertDTO,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
@@ -240,9 +341,21 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
+    @Operation(
+            summary = "Renew Certificate",
+            description = "Renew the SSL certificate",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Renew Success"),
+                    @ApiResponse(responseCode = "444", description = "Renew Failed")
+            }
+    )
     @PutMapping(value = "/cert/ssl/{uuid}")
-    public ResultVO<ResponseCertDTO> renewCert(@PathVariable("uuid") String oldCertUuid,
-                                               @RequestBody JsonNode expiry,
+    public ResultVO<ResponseCertDTO> renewCert(@Parameter(name = "uuid", description = "SSL certificate UUID")
+                                                   @PathVariable("uuid") String oldCertUuid,
+                                               @Parameter(name = "expiry", description = "New expiry", schema = @Schema(
+                                                       type = "application/json", example = "{\"expiry\": 365}"
+                                               ))
+                                                   @RequestBody JsonNode expiry,
                                                HttpServletRequest request) throws Exception {
         ResponseCertDTO result = certificateService.renewCert(oldCertUuid,
                 expiry.get("expiry").asInt(),
@@ -260,8 +373,17 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
+    @Operation(
+            summary = "Delete Certificate",
+            description = "Delete the SSL certificate",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Delete Success"),
+                    @ApiResponse(responseCode = "444", description = "Delete Failed")
+            }
+    )
     @DeleteMapping(value = "/cert/ssl/{uuid}")
-    public ResultVO<Void> deleteCert(@PathVariable("uuid") String uuid,
+    public ResultVO<Void> deleteCert(@Parameter(name = "uuid", description = "SSL certificate UUID")
+                                         @PathVariable("uuid") String uuid,
                                      HttpServletRequest request) {
         Boolean result = certificateService.deleteCert(uuid,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
@@ -278,8 +400,19 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
+    @Operation(
+            summary = "Analyze Certificate",
+            description = "Certificate parser, used for parsing certificate information",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Get Success"),
+                    @ApiResponse(responseCode = "444", description = "Get Failed")
+            }
+    )
     @PostMapping(value = "/cert/analyze")
-    public ResultVO<CertificateDetailsDTO> getCertificateDetails(@RequestBody JsonNode certBase64) throws Exception {
+    public ResultVO<CertificateDetailsDTO> getCertificateDetails(@Parameter(name = "certBase64", description = "Certificate with Base64 format", schema = @Schema(
+                                                                        type = "application/json", example = "{\"cert\": \"xxxxxxxxxxxx\"}"
+                                                                ))
+                                                                     @RequestBody JsonNode certBase64) throws Exception {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "success",
                 new CertificateDetailsDTO(CertAnalyzer.analyzeCertificate(certBase64.get("cert").asText())));
@@ -291,6 +424,13 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
+    @Operation(
+            summary = "Count Bound CA",
+            description = "Count the number of CA bound to the current user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success")
+            }
+    )
     @GetMapping(value = "/cert/ca/count")
     public ResultVO<Long> countBoundCa(HttpServletRequest request) {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
@@ -304,6 +444,13 @@ public class UserController {
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
+    @Operation(
+            summary = "Count the number of user requested certificates",
+            description = "Count the number of user requested certificates",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success")
+            }
+    )
     @GetMapping(value = "/cert/ssl/count")
     public ResultVO<Long> countRequestedCertificates(HttpServletRequest request) {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),

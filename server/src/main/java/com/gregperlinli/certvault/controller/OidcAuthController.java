@@ -7,16 +7,18 @@ import com.gregperlinli.certvault.domain.vo.ResultVO;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
@@ -50,6 +52,7 @@ import java.util.concurrent.TimeUnit;
  * @className {@code OidcAuthController}
  * @date 2025/3/28 12:32
  */
+@Tag(name = "OpenID Connect", description = "OpenID Connect Integration API")
 @RequestMapping("/api/v1/auth/oauth")
 @RestController
 @Slf4j
@@ -73,6 +76,19 @@ public class OidcAuthController {
     @Value("${oidc.provider}")
     String provider;
 
+    /**
+     * Get OIDC provider
+     *
+     * @return {@link ResultVO}
+     */
+    @Operation(
+            summary = "OIDC provider",
+            description = "Get OIDC is Enabled",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OIDC Enabled"),
+                    @ApiResponse(responseCode = "204", description = "OIDC Disabled")
+            }
+    )
     @GetMapping(value = "/provider")
     public ResultVO<String> getOidcProvider() {
         if ( isEnabled ) {
@@ -83,6 +99,21 @@ public class OidcAuthController {
         }
     }
 
+    /**
+     * OIDC Login
+     *
+     * @param response {@link HttpServletResponse}
+     * @return {@link ResultVO}
+     * @throws Exception if an error occurs during the OIDC login process
+     */
+    @Operation(
+            summary = "OIDC Login",
+            description = "Redirect to OpenID Connect IdP Login",
+            responses = {
+                    @ApiResponse(responseCode = "302", description = "Redirect to OIDC Login Page"),
+                    @ApiResponse(responseCode = "204", description = "OIDC Disabled")
+            }
+    )
     @GetMapping(value = "/login")
     public ResultVO<Void> login(HttpServletResponse response) throws Exception {
         // 这里直接重定向到 Spring Security 的 OAuth2 登录页面
@@ -90,12 +121,31 @@ public class OidcAuthController {
             return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "OIDC Disabled");
         }
         response.sendRedirect("/oauth2/authorization/oidc");
-        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Redirect to OIDC Login Page");
+        return new ResultVO<>(ResultStatusCodeConstant.REDIRECT.getResultCode(), "Redirect to OIDC Login Page");
     }
 
+    /**
+     * OIDC Callback
+     *
+     * @param code      {@link String}
+     * @param state     {@link String}
+     * @param request   {@link HttpServletRequest}
+     * @param response  {@link HttpServletResponse}
+     * @return {@link ResultVO}
+     * @throws Exception if an error occurs during the OIDC callback process
+     */
+    @Operation(
+            summary = "OIDC Callback",
+            description = "OpenID Connect IdP Login Success Callback Endpoint",
+            responses = {
+                    @ApiResponse(responseCode = "302", description = "Redirect to OIDC Login Page"),
+                    @ApiResponse(responseCode = "204", description = "OIDC Disabled"),
+                    @ApiResponse(responseCode = "444", description = "OIDC User is Null")
+            }
+    )
     @GetMapping(value = "/callback")
-    public ResultVO<UserProfileDTO> oidcCallback(@RequestParam("code") String code,
-                                                 @RequestParam("state") String state,
+    public ResultVO<UserProfileDTO> oidcCallback(@Parameter(name = "code", description = "OpenID Connect IdP Response JWT Code") @RequestParam("code") String code,
+                                                 @Parameter(name = "state", description = "OpenID Connect IdP Response State") @RequestParam("state") String state,
                                                  HttpServletRequest request,
                                                  HttpServletResponse response) throws Exception {
         if ( !isEnabled ) {
@@ -162,9 +212,19 @@ public class OidcAuthController {
         redisTemplate.opsForValue().set(RedisKeyConstant.USER.joinLoginPrefix(request.getSession().getId()), userProfileDTO, 60, TimeUnit.MINUTES);
 
         response.sendRedirect("/");
-        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "OIDC login successful.", userProfileDTO);
+        return new ResultVO<>(ResultStatusCodeConstant.REDIRECT.getResultCode(), "OIDC login successful.", userProfileDTO);
     }
 
+    /**
+     * OIDC Login Success
+     *
+     * @return {@link ResultVO}
+     */
+    @Operation(
+            summary = "OIDC Login Success",
+            description = "OIDC Login Success Endpoint",
+            hidden = true
+    )
     @GetMapping(value = "/success")
     public ResultVO<Void> success() {
         if ( !isEnabled ) {
@@ -173,6 +233,16 @@ public class OidcAuthController {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Login successful.");
     }
 
+    /**
+     * OIDC Login Failure
+     *
+     * @return {@link ResultVO}
+     */
+    @Operation(
+            summary = "OIDC Login Failure",
+            description = "OIDC Login Failure Endpoint",
+            hidden = true
+    )
     @GetMapping(value = "/failure")
     public ResultVO<Void> failure() {
         if ( !isEnabled ) {
