@@ -110,9 +110,9 @@ public class SuperadminController {
     @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
     @PatchMapping(value = "/user/{username}")
-    public ResultVO<Void> updateUserInfo(@Parameter(name = "username", description = "Username of the user to be updated")
+    public ResultVO<Void> updateUserInfo(@Parameter(name = "username", description = "Username of the user to be updated", example = "user")
                                              @PathVariable("username") String username,
-                                         @Parameter(name = "UpdateUserProfileDTO", description = "Update user entity")
+                                         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Update user entity")
                                              @RequestBody UpdateUserProfileDTO updateUserProfileDTO) {
         Boolean result = userService.updateUserProfile(username, updateUserProfileDTO, true);
         if ( result ) {
@@ -244,7 +244,7 @@ public class SuperadminController {
     @DoesNotExistApiResponse
     @ParamNotNullApiResponse
     @DeleteMapping(value = "/user/{username}")
-    public ResultVO<Void> deleteUser(@Parameter(name = "username", description = "Username of the user to be deleted")
+    public ResultVO<Void> deleteUser(@Parameter(name = "username", description = "Username of the user to be deleted", example = "user")
                                          @PathVariable("username") String username,
                                      HttpServletRequest request) {
         Boolean result = userService.deleteUser(username, ((UserProfileDTO)
@@ -288,7 +288,7 @@ public class SuperadminController {
     @DoesNotExistApiResponse
     @ParamNotNullApiResponse
     @DeleteMapping(value = "/users")
-    public ResultVO<Void> deleteUsers(@Parameter(name = "usernames", description = "Username list of the users to be deleted")
+    public ResultVO<Void> deleteUsers(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Username list of the users to be deleted")
                                           @RequestBody List<String> usernames,
                                       HttpServletRequest request) {
         Boolean result = userService.deleteUsers(usernames, ((UserProfileDTO)
@@ -311,7 +311,7 @@ public class SuperadminController {
     )
     @SuccessApiResponse
     @GetMapping(value = "/cert/ca/count")
-    public ResultVO<Long> countAllCa(@Parameter(name = "condition", description = "Condition of the CA")
+    public ResultVO<Long> countAllCa(@Parameter(name = "condition", description = "Condition of the CA", example = "none")
                                          @RequestParam(value = "condition", defaultValue = "none", required = false) String condition) {
         if ( "available".equals(condition) ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
@@ -357,7 +357,7 @@ public class SuperadminController {
     )
     @SuccessApiResponse
     @GetMapping(value = "/user/count")
-    public ResultVO<Long> countAllUser(@Parameter(name = "role", description = "Role of the user")
+    public ResultVO<Long> countAllUser(@Parameter(name = "role", description = "Role of the user (0: all user, 1: user, 2: admin, 3: superadmin)", example = "0")
                                            @RequestParam(value = "role", defaultValue = "0", required = false) Integer role) {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "Success",

@@ -92,7 +92,8 @@ public class UserController {
                                                 "data": null,
                                                 "timestamp": "2025-04-04T16:16:02.5641+08:00"
                                             }
-                                            """)}
+                                            """
+                                    )}
                             )
                     )
             }
@@ -129,11 +130,11 @@ public class UserController {
     @NoDataListApiResponse
     @SuccessApiResponse
     @GetMapping(value = "/cert/ca")
-    public ResultVO<PageDTO<CaInfoDTO>> getCas(@Parameter(name = "keyword", description = "Search keywords (Can be UUID, comments)")
+    public ResultVO<PageDTO<CaInfoDTO>> getCas(@Parameter(name = "keyword", description = "Search keywords (Can be UUID, comments)", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                                    @RequestParam(value = "keyword", required = false) String keyword,
-                                               @Parameter(name = "page", description = "Page number")
+                                               @Parameter(name = "page", description = "Page number", example = "1")
                                                    @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                               @Parameter(name = "limit", description = "Page limit")
+                                               @Parameter(name = "limit", description = "Page limit", example = "10")
                                                    @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                                HttpServletRequest request) {
         PageDTO<CaInfoDTO> result = caService.getBoundCas(keyword,
@@ -163,11 +164,11 @@ public class UserController {
     @SuccessApiResponse
     @NoDataApiResponse
     @GetMapping(value = "/cert/ca/{uuid}/cer")
-    public ResultVO<String> getCaCert(@Parameter(name = "uuid", description = "CA UUID")
+    public ResultVO<String> getCaCert(@Parameter(name = "uuid", description = "CA UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                           @PathVariable("uuid") String uuid,
-                                      @Parameter(name = "isChain", description = "Whether to get the certificate chain")
+                                      @Parameter(name = "isChain", description = "Whether to get the certificate chain", example = "true")
                                           @RequestParam(value = "isChain", defaultValue = "false", required = false) Boolean isChain,
-                                      @Parameter(name = "needRootCa", description = "Whether to get the root CA certificate in the chain")
+                                      @Parameter(name = "needRootCa", description = "Whether to get the root CA certificate in the chain", example = "true")
                                           @RequestParam(value = "needRootCa", defaultValue = "true", required = false) Boolean needRootCa,
                                       HttpServletRequest request) {
         String result = null;
@@ -218,11 +219,11 @@ public class UserController {
     @NoDataListApiResponse
     @SuccessApiResponse
     @GetMapping(value = "/cert/ssl")
-    public ResultVO<PageDTO<CertInfoDTO>> getCerts(@Parameter(name = "keyword", description = "Search keywords (Can be UUID, comments)")
+    public ResultVO<PageDTO<CertInfoDTO>> getCerts(@Parameter(name = "keyword", description = "Search keywords (Can be UUID, comments)", example = "72267ce5-e94a-4cdb-b35b-63f1f385b253")
                                                        @RequestParam(value = "keyword", required = false) String keyword,
-                                                   @Parameter(name = "page", description = "Page number")
+                                                   @Parameter(name = "page", description = "Page number", example = "1")
                                                        @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                                   @Parameter(name = "limit", description = "Page limit")
+                                                   @Parameter(name = "limit", description = "Page limit", example = "10")
                                                        @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                                    HttpServletRequest request) {
         PageDTO<CertInfoDTO> result = certificateService.getCertificates(keyword,
@@ -252,11 +253,11 @@ public class UserController {
     @SuccessApiResponse
     @NoDataApiResponse
     @GetMapping(value = "/cert/ssl/{uuid}/cer")
-    public ResultVO<String> getCertificateCert(@Parameter(name = "uuid", description = "SSL certificate UUID")
+    public ResultVO<String> getCertificateCert(@Parameter(name = "uuid", description = "SSL certificate UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                                    @PathVariable("uuid") String uuid,
-                                               @Parameter(name = "isChain", description = "Whether to get the certificate chain")
+                                               @Parameter(name = "isChain", description = "Whether to get the certificate chain", example = "true")
                                                    @RequestParam(value = "isChain", defaultValue = "false") Boolean isChain,
-                                               @Parameter(name = "needRootCa", description = "Whether to get the root CA certificate in the chain")
+                                               @Parameter(name = "needRootCa", description = "Whether to get the root CA certificate in the chain", example = "true")
                                                    @RequestParam(value = "needRootCa", defaultValue = "true", required = false) Boolean needRootCa,
                                                HttpServletRequest request) {
         String result = null;
@@ -291,7 +292,7 @@ public class UserController {
     @SuccessApiResponse
     @NoDataApiResponse
     @PostMapping(value = "/cert/ssl/{uuid}/privkey")
-    public ResultVO<String> getCertificatePrivkey(@Parameter(name = "uuid", description = "SSL certificate UUID")
+    public ResultVO<String> getCertificatePrivkey(@Parameter(name = "uuid", description = "SSL certificate UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                                       @PathVariable("uuid") String uuid,
                                                   @Parameter(name = "confirmPassword", description = "Confirm password", schema = @Schema(
                                                           type = "application/json", example = "{\"password\": \"123456\"}"
@@ -323,7 +324,7 @@ public class UserController {
     @NotYourResourceApiResponse
     @DoesNotExistApiResponse
     @PatchMapping(value = "/cert/ssl/{uuid}/comment")
-    public ResultVO<Void> updateCertComment(@Parameter(name = "uuid", description = "SSL certificate UUID")
+    public ResultVO<Void> updateCertComment(@Parameter(name = "uuid", description = "SSL certificate UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                                 @PathVariable("uuid") String uuid,
                                             @Parameter(name = "updateComment", description = "Update comment entity", schema = @Schema(
                                                     type = "application/json", example = "{\"comment\": \"new comment of the cert\"}"
@@ -404,7 +405,7 @@ public class UserController {
     @NotYourResourceApiResponse
     @DoesNotExistApiResponse
     @PutMapping(value = "/cert/ssl/{uuid}")
-    public ResultVO<ResponseCertDTO> renewCert(@Parameter(name = "uuid", description = "SSL certificate UUID")
+    public ResultVO<ResponseCertDTO> renewCert(@Parameter(name = "uuid", description = "SSL certificate UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                                    @PathVariable("uuid") String oldCertUuid,
                                                @Parameter(name = "expiry", description = "New expiry", schema = @Schema(
                                                        type = "application/json", example = "{\"expiry\": 365}"
@@ -439,7 +440,7 @@ public class UserController {
     @NotYourResourceApiResponse
     @DoesNotExistApiResponse
     @DeleteMapping(value = "/cert/ssl/{uuid}")
-    public ResultVO<Void> deleteCert(@Parameter(name = "uuid", description = "SSL certificate UUID")
+    public ResultVO<Void> deleteCert(@Parameter(name = "uuid", description = "SSL certificate UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                          @PathVariable("uuid") String uuid,
                                      HttpServletRequest request) {
         Boolean result = certificateService.deleteCert(uuid,

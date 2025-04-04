@@ -64,11 +64,11 @@ public class AdminController {
     @NoDataListApiResponse
     @SuccessApiResponse
     @GetMapping(value = "/users")
-    public ResultVO<PageDTO<UserProfileDTO>> getUsers(@Parameter(name = "keyword", description = "Search keywords (Can be username, display name, and email)")
+    public ResultVO<PageDTO<UserProfileDTO>> getUsers(@Parameter(name = "keyword", description = "Search keywords (Can be username, display name, and email)", example = "user")
                                                           @RequestParam(value = "keyword", required = false) String keyword,
-                                                      @Parameter(name = "page", description = "Page number")
+                                                      @Parameter(name = "page", description = "Page number", example = "1")
                                                           @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                                      @Parameter(name = "limit", description = "Page limit")
+                                                      @Parameter(name = "limit", description = "Page limit", example = "10")
                                                           @RequestParam(value = "limit", defaultValue = "10") Integer limit) {
         PageDTO<UserProfileDTO> result = userService.getUsers(keyword, page, limit);
         if ( result != null && result.getList() != null && !result.getList().isEmpty()) {
@@ -92,11 +92,11 @@ public class AdminController {
     @NoDataListApiResponse
     @SuccessApiResponse
     @GetMapping(value = "/cert/ca")
-    public ResultVO<PageDTO<CaInfoDTO>> getCas(@Parameter(name = "keyword", description = "Search keywords (Can be UUID, comments)")
+    public ResultVO<PageDTO<CaInfoDTO>> getCas(@Parameter(name = "keyword", description = "Search keywords (Can be UUID, comments)", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                                    @RequestParam(value = "keyword", required = false) String keyword,
-                                               @Parameter(name = "page", description = "Page number")
+                                               @Parameter(name = "page", description = "Page number", example = "1")
                                                    @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                               @Parameter(name = "limit", description = "Page limit")
+                                               @Parameter(name = "limit", description = "Page limit", example = "10")
                                                    @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                                HttpServletRequest request) {
         PageDTO<CaInfoDTO> result = caService.getCas(keyword,
@@ -124,13 +124,13 @@ public class AdminController {
     @NoDataListApiResponse
     @SuccessApiResponse
     @GetMapping(value = "/cert/ca/{uuid}/bind")
-    public ResultVO<PageDTO<UserProfileDTO>> getCaBindUsers(@Parameter(name = "uuid", description = "CA UUID")
+    public ResultVO<PageDTO<UserProfileDTO>> getCaBindUsers(@Parameter(name = "uuid", description = "CA UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                                                 @PathVariable("uuid") String uuid,
-                                                            @Parameter(name = "keyword", description = "Search keywords (Can be username, display name, and email)")
+                                                            @Parameter(name = "keyword", description = "Search keywords (Can be username, display name, and email)", example = "user")
                                                                 @RequestParam(value = "keyword", required = false) String keyword,
-                                                            @Parameter(name = "page", description = "Page number")
+                                                            @Parameter(name = "page", description = "Page number", example = "1")
                                                                 @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                                            @Parameter(name = "limit", description = "Page limit")
+                                                            @Parameter(name = "limit", description = "Page limit", example = "10")
                                                                 @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                                             HttpServletRequest request) {
         PageDTO<UserProfileDTO> result = caService.getBoundUsers(keyword,
@@ -161,11 +161,11 @@ public class AdminController {
     @SuccessApiResponse
     @GetMapping(value = "/cert/ca/{uuid}/cer")
     @Deprecated(since = "0.4.0")
-    public ResultVO<String> getCaCert(@Parameter(name = "uuid", description = "CA UUID")
+    public ResultVO<String> getCaCert(@Parameter(name = "uuid", description = "CA UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                           @PathVariable("uuid") String uuid,
-                                      @Parameter(name = "isChain", description = "Whether to get the certificate chain")
+                                      @Parameter(name = "isChain", description = "Whether to get the certificate chain", example = "true")
                                           @RequestParam(value = "isChain", defaultValue = "false", required = false) Boolean isChain,
-                                      @Parameter(name = "needRootCa", description = "Whether to get the root CA certificate in the chain")
+                                      @Parameter(name = "needRootCa", description = "Whether to get the root CA certificate in the chain", example = "true")
                                           @RequestParam(value = "needRootCa", defaultValue = "true", required = false) Boolean needRootCa,
                                       HttpServletRequest request) {
         String result = null;
@@ -199,7 +199,7 @@ public class AdminController {
     @DoesNotExistApiResponse
     @SuccessApiResponse
     @PostMapping(value = "/cert/ca/{uuid}/privkey")
-    public ResultVO<String> getCaPrivkey(@Parameter(name = "uuid", description = "CA UUID")
+    public ResultVO<String> getCaPrivkey(@Parameter(name = "uuid", description = "CA UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                              @PathVariable("uuid") String uuid,
                                          @Parameter(name = "confirmPassword", description = "Confirm password", schema = @Schema(
                                                  type = "application/json", example = "{\"password\": \"123456\"}"
@@ -230,7 +230,7 @@ public class AdminController {
     @NotYourResourceApiResponse
     @DoesNotExistApiResponse
     @PatchMapping(value = "/cert/ca/{uuid}/comment")
-    public ResultVO<Void> updateCaComment(@Parameter(name = "uuid", description = "CA UUID")
+    public ResultVO<Void> updateCaComment(@Parameter(name = "uuid", description = "CA UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                               @PathVariable("uuid") String uuid,
                                           @Parameter(name = "updateComment", description = "Update comment entity", schema = @Schema(
                                                   type = "application/json", example = "{\"comment\": \"new comment of the ca\"}"
@@ -261,7 +261,7 @@ public class AdminController {
     @DoesNotExistApiResponse
     @SuccessApiResponse
     @PatchMapping(value = "/cert/ca/{uuid}/available")
-    public ResultVO<Boolean> modifyCaAvailable(@Parameter(name = "uuid", description = "CA UUID")
+    public ResultVO<Boolean> modifyCaAvailable(@Parameter(name = "uuid", description = "CA UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                                    @PathVariable("uuid") String uuid,
                                                HttpServletRequest request) {
         Boolean result = caService.modifyCaAvailability(uuid,
@@ -320,7 +320,8 @@ public class AdminController {
     )
     @SuccessAndFailedApiResponse
     @PostMapping(value = "/cert/ca/import")
-    public ResultVO<ResponseCaDTO> importCa(@RequestBody ImportCertDTO importCertDTO,
+    public ResultVO<ResponseCaDTO> importCa(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Import certificate entity")
+                                                @RequestBody ImportCertDTO importCertDTO,
                                             HttpServletRequest request) throws Exception {
         ResponseCaDTO result = caService.importCa(importCertDTO,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
@@ -439,7 +440,7 @@ public class AdminController {
     @DoesNotExistApiResponse
     @FailedApiResponse
     @PutMapping(value = "/cert/ca/{uuid}")
-    public ResultVO<ResponseCaDTO> renewCa(@Parameter(name = "uuid", description = "CA UUID")
+    public ResultVO<ResponseCaDTO> renewCa(@Parameter(name = "uuid", description = "CA UUID", example = "bf35ecb1-9b67-4083-9476-e264ba153188")
                                                @PathVariable("uuid") String uuid,
                                            @Parameter(name = "expiry", description = "New expiry", schema = @Schema(
                                                    type = "application/json", example = "{\"expiry\": 3650}"
@@ -469,7 +470,7 @@ public class AdminController {
     @NotYourResourceApiResponse
     @DoesNotExistApiResponse
     @DeleteMapping(value = "/cert/ca/{uuid}")
-    public ResultVO<Void> deleteCa(@Parameter(name = "uuid", description = "CA UUID")
+    public ResultVO<Void> deleteCa(@Parameter(name = "uuid", description = "CA UUID", example = "bf35ecb1-9b67-4083-9476-e264ba153188")
                                        @PathVariable("uuid") String uuid,
                                    HttpServletRequest request) {
         Boolean result = caService.deleteCa(uuid,
@@ -585,7 +586,7 @@ public class AdminController {
     )
     @SuccessApiResponse
     @GetMapping(value = "/cert/ca/count")
-    public ResultVO<Long> countRequestedCa(@Parameter(name = "condition", description = "Condition of the CA certificate")
+    public ResultVO<Long> countRequestedCa(@Parameter(name = "condition", description = "Condition of the CA certificate", example = "none")
                                                @RequestParam(value = "condition", defaultValue = "none", required = false) String condition,
                                            HttpServletRequest request) {
         if ( "available".equals(condition) ) {
@@ -617,9 +618,9 @@ public class AdminController {
     )
     @SuccessApiResponse
     @GetMapping(value = "/cert/ca/{uuid}/count")
-    public ResultVO<Long> countCaSigned(@Parameter(name = "uuid", description = "CA UUID")
+    public ResultVO<Long> countCaSigned(@Parameter(name = "uuid", description = "CA UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                             @PathVariable("uuid") String uuid,
-                                        @Parameter(name = "caOrSsl", description = "Flag of CA or SSL")
+                                        @Parameter(name = "caOrSsl", description = "Flag of CA or SSL (true if count ca certificates, false if count ssl certificates)", example = "false")
                                             @RequestParam(value = "caOrSsl", defaultValue = "false", required = false) Boolean caOrSsl,
                                         HttpServletRequest request) {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),

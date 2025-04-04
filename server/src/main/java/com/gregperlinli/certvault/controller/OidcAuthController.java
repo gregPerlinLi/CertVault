@@ -213,8 +213,10 @@ public class OidcAuthController {
     )
     @OidcDisabledApiResponse
     @GetMapping(value = "/callback")
-    public ResultVO<UserProfileDTO> oidcCallback(@Parameter(name = "code", description = "OpenID Connect IdP Response JWT Code") @RequestParam("code") String code,
-                                                 @Parameter(name = "state", description = "OpenID Connect IdP Response State") @RequestParam("state") String state,
+    public ResultVO<UserProfileDTO> oidcCallback(@Parameter(name = "code", description = "OpenID Connect IdP Response JWT Code", example = "c1ds5v1...")
+                                                     @RequestParam("code") String code,
+                                                 @Parameter(name = "state", description = "OpenID Connect IdP Response State", example = "s1ds5v1...")
+                                                     @RequestParam("state") String state,
                                                  HttpServletRequest request,
                                                  HttpServletResponse response) throws Exception {
         if ( !isEnabled ) {
