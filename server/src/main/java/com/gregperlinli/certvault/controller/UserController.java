@@ -294,9 +294,18 @@ public class UserController {
     @PostMapping(value = "/cert/ssl/{uuid}/privkey")
     public ResultVO<String> getCertificatePrivkey(@Parameter(name = "uuid", description = "SSL certificate UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                                       @PathVariable("uuid") String uuid,
-                                                  @Parameter(name = "confirmPassword", description = "Confirm password", schema = @Schema(
-                                                          type = "application/json", example = "{\"password\": \"123456\"}"
-                                                  ))
+                                                  @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                          description = "Confirm password",
+                                                          content = @Content(
+                                                                  examples = {@ExampleObject(value =
+                                                                          """
+                                                                          {
+                                                                              "password": "123456"
+                                                                          }
+                                                                          """
+                                                                  )}
+                                                          )
+                                                  )
                                                       @RequestBody JsonNode confirmPassword,
                                                   HttpServletRequest request) throws Exception {
         String result = certificateService.getCertificatePrivkey(uuid,
@@ -326,9 +335,18 @@ public class UserController {
     @PatchMapping(value = "/cert/ssl/{uuid}/comment")
     public ResultVO<Void> updateCertComment(@Parameter(name = "uuid", description = "SSL certificate UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                                 @PathVariable("uuid") String uuid,
-                                            @Parameter(name = "updateComment", description = "Update comment entity", schema = @Schema(
-                                                    type = "application/json", example = "{\"comment\": \"new comment of the cert\"}"
-                                            ))
+                                            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                    description = "Update comment",
+                                                    content = @Content(
+                                                            examples = {@ExampleObject(value =
+                                                                    """
+                                                                    {
+                                                                        "comment": "New comment of the cert"
+                                                                    }
+                                                                    """
+                                                            )}
+                                                    )
+                                            )
                                                 @RequestBody JsonNode updateComment,
                                             HttpServletRequest request) {
         Boolean result = certificateService.updateCertComment(uuid,
@@ -407,9 +425,18 @@ public class UserController {
     @PutMapping(value = "/cert/ssl/{uuid}")
     public ResultVO<ResponseCertDTO> renewCert(@Parameter(name = "uuid", description = "SSL certificate UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                                    @PathVariable("uuid") String oldCertUuid,
-                                               @Parameter(name = "expiry", description = "New expiry", schema = @Schema(
-                                                       type = "application/json", example = "{\"expiry\": 365}"
-                                               ))
+                                               @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                       description = "New expiry",
+                                                       content = @Content(
+                                                               examples = {@ExampleObject(value =
+                                                                       """
+                                                                       {
+                                                                           "expiry": 365
+                                                                       }
+                                                                       """
+                                                               )}
+                                                       )
+                                               )
                                                    @RequestBody JsonNode expiry,
                                                HttpServletRequest request) throws Exception {
         ResponseCertDTO result = certificateService.renewCert(oldCertUuid,
@@ -464,9 +491,18 @@ public class UserController {
     )
     @SuccessApiResponse
     @PostMapping(value = "/cert/analyze")
-    public ResultVO<CertificateDetailsDTO> getCertificateDetails(@Parameter(name = "certBase64", description = "Certificate with Base64 format", schema = @Schema(
-                                                                        type = "application/json", example = "{\"cert\": \"xxxxxxxxxxxx\"}"
-                                                                ))
+    public ResultVO<CertificateDetailsDTO> getCertificateDetails(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                                         description = "Certificate Base64",
+                                                                         content = @Content(
+                                                                                 examples = {@ExampleObject(value =
+                                                                                         """
+                                                                                         {
+                                                                                             "cert": "MIIB+zCCAVigAwIBAgIQJz+JlZg97kbB6ZnzUfe8pYDANBgk..."
+                                                                                         }
+                                                                                         """
+                                                                                 )}
+                                                                         )
+                                                                 )
                                                                      @RequestBody JsonNode certBase64) throws Exception {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "success",

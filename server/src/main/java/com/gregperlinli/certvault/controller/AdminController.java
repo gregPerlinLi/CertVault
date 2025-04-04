@@ -201,9 +201,18 @@ public class AdminController {
     @PostMapping(value = "/cert/ca/{uuid}/privkey")
     public ResultVO<String> getCaPrivkey(@Parameter(name = "uuid", description = "CA UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                              @PathVariable("uuid") String uuid,
-                                         @Parameter(name = "confirmPassword", description = "Confirm password", schema = @Schema(
-                                                 type = "application/json", example = "{\"password\": \"123456\"}"
-                                         ))
+                                         @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                 description = "Confirm password",
+                                                 content = @Content(
+                                                         examples = {@ExampleObject(value =
+                                                                 """
+                                                                 {
+                                                                     "password": "123456"
+                                                                 }
+                                                                 """
+                                                         )}
+                                                 )
+                                         )
                                              @RequestBody JsonNode confirmPassword,
                                          HttpServletRequest request) throws Exception {
         String result = caService.getCaPrivKey(uuid,
@@ -232,9 +241,18 @@ public class AdminController {
     @PatchMapping(value = "/cert/ca/{uuid}/comment")
     public ResultVO<Void> updateCaComment(@Parameter(name = "uuid", description = "CA UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                               @PathVariable("uuid") String uuid,
-                                          @Parameter(name = "updateComment", description = "Update comment entity", schema = @Schema(
-                                                  type = "application/json", example = "{\"comment\": \"new comment of the ca\"}"
-                                          ))
+                                          @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                  description = "Update comment",
+                                                  content = @Content(
+                                                          examples = {@ExampleObject(value =
+                                                                  """
+                                                                  {
+                                                                      "comment": "This is a comment"
+                                                                  }
+                                                                  """
+                                                          )}
+                                                 )
+                                          )
                                               @RequestBody JsonNode updateComment,
                                           HttpServletRequest request) {
         Boolean result = caService.updateCaComment(uuid,
@@ -364,30 +382,29 @@ public class AdminController {
     @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
     @PostMapping(value = "/cert/ca")
-    public ResultVO<ResponseCaDTO> requestCa(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Request certificate entity",
-                    content = @Content(
-                            examples = @ExampleObject(value =
-                                    """
-                                    {
-                                        "caUuid": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
-                                        "allowSubCa": true,
-                                        "country": "China",
-                                        "province": "Guangdong",
-                                        "city": "Canton",
-                                        "organization": "CertVault Develop Org",
-                                        "organizationalUnit": "CertVault Dev",
-                                        "commonName": "CertVault Intermediate CA",
-                                        "expiry": 180,
-                                        "comment": "Cert Vault Default Intermediate Certificate Authority"
-                                    }
-                                    """
-                            )
-                    )
-            )
-            @RequestBody RequestCertDTO requestCertDTO,
-            HttpServletRequest request) throws Exception {
+    public ResultVO<ResponseCaDTO> requestCa(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                     description = "Request certificate entity",
+                                                     content = @Content(
+                                                             examples = @ExampleObject(value =
+                                                                     """
+                                                                     {
+                                                                         "caUuid": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
+                                                                         "allowSubCa": true,
+                                                                         "country": "China",
+                                                                         "province": "Guangdong",
+                                                                         "city": "Canton",
+                                                                         "organization": "CertVault Develop Org",
+                                                                         "organizationalUnit": "CertVault Dev",
+                                                                         "commonName": "CertVault Intermediate CA",
+                                                                         "expiry": 180,
+                                                                         "comment": "Cert Vault Default Intermediate Certificate Authority"
+                                                                     }
+                                                                     """
+                                                             )
+                                                     )
+                                             )
+                                                 @RequestBody RequestCertDTO requestCertDTO,
+                                             HttpServletRequest request) throws Exception {
         ResponseCaDTO result = caService.requestCa(requestCertDTO,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result != null ) {
@@ -442,9 +459,18 @@ public class AdminController {
     @PutMapping(value = "/cert/ca/{uuid}")
     public ResultVO<ResponseCaDTO> renewCa(@Parameter(name = "uuid", description = "CA UUID", example = "bf35ecb1-9b67-4083-9476-e264ba153188")
                                                @PathVariable("uuid") String uuid,
-                                           @Parameter(name = "expiry", description = "New expiry", schema = @Schema(
-                                                   type = "application/json", example = "{\"expiry\": 3650}"
-                                           ))
+                                           @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                   description = "New expiry",
+                                                   content = @Content(
+                                                           examples = @ExampleObject(value =
+                                                                   """
+                                                                   {
+                                                                       "expiry": 3650
+                                                                   }
+                                                                   """
+                                                           )
+                                                   )
+                                           )
                                                @RequestBody JsonNode expiry,
                                            HttpServletRequest request) throws Exception {
         ResponseCaDTO result = caService.renewCa(uuid, expiry.get("expiry").asInt(),
