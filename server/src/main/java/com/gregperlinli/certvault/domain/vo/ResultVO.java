@@ -52,6 +52,11 @@ public class ResultVO<T> {
     /**
      * 返回前端需要获取的实体对象
      */
+    @Schema(
+            name = "Data",
+            description = "Data",
+            nullable = true
+    )
     private T data;
 
     /**
