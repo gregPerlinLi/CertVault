@@ -9,6 +9,9 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -85,8 +88,38 @@ public class OidcAuthController {
             summary = "OIDC provider",
             description = "Get OIDC is Enabled",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "OIDC Enabled"),
-                    @ApiResponse(responseCode = "204", description = "OIDC Disabled")
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OIDC Enabled",
+                            content = @Content(
+                                    examples = {@ExampleObject(value =
+                                            """
+                                            {
+                                                "code": 200,
+                                                "msg": "OIDC Enabled",
+                                                "data": "OpenID Connect",
+                                                "timestamp": "2025-03-29T00:59:00.06971"
+                                            }
+                                            """
+                                    )}
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "204",
+                            description = "OIDC Disabled",
+                            content = @Content(
+                                    examples = {@ExampleObject(value =
+                                            """
+                                            {
+                                                "code": 204,
+                                                "msg": "OIDC Disabled",
+                                                "data": null,
+                                                "timestamp": "2025-03-29T00:59:00.06971"
+                                            }
+                                            """
+                                    )}
+                            )
+                    )
             }
     )
     @GetMapping(value = "/provider")
