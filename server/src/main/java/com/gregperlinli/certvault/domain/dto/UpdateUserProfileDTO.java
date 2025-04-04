@@ -13,15 +13,7 @@ import lombok.*;
  */
 @Schema(
         name = "Update User Profile DTO",
-        description = "Data transfer object for updating user profile information",
-        example = """
-        {
-            "displayName": "John Doe",
-            "email": "john.doe@example.com",
-            "oldPassword": "oldPass123",
-            "newPassword": "newPass456"
-        }
-        """
+        description = "Data transfer object for updating user profile information"
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,7 +26,7 @@ public class UpdateUserProfileDTO {
      * Display name
      */
     @Schema(
-            name = "Display Name",
+            name = "displayName",
             description = "Display name of the user",
             example = "John Doe",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -46,7 +38,7 @@ public class UpdateUserProfileDTO {
      * Email
      */
     @Schema(
-            name = "Email",
+            name = "email",
             description = "Email of the user",
             example = "john.doe@example.com",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -58,7 +50,7 @@ public class UpdateUserProfileDTO {
      * Old password
      */
     @Schema(
-            name = "Old Password",
+            name = "oldPassword",
             description = "Old password of the user",
             example = "oldPass123",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -70,7 +62,7 @@ public class UpdateUserProfileDTO {
      * New password
      */
     @Schema(
-            name = "New Password",
+            name = "newPassword",
             description = "New password of the user",
             example = "newPass456",
             requiredMode = Schema.RequiredMode.REQUIRED,

@@ -14,13 +14,7 @@ import lombok.*;
  */
 @Schema(
         name = "Login DTO",
-        description = "Data transfer object for user authentication",
-        example = """
-        {
-            "username": "testadmin",
-            "password": "123456"
-        }
-        """
+        description = "Data transfer object for user authentication"
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,7 +27,7 @@ public class LoginDTO {
      * username
      */
     @Schema(
-            name = "Username",
+            name = "username",
             description = "Username of the user",
             example = "testadmin",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -45,7 +39,7 @@ public class LoginDTO {
      * password
      */
     @Schema(
-            name = "Password",
+            name = "password",
             description = "Password of the user",
             example = "123456",
             requiredMode = Schema.RequiredMode.REQUIRED,

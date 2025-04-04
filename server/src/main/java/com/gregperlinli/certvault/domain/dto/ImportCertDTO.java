@@ -13,14 +13,7 @@ import lombok.*;
  */
 @Schema(
         name = "Import Certificate DTO",
-        description = "Data transfer object for importing certificates with private key",
-        example = """
-        {
-            "privkey": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRd0lCQURBTkJn...",
-            "certificate": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUdFekNDQ...",
-            "comment": "Testing CA"
-        }
-        """
+        description = "Data transfer object for importing certificates with private key"
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,7 +23,7 @@ import lombok.*;
 public class ImportCertDTO {
 
     @Schema(
-            name = "Private Key",
+            name = "privkey",
             description = "Private key of the certificate",
             example = "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRd0lCQURBTkJn...",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -39,7 +32,7 @@ public class ImportCertDTO {
     private String privkey;
 
     @Schema(
-            name = "Certificate",
+            name = "certificate",
             description = "Certificate of the certificate",
             example = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUdFekNDQ...",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -48,7 +41,7 @@ public class ImportCertDTO {
     private String certificate;
 
     @Schema(
-            name = "Comment",
+            name = "comment",
             description = "Comment of the certificate",
             example = "Testing CA",
             requiredMode = Schema.RequiredMode.REQUIRED,

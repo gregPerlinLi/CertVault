@@ -13,13 +13,13 @@ import lombok.*;
  */
 @Schema(
         name = "CA Binding DTO",
-        description = "CA-User binding data transfer object",
+        description = "CA-User binding data transfer object"/*,
         example = """
         {
             "caUuid": "2f2d63a8-b29c-4404-ae10-81f5ff023a69",
             "username": "john.doe"
         }
-        """
+        """*/
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,7 +32,7 @@ public class CaBindingDTO {
      * CA UUID
      */
     @Schema(
-            name = "CA UUID",
+            name = "caUuid",
             description = "The UUID of the Certificate Authority (CA)",
             example = "2f2d63a8-b29c-4404-ae10-81f5ff023a69",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -44,7 +44,7 @@ public class CaBindingDTO {
      * User name
      */
     @Schema(
-            name = "Username",
+            name = "username",
             description = "The username of the user associated with the CA binding",
             example = "john.doe",
             requiredMode = Schema.RequiredMode.REQUIRED,

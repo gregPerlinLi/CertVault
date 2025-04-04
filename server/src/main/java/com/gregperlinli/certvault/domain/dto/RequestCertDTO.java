@@ -16,34 +16,7 @@ import java.util.List;
  */
 @Schema(
         name = "Request Certificate DTO",
-        description = "Data transfer object for requesting SSL certificates or Certificate Authority (CA)",
-        example = """
-        {
-            "caUuid": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
-            "country": "CN",
-            "province": "Guangdong",
-            "city": "Canton",
-            "organization": "GregPerlinLi",
-            "organizationalUnit": "Cert Vault",
-            "commonName": "a.b.c",
-            "expiry": 30,
-            "comment": "CertVault SSL Certificate",
-            "subjectAltNames": [
-                {
-                    "type": "DNS_NAME",
-                    "value": "a.b.c"
-                },
-                {
-                    "type": "IP_ADDRESS",
-                    "value": "10.18.0.1"
-                },
-                {
-                    "type": "URI",
-                    "value": "https://a.b.c"
-                }
-            ]
-        }
-        """
+        description = "Data transfer object for requesting SSL certificates or Certificate Authority (CA)"
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -56,7 +29,7 @@ public class RequestCertDTO {
      * CA UUID (Only required when applying for an SSL certificate or Intermediate CA)
      */
     @Schema(
-            name = "CA UUID",
+            name = "caUuid",
             description = "CA UUID",
             example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
             type = "UUID"
@@ -67,7 +40,7 @@ public class RequestCertDTO {
      * Whether to allow sub-CA (Only required when applying for an Intermediate CA)
      */
     @Schema(
-            name = "Allow Sub-CA",
+            name = "allowSubCa",
             description = "Whether to allow sub-CA",
             example = "true",
             type = "Boolean"
@@ -78,7 +51,7 @@ public class RequestCertDTO {
      * Country
      */
     @Schema(
-            name = "Country",
+            name = "country",
             description = "Country",
             example = "CN",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -90,7 +63,7 @@ public class RequestCertDTO {
      * Province
      */
     @Schema(
-            name = "Province",
+            name = "province",
             description = "Province",
             example = "Guangdong",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -102,7 +75,7 @@ public class RequestCertDTO {
      * City
      */
     @Schema(
-            name = "City",
+            name = "city",
             description = "City",
             example = "Canton",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -114,7 +87,7 @@ public class RequestCertDTO {
      * Organization
      */
     @Schema(
-            name = "Organization",
+            name = "organization",
             description = "Organization",
             example = "GregPerlinLi",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -126,7 +99,7 @@ public class RequestCertDTO {
      * Organizational Unit
      */
     @Schema(
-            name = "Organizational Unit",
+            name = "organizationalUnit",
             description = "Organizational Unit",
             example = "Cert Vault",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -138,7 +111,7 @@ public class RequestCertDTO {
      * Common Name
      */
     @Schema(
-            name = "Common Name",
+            name = "commonName",
             description = "Common Name",
             example = "a.b.c",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -150,7 +123,7 @@ public class RequestCertDTO {
      * Expiry (day)
      */
     @Schema(
-            name = "Expiry",
+            name = "expiry",
             description = "Expiry (day)",
             example = "30",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -162,7 +135,7 @@ public class RequestCertDTO {
      * Subject Alternative Name (Only required when applying for an SSL certificate)
      */
     @Schema(
-            name = "Subject Alternative Name",
+            name = "subjectAltNames",
             description = "Subject Alternative Name",
             example = """
             [
@@ -187,7 +160,7 @@ public class RequestCertDTO {
      * Comment
      */
     @Schema(
-            name = "Comment",
+            name = "comment",
             description = "Comment",
             example = "CertVault SSL Certificate",
             type = "String"

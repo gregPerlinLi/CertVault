@@ -15,15 +15,7 @@ import java.io.Serializable;
  */
 @Schema(
         name = "Test DTO",
-        description = "Data transfer object for testing API responses and system status",
-        example = """
-        {
-            "method": "GET",
-            "message": "success getting",
-            "version": "1.1.3",
-            "serverTimezone": "+08:00"
-        }
-        """
+        description = "Data transfer object for testing API responses and system status"
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,7 +26,7 @@ import java.io.Serializable;
 public class TestDTO implements Serializable {
 
     @Schema(
-            name = "Method",
+            name = "method",
             description = "HTTP method used for the request",
             example = "GET",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -43,7 +35,7 @@ public class TestDTO implements Serializable {
     private String method;
 
     @Schema(
-            name = "Message",
+            name = "message",
             description = "Response message",
             example = "success getting",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -52,7 +44,7 @@ public class TestDTO implements Serializable {
     private String message;
 
     @Schema(
-            name = "Version",
+            name = "version",
             description = "Version of the Server",
             example = "1.1.3",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -61,7 +53,7 @@ public class TestDTO implements Serializable {
     private String version;
 
     @Schema(
-            name = "Timezone",
+            name = "serverTimezone",
             description = "Timezone of the Server",
             example = "+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,

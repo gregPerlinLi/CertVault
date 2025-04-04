@@ -28,8 +28,7 @@ public class PageDTO<T> {
             description = "Total",
             requiredMode = Schema.RequiredMode.REQUIRED,
             type = "Long",
-            minLength = 1,
-            maxLength = 3
+            examples = "100"
     )
     private Long total;
 

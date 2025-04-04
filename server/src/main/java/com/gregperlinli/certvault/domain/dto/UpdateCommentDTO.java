@@ -13,13 +13,7 @@ import lombok.*;
  */
 @Schema(
         name = "Update Comment DTO",
-        description = "Data transfer object for updating a certificate's comment field",
-        example = """
-        {
-            "uuid": "99d6cb53-1151-4b2d-a9d1-d1a71d58d47c",
-            "comment": "Updated security policy requirements"
-        }
-        """
+        description = "Data transfer object for updating a certificate's comment field"
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,7 +26,7 @@ public class UpdateCommentDTO {
      * Certificate UUID
      */
     @Schema(
-            name = "UUID",
+            name = "uuid",
             description = "The UUID of the certificate to update",
             example = "99d6cb53-1151-4b2d-a9d1-d1a71d58d47c",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -44,7 +38,7 @@ public class UpdateCommentDTO {
      * Certificate Comment
      */
     @Schema(
-            name = "Comment",
+            name = "comment",
             description = "The updated comment for the certificate",
             example = "Updated security policy requirements",
             requiredMode = Schema.RequiredMode.REQUIRED,

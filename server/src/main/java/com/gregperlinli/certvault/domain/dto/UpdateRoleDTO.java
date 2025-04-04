@@ -13,13 +13,7 @@ import lombok.*;
  */
 @Schema(
         name = "Update Role DTO",
-        description = "Data transfer object for updating a user's role information",
-        example = """
-        {
-            "username": "john.doe",
-            "role": 2
-        }
-        """
+        description = "Data transfer object for updating a user's role information"
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,7 +26,7 @@ public class UpdateRoleDTO {
      * Username of the user whose role information needs to be updated
      */
     @Schema(
-            name = "Username",
+            name = "username",
             description = "Username of the user whose role information needs to be updated",
             example = "john.doe",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -44,7 +38,7 @@ public class UpdateRoleDTO {
      * Role of the user (1: User, 2: Admin, 3: Superadmin)
      */
     @Schema(
-            name = "Role",
+            name = "role",
             description = "Role of the user (1: User, 2: Admin, 3: Superadmin)",
             example = "2",
             requiredMode = Schema.RequiredMode.REQUIRED,

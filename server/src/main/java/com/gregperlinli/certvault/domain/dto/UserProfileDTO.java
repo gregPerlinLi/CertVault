@@ -16,15 +16,7 @@ import java.util.List;
  */
 @Schema(
         name = "User Profile DTO",
-        description = "User profile information transfer object containing account details",
-        example = """
-        {
-            "username": "john.doe",
-            "displayName": "John Doe",
-            "email": "john.doe@example.com",
-            "role": 2
-        }
-        """
+        description = "User profile information transfer object containing account details"
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,7 +30,7 @@ public class UserProfileDTO {
      * username
      */
     @Schema(
-            name = "Username",
+            name = "username",
             description = "Username of the user",
             example = "john.doe",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -50,7 +42,7 @@ public class UserProfileDTO {
      * display name
      */
     @Schema(
-            name = "Display Name",
+            name = "displayName",
             description = "Display name of the user",
             example = "John Doe",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -62,7 +54,7 @@ public class UserProfileDTO {
      * email
      */
     @Schema(
-            name = "Email",
+            name = "email",
             description = "Email of the user",
             example = "john.doe@example.com",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -74,7 +66,7 @@ public class UserProfileDTO {
      * roles (1: User, 2: Admin, 3: Superadmin)
      */
     @Schema(
-            name = "Role",
+            name = "role",
             description = "Role of the user (1: User, 2: Admin, 3: Superadmin)",
             example = "2",
             requiredMode = Schema.RequiredMode.REQUIRED,

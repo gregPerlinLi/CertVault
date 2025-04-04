@@ -27,7 +27,7 @@ public class ResultVO<T> {
      * 消息代码
      */
     @Schema(
-            name = "Code",
+            name = "code",
             description = "Message code",
             examples = {
                     "200", "204", "302", "400", "401", "403", "404", "405", "417", "422", "444", "500", "501"
@@ -41,7 +41,7 @@ public class ResultVO<T> {
      * 返回信息
      */
     @Schema(
-            name = "Message",
+            name = "msg",
             description = "Return message",
             example = "Success",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -53,7 +53,7 @@ public class ResultVO<T> {
      * 返回前端需要获取的实体对象
      */
     @Schema(
-            name = "Data",
+            name = "data",
             description = "Data",
             nullable = true
     )
@@ -63,7 +63,7 @@ public class ResultVO<T> {
      * 时间戳
      */
     @Schema(
-            name = "Timestamp",
+            name = "timestamp",
             description = "Timestamp",
             example = "2025-03-19T01:38:31+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,

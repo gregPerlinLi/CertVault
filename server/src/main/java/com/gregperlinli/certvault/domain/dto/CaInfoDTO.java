@@ -15,21 +15,7 @@ import java.time.LocalDateTime;
  */
 @Schema(
         name = "CA Information DTO",
-        description = "Certificate Authority information transfer object",
-        example = """
-        {
-            "uuid": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
-            "owner": "gregPerlinLi",
-            "parentCa": 3885be11-4084-4538-9fa0-70ffe4c4cbe0,
-            "allowSubCa": true,
-            "comment": "Cert Vault Default Intermediate Certificate Authority",
-            "available": true,
-            "notBefore": "2025-03-23T10:14:45+08:00",
-            "notAfter": "2035-03-21T10:14:45+08:00",
-            "createdAt": "2025-03-18T11:10:14+08:00",
-            "modifiedAt": "2025-03-23T10:14:45+08:00"
-        }
-        """
+        description = "Certificate Authority information transfer object"
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -42,7 +28,7 @@ public class CaInfoDTO {
      * UUID of the Certificate Authority
      */
     @Schema(
-            name = "UUID",
+            name = "uuid",
             description = "Unique identifier of the Certificate Authority",
             example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -54,7 +40,7 @@ public class CaInfoDTO {
      * Username of the CA owner
      */
     @Schema(
-            name = "Owner",
+            name = "owner",
             description = "Username of the CA owner",
             example = "gregPerlinLi",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -66,7 +52,7 @@ public class CaInfoDTO {
      * UUID of the parent Certificate Authority (if any)
      */
     @Schema(
-            name = "Parent CA",
+            name = "parentCa",
             description = "UUID of the parent Certificate Authority (if any)",
             example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0"
     )
@@ -76,7 +62,7 @@ public class CaInfoDTO {
      * Indicates if sub CAs can be created under this CA
      */
     @Schema(
-            name = "Allow Sub CA",
+            name = "allowSubCa",
             description = "Whether sub CAs can be created under this CA",
             example = "true",
             type = "Boolean"
@@ -87,7 +73,7 @@ public class CaInfoDTO {
      * Optional description or notes about the CA
      */
     @Schema(
-            name = "Comment",
+            name = "comment",
             description = "Optional description or notes about the CA",
             example = "Cert Vault Default Intermediate Certificate Authority",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -99,7 +85,7 @@ public class CaInfoDTO {
      * Indicates if the CA is currently active
      */
     @Schema(
-            name = "Available",
+            name = "available",
             description = "Indicates if the CA is currently active",
             example = "true",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -111,7 +97,7 @@ public class CaInfoDTO {
      * Start date of CA validity period (ISO 8601 format)
      */
     @Schema(
-            name = "Not Before",
+            name = "notBefore",
             description = "Start date of CA validity period (ISO 8601 format)",
             example = "2025-03-23T10:14:45+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -123,7 +109,7 @@ public class CaInfoDTO {
      * End date of CA validity period (ISO 8601 format)
      */
     @Schema(
-            name = "Not After",
+            name = "notAfter",
             description = "End date of CA validity period (ISO 8601 format)",
             example = "2035-03-21T10:14:45+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -135,7 +121,7 @@ public class CaInfoDTO {
      * Date when the CA was created (ISO 8601 format)
      */
     @Schema(
-            name = "Created At",
+            name = "createdAt",
             description = "Date when the CA was created (ISO 8601 format)",
             example = "2025-03-18T11:10:14+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -147,7 +133,7 @@ public class CaInfoDTO {
      * Date when the CA was last modified (ISO 8601 format)
      */
     @Schema(
-            name = "Modified At",
+            name = "modifiedAt",
             description = "Date when the CA was last modified (ISO 8601 format)",
             example = "2025-03-23T10:14:45+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,

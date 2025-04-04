@@ -17,19 +17,7 @@ import java.time.LocalDateTime;
  */
 @Schema(
         name = "Response CA DTO",
-        description = "Certificate Authority (CA) response data transfer object containing generated certificate and private key details",
-        example = """
-        {
-            "uuid": "bf35ecb1-9b67-4083-9476-e264ba153188",
-            "privkey": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2QUl...",
-            "cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVFakN...",
-            "parentCa": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
-            "allowSubCa": true,
-            "notBefore": "2025-03-23T12:49:45.733",
-            "notAfter": "2025-09-19T12:49:45.733",
-            "comment": "Cert Vault Default Intermediate Certificate Authority"
-        }
-        """
+        description = "Certificate Authority (CA) response data transfer object containing generated certificate and private key details"
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -42,7 +30,7 @@ public class ResponseCaDTO {
      * UUID
      */
     @Schema(
-            name = "UUID",
+            name = "uuid",
             description = "Unique identifier for the CA certificate",
             example = "bf35ecb1-9b67-4083-9476-e264ba153188",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -54,7 +42,7 @@ public class ResponseCaDTO {
      * Private key with BASE64 encoding
      */
     @Schema(
-            name = "Private Key",
+            name = "privkey",
             description = "Private key with BASE64 encoding",
             example = "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2QUl...",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -66,7 +54,7 @@ public class ResponseCaDTO {
      * Certificate with BASE64 encoding
      */
     @Schema(
-            name = "Certificate",
+            name = "cert",
             description = "Certificate with BASE64 encoding",
             example = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUV2QUl...",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -78,7 +66,7 @@ public class ResponseCaDTO {
      * Parent CA UUID
      */
     @Schema(
-            name = "Parent CA UUID",
+            name = "parentCa",
             description = "Parent CA UUID",
             example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
             type = "String"
@@ -89,7 +77,7 @@ public class ResponseCaDTO {
      * Whether to allow issue subordinate CA
      */
     @Schema(
-            name = "Allow Subordinate CA",
+            name = "allowSubCa",
             description = "Whether to allow issue subordinate CA",
             example = "true",
             type = "Boolean"
@@ -100,7 +88,7 @@ public class ResponseCaDTO {
      * Effective Date
      */
     @Schema(
-            name = "Effective Date",
+            name = "notBefore",
             description = "Start date of CA validity period (ISO 8601 format)",
             example = "2025-03-23T12:49:45.733",
             type = "OffsetDateTime"
@@ -111,7 +99,7 @@ public class ResponseCaDTO {
      * Expiration Date
      */
     @Schema(
-            name = "Expiration Date",
+            name = "notAfter",
             description = "End date of CA validity period (ISO 8601 format)",
             example = "2025-09-19T12:49:45.733",
             type = "OffsetDateTime"
@@ -122,7 +110,7 @@ public class ResponseCaDTO {
      * Comment
      */
     @Schema(
-            name = "Comment",
+            name = "comment",
             description = "Optional description or notes about the CA",
             example = "Cert Vault Default Intermediate Certificate Authority",
             type = "String"

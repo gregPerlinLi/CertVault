@@ -15,19 +15,7 @@ import java.time.LocalDateTime;
  */
 @Schema(
         name = "Certificate Info DTO",
-        description = "Certificate information transfer object containing metadata and lifecycle details",
-        example = """
-        {
-            "uuid": "72267ce5-e94a-4cdb-b35b-63f1f385b253",
-            "caUuid": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
-            "owner": "gregPerlinLi",
-            "comment": "Cert Vault SSL Certificate",
-            "notBefore": "2025-03-19T01:38:31+08:00",
-            "notAfter": "2025-06-17T01:38:31+08:00",
-            "createdAt": "2025-03-19T01:38:31+08:00",
-            "modifiedAt": "2025-03-19T01:38:31+08:00"
-        }
-        """
+        description = "Certificate information transfer object containing metadata and lifecycle details"
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,7 +25,7 @@ import java.time.LocalDateTime;
 public class CertInfoDTO {
 
     @Schema(
-            name = "UUID",
+            name = "uuid",
             description = "Unique identifier for the certificate",
             example = "72267ce5-e94a-4cdb-b35b-63f1f385b253",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -46,7 +34,7 @@ public class CertInfoDTO {
     private String uuid;
 
     @Schema(
-            name = "CA UUID",
+            name = "caUuid",
             description = "Unique identifier for the Certificate Authority that issued the certificate",
             example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -55,7 +43,7 @@ public class CertInfoDTO {
     private String caUuid;
 
     @Schema(
-            name = "Owner",
+            name = "owner",
             description = "Username of the certificate owner",
             example = "gregPerlinLi",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -64,7 +52,7 @@ public class CertInfoDTO {
     private String owner;
 
     @Schema(
-            name = "Comment",
+            name = "comment",
             description = "Optional description or notes about the certificate",
             example = "Cert Vault SSL Certificate",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -73,7 +61,7 @@ public class CertInfoDTO {
     private String comment;
 
     @Schema(
-            name = "Not Before",
+            name = "notBefore",
             description = "Start date of the certificate's validity period (ISO 8601 format)",
             example = "2025-03-19T01:38:31+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -82,7 +70,7 @@ public class CertInfoDTO {
     private LocalDateTime notBefore;
 
     @Schema(
-            name = "Not After",
+            name = "notAfter",
             description = "End date of the certificate's validity period (ISO 8601 format)",
             example = "2025-06-17T01:38:31+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -91,7 +79,7 @@ public class CertInfoDTO {
     private LocalDateTime notAfter;
 
     @Schema(
-            name = "Created At",
+            name = "createdAt",
             description = "Date when the certificate was created (ISO 8601 format)",
             example = "2025-03-19T01:38:31+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -100,7 +88,7 @@ public class CertInfoDTO {
     private LocalDateTime createdAt;
 
     @Schema(
-            name = "Modified At",
+            name = "modifiedAt",
             description = "Date when the certificate was last modified (ISO 8601 format)",
             example = "2025-03-19T01:38:31+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,

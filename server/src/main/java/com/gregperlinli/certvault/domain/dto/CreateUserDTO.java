@@ -17,16 +17,7 @@ import java.time.LocalDateTime;
  */
 @Schema(
         name = "Create User DTO",
-        description = "Data transfer object for user creation and updates",
-        example = """
-        {
-            "username": "hello",
-            "displayName": "Hello Admin",
-            "email": "k8qscp.k65@yahoo.com.cn",
-            "password": "1234567890",
-            "role": 2
-        }
-        """
+        description = "Data transfer object for user creation and updates"
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,7 +27,7 @@ import java.time.LocalDateTime;
 public class CreateUserDTO {
 
     @Schema(
-            name = "Username",
+            name = "username",
             description = "Username of the user",
             example = "hello",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -45,7 +36,7 @@ public class CreateUserDTO {
     private String username;
 
     @Schema(
-            name = "Display Name",
+            name = "displayName",
             description = "Display name of the user",
             example = "Hello Admin",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -54,7 +45,7 @@ public class CreateUserDTO {
     private String displayName;
 
     @Schema(
-            name = "Email",
+            name = "email",
             description = "Email address of the user",
             example = "k8qscp.k65@yahoo.com.cn",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -63,7 +54,7 @@ public class CreateUserDTO {
     private String email;
 
     @Schema(
-            name = "Password",
+            name = "password",
             description = "Password of the user",
             example = "1234567890",
             requiredMode = Schema.RequiredMode.REQUIRED,
@@ -72,7 +63,7 @@ public class CreateUserDTO {
     private String password;
 
     @Schema(
-            name = "Role",
+            name = "role",
             description = "Role of the user (1: User, 2: Admin, 3: Superadmin)",
             example = "2",
             requiredMode = Schema.RequiredMode.REQUIRED,
