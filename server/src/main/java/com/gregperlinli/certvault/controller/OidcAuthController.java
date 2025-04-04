@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.controller;
 
+import com.gregperlinli.certvault.annotation.OidcDisabledApiResponse;
 import com.gregperlinli.certvault.constant.RedisKeyConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
@@ -103,25 +104,10 @@ public class OidcAuthController {
                                             """
                                     )}
                             )
-                    ),
-                    @ApiResponse(
-                            responseCode = "204",
-                            description = "OIDC Disabled",
-                            content = @Content(
-                                    examples = {@ExampleObject(value =
-                                            """
-                                            {
-                                                "code": 204,
-                                                "msg": "OIDC Disabled",
-                                                "data": null,
-                                                "timestamp": "2025-03-29T00:59:00.06971"
-                                            }
-                                            """
-                                    )}
-                            )
                     )
             }
     )
+    @OidcDisabledApiResponse
     @GetMapping(value = "/provider")
     public ResultVO<String> getOidcProvider() {
         if ( isEnabled ) {
@@ -143,10 +129,25 @@ public class OidcAuthController {
             summary = "OIDC Login",
             description = "Redirect to OpenID Connect IdP Login",
             responses = {
-                    @ApiResponse(responseCode = "302", description = "Redirect to OIDC Login Page"),
-                    @ApiResponse(responseCode = "204", description = "OIDC Disabled")
+                    @ApiResponse(
+                            responseCode = "302",
+                            description = "Redirect to OIDC Login Page",
+                            content = @Content(
+                                    examples = {@ExampleObject(value =
+                                            """
+                                            {
+                                                "code": 302,
+                                                "msg": "Redirect to OIDC Login Page",
+                                                "data": null,
+                                                "timestamp": "2025-03-29T00:59:00.06971"
+                                            }
+                                            """
+                                    )}
+                            )
+                    )
             }
     )
+    @OidcDisabledApiResponse
     @GetMapping(value = "/login")
     public ResultVO<Void> login(HttpServletResponse response) throws Exception {
         // 这里直接重定向到 Spring Security 的 OAuth2 登录页面
@@ -171,11 +172,46 @@ public class OidcAuthController {
             summary = "OIDC Callback",
             description = "OpenID Connect IdP Login Success Callback Endpoint",
             responses = {
-                    @ApiResponse(responseCode = "302", description = "Redirect to OIDC Login Page"),
-                    @ApiResponse(responseCode = "204", description = "OIDC Disabled"),
-                    @ApiResponse(responseCode = "444", description = "OIDC User is Null")
+                    @ApiResponse(
+                            responseCode = "302",
+                            description = "Redirect to OIDC Login Page",
+                            content = @Content(
+                                    examples = {@ExampleObject(value =
+                                            """
+                                            {
+                                                "code": 302,
+                                                "msg": "Redirect to OIDC Login Page",
+                                                "data": {
+                                                    "username": "testadmin",
+                                                    "displayName": "测试管理员",
+                                                    "email": "admin@test.com",
+                                                    "role": 2
+                                                },
+                                                "timestamp": "2025-03-29T00:59:00.06971"
+                                            }
+                                            """
+                                    )}
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "444",
+                            description = "OIDC User is Null",
+                            content = @Content(
+                                    examples = {@ExampleObject(value =
+                                            """
+                                            {
+                                                "code": 444,
+                                                "msg": "OIDC User is Null",
+                                                "data": null,
+                                                "timestamp": "2025-03-29T00:59:00.06971"
+                                            }
+                                            """
+                                    )}
+                            )
+                    )
             }
     )
+    @OidcDisabledApiResponse
     @GetMapping(value = "/callback")
     public ResultVO<UserProfileDTO> oidcCallback(@Parameter(name = "code", description = "OpenID Connect IdP Response JWT Code") @RequestParam("code") String code,
                                                  @Parameter(name = "state", description = "OpenID Connect IdP Response State") @RequestParam("state") String state,
