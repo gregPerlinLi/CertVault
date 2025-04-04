@@ -68,7 +68,8 @@ public class AuthController {
             }
     )
     @PostMapping(value =  "/login")
-    public ResultVO<UserProfileDTO> login(@Parameter(name = "LoginDTO", description = "Login Entity") @RequestBody LoginDTO loginDTO,
+    public ResultVO<UserProfileDTO> login(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Login entity")
+                                              @RequestBody LoginDTO loginDTO,
                                           HttpServletRequest request) {
         UserProfileDTO loginResult = userService.login(loginDTO.getUsername(),
                 loginDTO.getPassword(),

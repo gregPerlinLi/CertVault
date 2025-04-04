@@ -261,7 +261,8 @@ public class AdminController {
     @DoesNotExistApiResponse
     @SuccessApiResponse
     @PatchMapping(value = "/cert/ca/{uuid}/available")
-    public ResultVO<Boolean> modifyCaAvailable(@PathVariable("uuid") String uuid,
+    public ResultVO<Boolean> modifyCaAvailable(@Parameter(name = "uuid", description = "CA UUID")
+                                                   @PathVariable("uuid") String uuid,
                                                HttpServletRequest request) {
         Boolean result = caService.modifyCaAvailability(uuid,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
@@ -287,7 +288,8 @@ public class AdminController {
                             responseCode = "444",
                             description = "Certificate Invalid",
                             content = @Content(
-                                    examples = {@ExampleObject(value = """
+                                    examples = {@ExampleObject(value =
+                                            """
                                             {
                                                 "code": 444,
                                                 "msg": "The certificate is invalid.",
@@ -302,7 +304,8 @@ public class AdminController {
                             responseCode = "444",
                             description = "Certificate is not CA",
                             content = @Content(
-                                    examples = {@ExampleObject(value = """
+                                    examples = {@ExampleObject(value =
+                                            """
                                             {
                                                 "code": 444,
                                                 "msg": "The certificate is not a CA.",
@@ -343,14 +346,16 @@ public class AdminController {
                             responseCode = "403",
                             description = "Parent CA Does Not Allow Sub CA",
                             content = @Content(
-                                    examples = {@ExampleObject(value = """
+                                    examples = {@ExampleObject(value =
+                                            """
                                             {
                                                 "code": 403,
                                                 "msg": "The CA does not allow sub CA.",
                                                 "data": null,
                                                 "timestamp": "2025-04-04T16:16:02.5641+08:00"
                                             }
-                                            """)}
+                                            """
+                                    )}
                             )
                     )
             }
@@ -358,9 +363,30 @@ public class AdminController {
     @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
     @PostMapping(value = "/cert/ca")
-    public ResultVO<ResponseCaDTO> requestCa(@Parameter(name = "RequestCertDTO", description = "Request certificate entity")
-                                                 @RequestBody RequestCertDTO requestCertDTO,
-                                             HttpServletRequest request) throws Exception {
+    public ResultVO<ResponseCaDTO> requestCa(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Request certificate entity",
+                    content = @Content(
+                            examples = @ExampleObject(value =
+                                    """
+                                    {
+                                        "caUuid": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
+                                        "allowSubCa": true,
+                                        "country": "China",
+                                        "province": "Guangdong",
+                                        "city": "Canton",
+                                        "organization": "CertVault Develop Org",
+                                        "organizationalUnit": "CertVault Dev",
+                                        "commonName": "CertVault Intermediate CA",
+                                        "expiry": 180,
+                                        "comment": "Cert Vault Default Intermediate Certificate Authority"
+                                    }
+                                    """
+                            )
+                    )
+            )
+            @RequestBody RequestCertDTO requestCertDTO,
+            HttpServletRequest request) throws Exception {
         ResponseCaDTO result = caService.requestCa(requestCertDTO,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername());
         if ( result != null ) {
@@ -380,11 +406,38 @@ public class AdminController {
      */
     @Operation(
             summary = "Renew CA Certificate",
-            description = "Renew the specified CA certificate"
+            description = "Renew the specified CA certificate",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Renew CA certificate successfully",
+                            content = @Content(
+                                    examples = {@ExampleObject(value =
+                                            """
+                                            {
+                                                "code": 200,
+                                                "msg": "Success",
+                                                "data": {
+                                                    "uuid": "bf35ecb1-9b67-4083-9476-e264ba153188",
+                                                    "privkey": null,
+                                                    "cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUV2QUl...",
+                                                    "parentCa": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
+                                                    "allowSubCa": true,
+                                                    "notBefore": "2025-03-23T12:49:45.733",
+                                                    "notAfter": "2025-09-19T12:49:45.733",
+                                                    "comment": "Cert Vault Default Intermediate Certificate Authority"
+                                                },
+                                                "timestamp": "2025-03-19T01:38:31+08:00"
+                                            }
+                                            """
+                                    )}
+                            )
+                    )
+            }
     )
-    @SuccessAndFailedApiResponse
     @NotYourResourceApiResponse
     @DoesNotExistApiResponse
+    @FailedApiResponse
     @PutMapping(value = "/cert/ca/{uuid}")
     public ResultVO<ResponseCaDTO> renewCa(@Parameter(name = "uuid", description = "CA UUID")
                                                @PathVariable("uuid") String uuid,
@@ -440,7 +493,7 @@ public class AdminController {
     @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
     @PostMapping(value = "/cert/ca/bind")
-    public ResultVO<Void> bindCaToUser(@Parameter(name = "CaBindingDTO", description = "CA binding entity")
+    public ResultVO<Void> bindCaToUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "CA-User binding entity")
                                            @RequestBody CaBindingDTO caBindingDTO) {
         Boolean result = caBindingService.newBinding(caBindingDTO);
         if ( result ) {
@@ -464,7 +517,7 @@ public class AdminController {
     @ParamNotNullApiResponse
     @DoesNotExistApiResponse
     @PostMapping(value = "/cert/ca/binds")
-    public ResultVO<Void> bindCasToUsers(@Parameter(name = "CaBindingDTOs", description = "CA binding entities list")
+    public ResultVO<Void> bindCasToUsers(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "List of CA-User binding entities")
                                              @RequestBody List<CaBindingDTO> caBindingDTOs) throws Exception {
         Boolean result = caBindingService.newBindings(caBindingDTOs);
         if ( result ) {
@@ -486,7 +539,7 @@ public class AdminController {
     @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
     @DeleteMapping(value = "/cert/ca/bind")
-    public ResultVO<Void> unbindCaFromUser(@Parameter(name = "CaBindingDTO", description = "CA binding entity")
+    public ResultVO<Void> unbindCaFromUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "CA-User binding entity")
                                                @RequestBody CaBindingDTO caBindingDTO) {
         Boolean result = caBindingService.deleteBinding(caBindingDTO);
         if ( result ) {
@@ -510,7 +563,7 @@ public class AdminController {
     @ParamNotNullApiResponse
     @DoesNotExistApiResponse
     @DeleteMapping(value = "/cert/ca/binds")
-    public ResultVO<Void> unbindCasFromUsers(@Parameter(name = "CaBindingDTOs", description = "CA binding entities list")
+    public ResultVO<Void> unbindCasFromUsers(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "List of CA-User binding entities")
                                                  @RequestBody List<CaBindingDTO> caBindingDTOs) throws Exception {
         Boolean result = caBindingService.deleteBindings(caBindingDTOs);
         if ( result ) {

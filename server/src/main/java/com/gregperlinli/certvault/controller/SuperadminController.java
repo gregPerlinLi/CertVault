@@ -61,7 +61,7 @@ public class SuperadminController {
     @ParamNotNullApiResponse
     @AlreadyExistApiResponse
     @PostMapping(value = "/user")
-    public ResultVO<UserProfileDTO> createUser(@Parameter(name = "CreateUserDTO", description = "Create user entity")
+    public ResultVO<UserProfileDTO> createUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Create user entity")
                                                    @RequestBody CreateUserDTO createUserDTO) throws Exception {
         UserProfileDTO userProfileDTO = userService.createUser(createUserDTO);
         if ( userProfileDTO != null ) {
@@ -87,7 +87,7 @@ public class SuperadminController {
     @ParamNotNullApiResponse
     @AlreadyExistApiResponse
     @PostMapping(value = "/users")
-    public ResultVO<Void> createUsers(@Parameter(name = "CreateUserDTOs", description = "Create user entity list")
+    public ResultVO<Void> createUsers(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "List of create user entities")
                                           @RequestBody List<CreateUserDTO> createUserDTOs) throws Exception {
         Boolean result = userService.createUsers(createUserDTOs);
         if ( result ) {
@@ -155,7 +155,7 @@ public class SuperadminController {
     @DoesNotExistApiResponse
     @ParamNotNullApiResponse
     @PatchMapping(value = "/user/role")
-    public ResultVO<Void> updateUserRole(@Parameter(name = "UpdateRoleDTO", description = "Update user role entity")
+    public ResultVO<Void> updateUserRole(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Update user role entity")
                                              @RequestBody UpdateRoleDTO updateRoleDTO,
                                          HttpServletRequest request) throws Exception {
         Boolean result = userService.updateUserRole(updateRoleDTO,
@@ -200,7 +200,7 @@ public class SuperadminController {
     @DoesNotExistApiResponse
     @ParamNotNullApiResponse
     @PatchMapping(value = "/users/role")
-    public ResultVO<Void> updateUsersRole(@Parameter(name = "UpdateRoleDTOs", description = "Update user roles entity list")
+    public ResultVO<Void> updateUsersRole(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "List of update user role entities")
                                               @RequestBody List<UpdateRoleDTO> updateRoleDTOs,
                                           HttpServletRequest request) throws Exception {
         Boolean result = userService.updateUsersRole(updateRoleDTOs,

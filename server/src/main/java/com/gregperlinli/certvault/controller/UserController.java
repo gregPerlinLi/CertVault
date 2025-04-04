@@ -84,7 +84,8 @@ public class UserController {
                             responseCode = "422",
                             description = "Success",
                             content = @Content(
-                                    examples = {@ExampleObject(value = """
+                                    examples = {@ExampleObject(value =
+                                            """
                                             {
                                                 "code": 422,
                                                 "msg": "The old password is incorrect.",
@@ -99,7 +100,7 @@ public class UserController {
     @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
     @PatchMapping(value = "/profile")
-    public ResultVO<Void> updateProfile(@Parameter(name = "UpdateUserProfileDTO", description = "Update user profile entity")
+    public ResultVO<Void> updateProfile(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Update user profile entity")
                                             @RequestBody UpdateUserProfileDTO updateUserProfileDTO,
                                         HttpServletRequest request) {
         if (
@@ -199,14 +200,16 @@ public class UserController {
                             responseCode = "404",
                             description = "Admin with no CA",
                             content = @Content(
-                                    examples = {@ExampleObject(value = """
+                                    examples = {@ExampleObject(value =
+                                            """
                                             {
                                                 "code": 404,
                                                 "msg": "The admin user does not have any CA.",
                                                 "data": null,
                                                 "timestamp": "2025-04-04T09:45:34.622698063+08:00"
                                             }
-                                            """)}
+                                            """
+                                    )}
                             )
                     )
             }
@@ -346,13 +349,34 @@ public class UserController {
      */
     @Operation(
             summary = "Request Certificate",
-            description = "Request a new SSL certificate"
+            description = "Request a new SSL certificate",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Success",
+                            content = @Content(
+                                    examples = {@ExampleObject(value =
+                                            """
+                                            {
+                                                "uuid": "2f2d63a8-b29c-4404-ae10-81f5ff023a69",
+                                                "privkey": null,
+                                                "cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk...",
+                                                "caUuid": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
+                                                "notBefore": "2025-03-22T23:05:54.773",
+                                                "notAfter": "2035-03-20T23:05:54.773",
+                                                "comment": "CertVault Website SSL Certificate"
+                                            }
+                                            """
+                                    )}
+                            )
+                    )
+            }
     )
-    @SuccessAndFailedApiResponse
     @NotYourResourceApiResponse
     @DoesNotExistApiResponse
+    @FailedApiResponse
     @PostMapping(value = "/cert/ssl")
-    public ResultVO<ResponseCertDTO> requestCert(@Parameter(name = "RequestCertDTO", description = "Request certificate entity")
+    public ResultVO<ResponseCertDTO> requestCert(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Request certificate entity")
                                                      @RequestBody RequestCertDTO requestCertDTO,
                                                  HttpServletRequest request) throws Exception {
         ResponseCertDTO result = certificateService.requestCert(requestCertDTO,
