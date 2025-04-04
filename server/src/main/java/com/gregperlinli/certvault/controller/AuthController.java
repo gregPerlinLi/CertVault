@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.controller;
 
+import com.gregperlinli.certvault.annotation.NoValidSessionApiResponse;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.LoginDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
@@ -8,6 +9,8 @@ import com.gregperlinli.certvault.service.interfaces.IUserService;
 import com.gregperlinli.certvault.utils.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -46,8 +49,21 @@ public class AuthController {
             summary = "Login",
             description = "User login",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Login Success"),
-                    @ApiResponse(responseCode = "444", description = "Login Failed")
+                    @ApiResponse(
+                            responseCode = "444",
+                            description = "Login Failed",
+                            content = @Content(
+                                    examples = {@ExampleObject(value = """
+                                            {
+                                                "code": 444,
+                                                "msg": "Login failed, username or password error",
+                                                "data": null,
+                                                "timestamp": "2025-04-04T09:45:34.622698063+08:00"
+                                            }
+                                            """)}
+                            )
+                    ),
+                    @ApiResponse(responseCode = "200", description = "Login Success")
             }
     )
     @PostMapping(value =  "/login")
@@ -92,10 +108,25 @@ public class AuthController {
             summary = "Logout",
             description = "User logout",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Logout Success"),
-                    @ApiResponse(responseCode = "444", description = "Logout Failed")
+                    @ApiResponse(
+                            responseCode = "444",
+                            description = "Logout Failed",
+                            content = @Content(
+                                    examples = {@ExampleObject(value = """
+                                            {
+                                                "code": 444,
+                                                "msg": "Logout failed, please login first!",
+                                                "data": null,
+                                                "timestamp": "2025-04-04T09:45:34.622698063+08:00"
+                                            }
+                                            """
+                                    )}
+                            )
+                    ),
+                    @ApiResponse(responseCode = "200", description = "Logout Success")
             }
     )
+    @NoValidSessionApiResponse
     @DeleteMapping(value = "/logout")
     public ResultVO<Void> logout(HttpServletRequest request) {
         if ( request.getSession().getAttribute("account") != null ) {

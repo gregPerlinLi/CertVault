@@ -1,6 +1,7 @@
 package com.gregperlinli.certvault.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.gregperlinli.certvault.annotation.*;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.*;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
@@ -10,9 +11,10 @@ import com.gregperlinli.certvault.service.interfaces.ICertificateService;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +31,8 @@ import java.util.List;
  * @date 2025/3/17 17:46
  */
 @Tag(name = "Admin", description = "Admin API")
+@InsufficientPrivilegesApiResponse
+@NoValidSessionApiResponse
 @RequestMapping("/api/v1/admin")
 @RestController
 public class AdminController {
@@ -55,12 +59,10 @@ public class AdminController {
      */
     @Operation(
             summary = "Get users",
-            description = "Retrieve all users (paged)",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success"),
-                    @ApiResponse(responseCode = "204", description = "No Data")
-            }
+            description = "Retrieve all users (paged)"
     )
+    @NoDataListApiResponse
+    @SuccessApiResponse
     @GetMapping(value = "/users")
     public ResultVO<PageDTO<UserProfileDTO>> getUsers(@Parameter(name = "keyword", description = "Search keywords (Can be username, display name, and email)")
                                                           @RequestParam(value = "keyword", required = false) String keyword,
@@ -85,12 +87,10 @@ public class AdminController {
      */
     @Operation(
             summary = "Get all CA information",
-            description = "Retrieve all CA information under this username (paged)",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success"),
-                    @ApiResponse(responseCode = "204", description = "No Data")
-            }
+            description = "Retrieve all CA information under this username (paged)"
     )
+    @NoDataListApiResponse
+    @SuccessApiResponse
     @GetMapping(value = "/cert/ca")
     public ResultVO<PageDTO<CaInfoDTO>> getCas(@Parameter(name = "keyword", description = "Search keywords (Can be UUID, comments)")
                                                    @RequestParam(value = "keyword", required = false) String keyword,
@@ -119,12 +119,10 @@ public class AdminController {
      */
     @Operation(
             summary = "Get all user information bound to a ca",
-            description = "Retrieve all user information bound to a ca (paged)",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success"),
-                    @ApiResponse(responseCode = "204", description = "No Data")
-            }
+            description = "Retrieve all user information bound to a ca (paged)"
     )
+    @NoDataListApiResponse
+    @SuccessApiResponse
     @GetMapping(value = "/cert/ca/{uuid}/bind")
     public ResultVO<PageDTO<UserProfileDTO>> getCaBindUsers(@Parameter(name = "uuid", description = "CA UUID")
                                                                 @PathVariable("uuid") String uuid,
@@ -157,15 +155,10 @@ public class AdminController {
      */
     @Operation(
             summary = "Get CA Certificate",
-            description = "Obtain the CA certificate allocated to the user",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success"),
-                    @ApiResponse(responseCode = "204", description = "No Data")
-            }
+            description = "Obtain the CA certificate allocated to the user"
     )
-    @ApiResponses(value = {
-
-    })
+    @DoesNotExistApiResponse
+    @SuccessApiResponse
     @GetMapping(value = "/cert/ca/{uuid}/cer")
     @Deprecated(since = "0.4.0")
     public ResultVO<String> getCaCert(@Parameter(name = "uuid", description = "CA UUID")
@@ -199,12 +192,12 @@ public class AdminController {
      */
     @Operation(
             summary = "Get CA Private Key",
-            description = "Obtain the CA private key allocated to the user (Need user password verify)",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success"),
-                    @ApiResponse(responseCode = "204", description = "No Data")
-            }
+            description = "Obtain the CA private key allocated to the user (Need user password verify)"
     )
+    @PasswordValidationFailedApiResponse
+    @NotYourResourceApiResponse
+    @DoesNotExistApiResponse
+    @SuccessApiResponse
     @PostMapping(value = "/cert/ca/{uuid}/privkey")
     public ResultVO<String> getCaPrivkey(@Parameter(name = "uuid", description = "CA UUID")
                                              @PathVariable("uuid") String uuid,
@@ -231,12 +224,11 @@ public class AdminController {
      */
     @Operation(
             summary = "Update CA Comment",
-            description = "Update the comment of the CA allocated to the user",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Update Success"),
-                    @ApiResponse(responseCode = "444", description = "Update Failed")
-            }
+            description = "Update the comment of the CA allocated to the user"
     )
+    @SuccessAndFailedApiResponse
+    @NotYourResourceApiResponse
+    @DoesNotExistApiResponse
     @PatchMapping(value = "/cert/ca/{uuid}/comment")
     public ResultVO<Void> updateCaComment(@Parameter(name = "uuid", description = "CA UUID")
                                               @PathVariable("uuid") String uuid,
@@ -263,11 +255,11 @@ public class AdminController {
      */
     @Operation(
             summary = "Modify CA Availability",
-            description = "Modify the availability of the CA allocated to the user",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Toggle Success")
-            }
+            description = "Modify the availability of the CA allocated to the user"
     )
+    @NotYourResourceApiResponse
+    @DoesNotExistApiResponse
+    @SuccessApiResponse
     @PatchMapping(value = "/cert/ca/{uuid}/available")
     public ResultVO<Boolean> modifyCaAvailable(@PathVariable("uuid") String uuid,
                                                HttpServletRequest request) {
@@ -291,10 +283,39 @@ public class AdminController {
             summary = "Import CA Certificate",
             description = "Import a CA certificate and private key allocated to the user",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Import Success"),
-                    @ApiResponse(responseCode = "444", description = "Import Failed")
+                    @ApiResponse(
+                            responseCode = "444",
+                            description = "Certificate Invalid",
+                            content = @Content(
+                                    examples = {@ExampleObject(value = """
+                                            {
+                                                "code": 444,
+                                                "msg": "The certificate is invalid.",
+                                                "data": null,
+                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                            }
+                                            """
+                                    )}
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "444",
+                            description = "Certificate is not CA",
+                            content = @Content(
+                                    examples = {@ExampleObject(value = """
+                                            {
+                                                "code": 444,
+                                                "msg": "The certificate is not a CA.",
+                                                "data": null,
+                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                            }
+                                            """
+                                    )}
+                            )
+                    )
             }
     )
+    @SuccessAndFailedApiResponse
     @PostMapping(value = "/cert/ca/import")
     public ResultVO<ResponseCaDTO> importCa(@RequestBody ImportCertDTO importCertDTO,
                                             HttpServletRequest request) throws Exception {
@@ -318,10 +339,24 @@ public class AdminController {
             summary = "Request CA Certificate",
             description = "Request a new CA certificate",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Request Success"),
-                    @ApiResponse(responseCode = "444", description = "Request Failed")
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Parent CA Does Not Allow Sub CA",
+                            content = @Content(
+                                    examples = {@ExampleObject(value = """
+                                            {
+                                                "code": 403,
+                                                "msg": "The CA does not allow sub CA.",
+                                                "data": null,
+                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                            }
+                                            """)}
+                            )
+                    )
             }
     )
+    @SuccessAndFailedApiResponse
+    @DoesNotExistApiResponse
     @PostMapping(value = "/cert/ca")
     public ResultVO<ResponseCaDTO> requestCa(@Parameter(name = "RequestCertDTO", description = "Request certificate entity")
                                                  @RequestBody RequestCertDTO requestCertDTO,
@@ -345,12 +380,11 @@ public class AdminController {
      */
     @Operation(
             summary = "Renew CA Certificate",
-            description = "Renew the specified CA certificate",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Renew Success"),
-                    @ApiResponse(responseCode = "444", description = "Renew Failed")
-            }
+            description = "Renew the specified CA certificate"
     )
+    @SuccessAndFailedApiResponse
+    @NotYourResourceApiResponse
+    @DoesNotExistApiResponse
     @PutMapping(value = "/cert/ca/{uuid}")
     public ResultVO<ResponseCaDTO> renewCa(@Parameter(name = "uuid", description = "CA UUID")
                                                @PathVariable("uuid") String uuid,
@@ -376,12 +410,11 @@ public class AdminController {
      */
     @Operation(
             summary = "Delete CA Certificate",
-            description = "Delete the specified CA certificate",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Delete Success"),
-                    @ApiResponse(responseCode = "444", description = "Delete Failed")
-            }
+            description = "Delete the specified CA certificate"
     )
+    @SuccessAndFailedApiResponse
+    @NotYourResourceApiResponse
+    @DoesNotExistApiResponse
     @DeleteMapping(value = "/cert/ca/{uuid}")
     public ResultVO<Void> deleteCa(@Parameter(name = "uuid", description = "CA UUID")
                                        @PathVariable("uuid") String uuid,
@@ -402,12 +435,10 @@ public class AdminController {
      */
     @Operation(
             summary = "Bind CA Certificate to User",
-            description = "Bind a specified CA for user to sign SSL certificates",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Bind Success"),
-                    @ApiResponse(responseCode = "444", description = "Bind Failed")
-            }
+            description = "Bind a specified CA for user to sign SSL certificates"
     )
+    @SuccessAndFailedApiResponse
+    @DoesNotExistApiResponse
     @PostMapping(value = "/cert/ca/bind")
     public ResultVO<Void> bindCaToUser(@Parameter(name = "CaBindingDTO", description = "CA binding entity")
                                            @RequestBody CaBindingDTO caBindingDTO) {
@@ -427,12 +458,11 @@ public class AdminController {
      */
     @Operation(
             summary = "Bind CA Certificate to Users",
-            description = "Batch bind users to specified CA certificate",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Bind Success"),
-                    @ApiResponse(responseCode = "444", description = "Bind Failed")
-            }
+            description = "Batch bind users to specified CA certificate"
     )
+    @SuccessAndFailedApiResponse
+    @ParamNotNullApiResponse
+    @DoesNotExistApiResponse
     @PostMapping(value = "/cert/ca/binds")
     public ResultVO<Void> bindCasToUsers(@Parameter(name = "CaBindingDTOs", description = "CA binding entities list")
                                              @RequestBody List<CaBindingDTO> caBindingDTOs) throws Exception {
@@ -451,12 +481,10 @@ public class AdminController {
      */
     @Operation(
             summary = "Unbind CA Certificate from User",
-            description = "Unbind a specified CA certificate from a user",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Unbind Success"),
-                    @ApiResponse(responseCode = "444", description = "Unbind Failed")
-            }
+            description = "Unbind a specified CA certificate from a user"
     )
+    @SuccessAndFailedApiResponse
+    @DoesNotExistApiResponse
     @DeleteMapping(value = "/cert/ca/bind")
     public ResultVO<Void> unbindCaFromUser(@Parameter(name = "CaBindingDTO", description = "CA binding entity")
                                                @RequestBody CaBindingDTO caBindingDTO) {
@@ -476,12 +504,11 @@ public class AdminController {
      */
     @Operation(
             summary = "Unbind CA Certificate from Users",
-            description = "Batch unbind users from specified CA certificate",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Unbind Success"),
-                    @ApiResponse(responseCode = "444", description = "Unbind Failed")
-            }
+            description = "Batch unbind users from specified CA certificate"
     )
+    @SuccessAndFailedApiResponse
+    @ParamNotNullApiResponse
+    @DoesNotExistApiResponse
     @DeleteMapping(value = "/cert/ca/binds")
     public ResultVO<Void> unbindCasFromUsers(@Parameter(name = "CaBindingDTOs", description = "CA binding entities list")
                                                  @RequestBody List<CaBindingDTO> caBindingDTOs) throws Exception {
@@ -501,11 +528,9 @@ public class AdminController {
      */
     @Operation(
             summary = "Count Requested CA Certificates",
-            description = "Count the number of user requested CA certificates",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success")
-            }
+            description = "Count the number of user requested CA certificates"
     )
+    @SuccessApiResponse
     @GetMapping(value = "/cert/ca/count")
     public ResultVO<Long> countRequestedCa(@Parameter(name = "condition", description = "Condition of the CA certificate")
                                                @RequestParam(value = "condition", defaultValue = "none", required = false) String condition,
@@ -535,11 +560,9 @@ public class AdminController {
      */
     @Operation(
             summary = "Count Signed CA Certificates",
-            description = "Count the number of SSL/CA certificates signed by a CA certificate",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success")
-            }
+            description = "Count the number of SSL/CA certificates signed by a CA certificate"
     )
+    @SuccessApiResponse
     @GetMapping(value = "/cert/ca/{uuid}/count")
     public ResultVO<Long> countCaSigned(@Parameter(name = "uuid", description = "CA UUID")
                                             @PathVariable("uuid") String uuid,

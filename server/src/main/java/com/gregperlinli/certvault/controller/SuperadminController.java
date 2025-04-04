@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.controller;
 
+import com.gregperlinli.certvault.annotation.*;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.CreateUserDTO;
 import com.gregperlinli.certvault.domain.dto.UpdateRoleDTO;
@@ -11,6 +12,8 @@ import com.gregperlinli.certvault.service.interfaces.ICertificateService;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -28,6 +31,8 @@ import java.util.List;
  * @date 2025/3/19 19:39
  */
 @Tag(name = "Superadmin", description = "Superadmin API")
+@InsufficientPrivilegesApiResponse
+@NoValidSessionApiResponse
 @RequestMapping("/api/v1/superadmin")
 @RestController
 public class SuperadminController {
@@ -50,12 +55,11 @@ public class SuperadminController {
      */
     @Operation(
             summary = "Create user",
-            description = "Create a new user",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Create Success"),
-                    @ApiResponse(responseCode = "444", description = "Create Failed")
-            }
+            description = "Create a new user"
     )
+    @SuccessAndFailedApiResponse
+    @ParamNotNullApiResponse
+    @AlreadyExistApiResponse
     @PostMapping(value = "/user")
     public ResultVO<UserProfileDTO> createUser(@Parameter(name = "CreateUserDTO", description = "Create user entity")
                                                    @RequestBody CreateUserDTO createUserDTO) throws Exception {
@@ -77,12 +81,11 @@ public class SuperadminController {
      */
     @Operation(
             summary = "Create users",
-            description = "Create multiple new users (i.e., import users)",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Request Success"),
-                    @ApiResponse(responseCode = "444", description = "Request Failed")
-            }
+            description = "Create multiple new users (i.e., import users)"
     )
+    @SuccessAndFailedApiResponse
+    @ParamNotNullApiResponse
+    @AlreadyExistApiResponse
     @PostMapping(value = "/users")
     public ResultVO<Void> createUsers(@Parameter(name = "CreateUserDTOs", description = "Create user entity list")
                                           @RequestBody List<CreateUserDTO> createUserDTOs) throws Exception {
@@ -102,12 +105,10 @@ public class SuperadminController {
      */
     @Operation(
             summary = "Update user information",
-            description = "Update user information",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Update Success"),
-                    @ApiResponse(responseCode = "444", description = "Update Failed")
-            }
+            description = "Update user information"
     )
+    @SuccessAndFailedApiResponse
+    @DoesNotExistApiResponse
     @PatchMapping(value = "/user/{username}")
     public ResultVO<Void> updateUserInfo(@Parameter(name = "username", description = "Username of the user to be updated")
                                              @PathVariable("username") String username,
@@ -132,10 +133,25 @@ public class SuperadminController {
             summary = "Update user role",
             description = "Update user role",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Update Success"),
-                    @ApiResponse(responseCode = "444", description = "Update Failed")
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Can not modify own role",
+                            content = @Content(
+                                    examples = {@ExampleObject(value = """
+                                            {
+                                                "code": 403,
+                                                "msg": "You cannot modify your own role.",
+                                                "data": null,
+                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                            }
+                                            """)}
+                            )
+                    )
             }
     )
+    @SuccessAndFailedApiResponse
+    @DoesNotExistApiResponse
+    @ParamNotNullApiResponse
     @PatchMapping(value = "/user/role")
     public ResultVO<Void> updateUserRole(@Parameter(name = "UpdateRoleDTO", description = "Update user role entity")
                                              @RequestBody UpdateRoleDTO updateRoleDTO,
@@ -160,10 +176,25 @@ public class SuperadminController {
             summary = "Update users role",
             description = "Batch update user roles",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Update Success"),
-                    @ApiResponse(responseCode = "444", description = "Update Failed")
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Can not modify own role",
+                            content = @Content(
+                                    examples = {@ExampleObject(value = """
+                                            {
+                                                "code": 403,
+                                                "msg": "You cannot modify your own role.",
+                                                "data": null,
+                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                            }
+                                            """)}
+                            )
+                    )
             }
     )
+    @SuccessAndFailedApiResponse
+    @DoesNotExistApiResponse
+    @ParamNotNullApiResponse
     @PatchMapping(value = "/users/role")
     public ResultVO<Void> updateUsersRole(@Parameter(name = "UpdateRoleDTOs", description = "Update user roles entity list")
                                               @RequestBody List<UpdateRoleDTO> updateRoleDTOs,
@@ -187,10 +218,25 @@ public class SuperadminController {
             summary = "Delete user",
             description = "Delete user",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Delete Success"),
-                    @ApiResponse(responseCode = "444", description = "Delete Failed")
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Can not delete own account",
+                            content = @Content(
+                                    examples = {@ExampleObject(value = """
+                                            {
+                                                "code": 403,
+                                                "msg": "You cannot delete your own account.",
+                                                "data": null,
+                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                            }
+                                            """)}
+                            )
+                    )
             }
     )
+    @SuccessAndFailedApiResponse
+    @DoesNotExistApiResponse
+    @ParamNotNullApiResponse
     @DeleteMapping(value = "/user/{username}")
     public ResultVO<Void> deleteUser(@Parameter(name = "username", description = "Username of the user to be deleted")
                                          @PathVariable("username") String username,
@@ -214,10 +260,25 @@ public class SuperadminController {
             summary = "Delete users",
             description = "Batch delete users",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Delete Success"),
-                    @ApiResponse(responseCode = "444", description = "Delete Failed")
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Can not delete own account",
+                            content = @Content(
+                                    examples = {@ExampleObject(value = """
+                                            {
+                                                "code": 403,
+                                                "msg": "You cannot delete your own account.",
+                                                "data": null,
+                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                            }
+                                            """)}
+                            )
+                    )
             }
     )
+    @SuccessAndFailedApiResponse
+    @DoesNotExistApiResponse
+    @ParamNotNullApiResponse
     @DeleteMapping(value = "/users")
     public ResultVO<Void> deleteUsers(@Parameter(name = "usernames", description = "Username list of the users to be deleted")
                                           @RequestBody List<String> usernames,
@@ -238,11 +299,9 @@ public class SuperadminController {
      */
     @Operation(
             summary = "Count all CA",
-            description = "Calculate the total number of CA",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Count Success")
-            }
+            description = "Calculate the total number of CA"
     )
+    @SuccessApiResponse
     @GetMapping(value = "/cert/ca/count")
     public ResultVO<Long> countAllCa(@Parameter(name = "condition", description = "Condition of the CA")
                                          @RequestParam(value = "condition", defaultValue = "none", required = false) String condition) {
@@ -268,11 +327,9 @@ public class SuperadminController {
      */
     @Operation(
             summary = "Count all ssl certificates",
-            description = "Calculate the total number of ssl certificates",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Count Success")
-            }
+            description = "Calculate the total number of ssl certificates"
     )
+    @SuccessApiResponse
     @GetMapping(value = "/cert/ssl/count")
     public ResultVO<Long> countAllCertificate() {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
@@ -288,11 +345,9 @@ public class SuperadminController {
      */
     @Operation(
             summary = "Count all users",
-            description = "Calculate the total number of users",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Count Success")
-            }
+            description = "Calculate the total number of users"
     )
+    @SuccessApiResponse
     @GetMapping(value = "/user/count")
     public ResultVO<Long> countAllUser(@Parameter(name = "role", description = "Role of the user")
                                            @RequestParam(value = "role", defaultValue = "0", required = false) Integer role) {

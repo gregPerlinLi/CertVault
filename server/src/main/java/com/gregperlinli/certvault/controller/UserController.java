@@ -1,6 +1,7 @@
 package com.gregperlinli.certvault.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.gregperlinli.certvault.annotation.*;
 import com.gregperlinli.certvault.certificate.CertAnalyzer;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.*;
@@ -11,6 +12,8 @@ import com.gregperlinli.certvault.service.interfaces.ICertificateService;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +31,8 @@ import org.springframework.web.bind.annotation.*;
  * @date 2025/3/10 20:37
  */
 @Tag(name = "User", description = "Common User API")
+@InsufficientPrivilegesApiResponse
+@NoValidSessionApiResponse
 @RequestMapping("/api/v1/user")
 @RestController
 public class UserController {
@@ -52,11 +57,11 @@ public class UserController {
      */
     @Operation(
             summary = "Get User Profile",
-            description = "Retrieve user's own personal information",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success")
-            }
+            description = "Retrieve user's own personal information"
     )
+    @ParamNotNullApiResponse
+    @DoesNotExistApiResponse
+    @SuccessApiResponse
     @GetMapping(value = "/profile")
     public ResultVO<UserProfileDTO> getProfile(HttpServletRequest request) {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
@@ -75,10 +80,24 @@ public class UserController {
             summary = "Update User Profile",
             description = "Update user's own personal information\nWrite the specific part that needs to be modified, do not include any part that does not need to be changed in the body (including keys and values).",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Update Success"),
-                    @ApiResponse(responseCode = "444", description = "Update Failed")
+                    @ApiResponse(
+                            responseCode = "422",
+                            description = "Success",
+                            content = @Content(
+                                    examples = {@ExampleObject(value = """
+                                            {
+                                                "code": 422,
+                                                "msg": "The old password is incorrect.",
+                                                "data": null,
+                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                            }
+                                            """)}
+                            )
+                    )
             }
     )
+    @SuccessAndFailedApiResponse
+    @DoesNotExistApiResponse
     @PatchMapping(value = "/profile")
     public ResultVO<Void> updateProfile(@Parameter(name = "UpdateUserProfileDTO", description = "Update user profile entity")
                                             @RequestBody UpdateUserProfileDTO updateUserProfileDTO,
@@ -103,12 +122,11 @@ public class UserController {
      */
     @Operation(
             summary = "Get User CA List",
-            description = "Retrieve all CA information bound to your own account (paged retrieval)",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success"),
-                    @ApiResponse(responseCode = "204", description = "Not Find")
-            }
+            description = "Retrieve all CA information bound to your own account (paged retrieval)"
     )
+    @DoesNotExistApiResponse
+    @NoDataListApiResponse
+    @SuccessApiResponse
     @GetMapping(value = "/cert/ca")
     public ResultVO<PageDTO<CaInfoDTO>> getCas(@Parameter(name = "keyword", description = "Search keywords (Can be UUID, comments)")
                                                    @RequestParam(value = "keyword", required = false) String keyword,
@@ -137,12 +155,12 @@ public class UserController {
      */
     @Operation(
             summary = "Get CA Certificate",
-            description = "Obtain the CA certificate allocated to the user",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success"),
-                    @ApiResponse(responseCode = "204", description = "No Data")
-            }
+            description = "Obtain the CA certificate allocated to the user"
     )
+    @NotYourResourceApiResponse
+    @DoesNotExistApiResponse
+    @SuccessApiResponse
+    @NoDataApiResponse
     @GetMapping(value = "/cert/ca/{uuid}/cer")
     public ResultVO<String> getCaCert(@Parameter(name = "uuid", description = "CA UUID")
                                           @PathVariable("uuid") String uuid,
@@ -177,10 +195,25 @@ public class UserController {
             summary = "Get User Certificate List",
             description = "Retrieve all certificate information for the user (paged retrieval)",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Success"),
-                    @ApiResponse(responseCode = "204", description = "Not Find")
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Admin with no CA",
+                            content = @Content(
+                                    examples = {@ExampleObject(value = """
+                                            {
+                                                "code": 404,
+                                                "msg": "The admin user does not have any CA.",
+                                                "data": null,
+                                                "timestamp": "2025-04-04T09:45:34.622698063+08:00"
+                                            }
+                                            """)}
+                            )
+                    )
             }
     )
+    @DoesNotExistApiResponse
+    @NoDataListApiResponse
+    @SuccessApiResponse
     @GetMapping(value = "/cert/ssl")
     public ResultVO<PageDTO<CertInfoDTO>> getCerts(@Parameter(name = "keyword", description = "Search keywords (Can be UUID, comments)")
                                                        @RequestParam(value = "keyword", required = false) String keyword,
@@ -209,12 +242,12 @@ public class UserController {
      */
     @Operation(
             summary = "Get SSL Certificate",
-            description = "Retrieve the SSL certificate allocated to the user",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success"),
-                    @ApiResponse(responseCode = "204", description = "No Data")
-            }
+            description = "Retrieve the SSL certificate allocated to the user"
     )
+    @NotYourResourceApiResponse
+    @DoesNotExistApiResponse
+    @SuccessApiResponse
+    @NoDataApiResponse
     @GetMapping(value = "/cert/ssl/{uuid}/cer")
     public ResultVO<String> getCertificateCert(@Parameter(name = "uuid", description = "SSL certificate UUID")
                                                    @PathVariable("uuid") String uuid,
@@ -247,13 +280,13 @@ public class UserController {
      */
     @Operation(
             summary = "Get SSL Certificate Private Key",
-            description = "Retrieve the private key of the SSL certificate (Need user password verify)",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success"),
-                    @ApiResponse(responseCode = "204", description = "No Data"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized")
-            }
+            description = "Retrieve the private key of the SSL certificate (Need user password verify)"
     )
+    @PasswordValidationFailedApiResponse
+    @NotYourResourceApiResponse
+    @DoesNotExistApiResponse
+    @SuccessApiResponse
+    @NoDataApiResponse
     @PostMapping(value = "/cert/ssl/{uuid}/privkey")
     public ResultVO<String> getCertificatePrivkey(@Parameter(name = "uuid", description = "SSL certificate UUID")
                                                       @PathVariable("uuid") String uuid,
@@ -281,12 +314,11 @@ public class UserController {
      */
     @Operation(
             summary = "Update Certificate Comment",
-            description = "Update the comment of the certificate",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Update Success"),
-                    @ApiResponse(responseCode = "444", description = "Update Failed")
-            }
+            description = "Update the comment of the certificate"
     )
+    @SuccessAndFailedApiResponse
+    @NotYourResourceApiResponse
+    @DoesNotExistApiResponse
     @PatchMapping(value = "/cert/ssl/{uuid}/comment")
     public ResultVO<Void> updateCertComment(@Parameter(name = "uuid", description = "SSL certificate UUID")
                                                 @PathVariable("uuid") String uuid,
@@ -314,12 +346,11 @@ public class UserController {
      */
     @Operation(
             summary = "Request Certificate",
-            description = "Request a new SSL certificate",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Request Success"),
-                    @ApiResponse(responseCode = "444", description = "Request Failed")
-            }
+            description = "Request a new SSL certificate"
     )
+    @SuccessAndFailedApiResponse
+    @NotYourResourceApiResponse
+    @DoesNotExistApiResponse
     @PostMapping(value = "/cert/ssl")
     public ResultVO<ResponseCertDTO> requestCert(@Parameter(name = "RequestCertDTO", description = "Request certificate entity")
                                                      @RequestBody RequestCertDTO requestCertDTO,
@@ -343,12 +374,11 @@ public class UserController {
      */
     @Operation(
             summary = "Renew Certificate",
-            description = "Renew the SSL certificate",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Renew Success"),
-                    @ApiResponse(responseCode = "444", description = "Renew Failed")
-            }
+            description = "Renew the SSL certificate"
     )
+    @SuccessAndFailedApiResponse
+    @NotYourResourceApiResponse
+    @DoesNotExistApiResponse
     @PutMapping(value = "/cert/ssl/{uuid}")
     public ResultVO<ResponseCertDTO> renewCert(@Parameter(name = "uuid", description = "SSL certificate UUID")
                                                    @PathVariable("uuid") String oldCertUuid,
@@ -381,6 +411,9 @@ public class UserController {
                     @ApiResponse(responseCode = "444", description = "Delete Failed")
             }
     )
+    @SuccessAndFailedApiResponse
+    @NotYourResourceApiResponse
+    @DoesNotExistApiResponse
     @DeleteMapping(value = "/cert/ssl/{uuid}")
     public ResultVO<Void> deleteCert(@Parameter(name = "uuid", description = "SSL certificate UUID")
                                          @PathVariable("uuid") String uuid,
@@ -402,12 +435,9 @@ public class UserController {
      */
     @Operation(
             summary = "Analyze Certificate",
-            description = "Certificate parser, used for parsing certificate information",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Get Success"),
-                    @ApiResponse(responseCode = "444", description = "Get Failed")
-            }
+            description = "Certificate parser, used for parsing certificate information"
     )
+    @SuccessApiResponse
     @PostMapping(value = "/cert/analyze")
     public ResultVO<CertificateDetailsDTO> getCertificateDetails(@Parameter(name = "certBase64", description = "Certificate with Base64 format", schema = @Schema(
                                                                         type = "application/json", example = "{\"cert\": \"xxxxxxxxxxxx\"}"
@@ -426,11 +456,9 @@ public class UserController {
      */
     @Operation(
             summary = "Count Bound CA",
-            description = "Count the number of CA bound to the current user",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success")
-            }
+            description = "Count the number of CA bound to the current user"
     )
+    @SuccessApiResponse
     @GetMapping(value = "/cert/ca/count")
     public ResultVO<Long> countBoundCa(HttpServletRequest request) {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
@@ -446,11 +474,9 @@ public class UserController {
      */
     @Operation(
             summary = "Count the number of user requested certificates",
-            description = "Count the number of user requested certificates",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Success")
-            }
+            description = "Count the number of user requested certificates"
     )
+    @SuccessApiResponse
     @GetMapping(value = "/cert/ssl/count")
     public ResultVO<Long> countRequestedCertificates(HttpServletRequest request) {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
