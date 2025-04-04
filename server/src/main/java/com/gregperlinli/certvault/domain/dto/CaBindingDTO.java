@@ -13,13 +13,7 @@ import lombok.*;
  */
 @Schema(
         name = "CA Binding DTO",
-        description = "CA-User binding data transfer object"/*,
-        example = """
-        {
-            "caUuid": "2f2d63a8-b29c-4404-ae10-81f5ff023a69",
-            "username": "john.doe"
-        }
-        """*/
+        description = "CA-User binding data transfer object"
 )
 @AllArgsConstructor
 @NoArgsConstructor
