@@ -137,14 +137,16 @@ public class SuperadminController {
                             responseCode = "403",
                             description = "Can not modify own role",
                             content = @Content(
-                                    examples = {@ExampleObject(value = """
+                                    examples = {@ExampleObject(value =
+                                            """
                                             {
                                                 "code": 403,
                                                 "msg": "You cannot modify your own role.",
                                                 "data": null,
                                                 "timestamp": "2025-04-04T16:16:02.5641+08:00"
                                             }
-                                            """)}
+                                            """
+                                    )}
                             )
                     )
             }
@@ -180,14 +182,16 @@ public class SuperadminController {
                             responseCode = "403",
                             description = "Can not modify own role",
                             content = @Content(
-                                    examples = {@ExampleObject(value = """
+                                    examples = {@ExampleObject(value =
+                                            """
                                             {
                                                 "code": 403,
                                                 "msg": "You cannot modify your own role.",
                                                 "data": null,
                                                 "timestamp": "2025-04-04T16:16:02.5641+08:00"
                                             }
-                                            """)}
+                                            """
+                                    )}
                             )
                     )
             }
@@ -222,14 +226,16 @@ public class SuperadminController {
                             responseCode = "403",
                             description = "Can not delete own account",
                             content = @Content(
-                                    examples = {@ExampleObject(value = """
+                                    examples = {@ExampleObject(value =
+                                            """
                                             {
                                                 "code": 403,
                                                 "msg": "You cannot delete your own account.",
                                                 "data": null,
                                                 "timestamp": "2025-04-04T16:16:02.5641+08:00"
                                             }
-                                            """)}
+                                            """
+                                    )}
                             )
                     )
             }
@@ -264,14 +270,16 @@ public class SuperadminController {
                             responseCode = "403",
                             description = "Can not delete own account",
                             content = @Content(
-                                    examples = {@ExampleObject(value = """
+                                    examples = {@ExampleObject(value =
+                                            """
                                             {
                                                 "code": 403,
                                                 "msg": "You cannot delete your own account.",
                                                 "data": null,
                                                 "timestamp": "2025-04-04T16:16:02.5641+08:00"
                                             }
-                                            """)}
+                                            """
+                                    )}
                             )
                     )
             }

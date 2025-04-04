@@ -53,7 +53,8 @@ public class AuthController {
                             responseCode = "444",
                             description = "Login Failed",
                             content = @Content(
-                                    examples = {@ExampleObject(value = """
+                                    examples = {@ExampleObject(value =
+                                            """
                                             {
                                                 "code": 444,
                                                 "msg": "Login failed, username or password error",
@@ -112,7 +113,8 @@ public class AuthController {
                             responseCode = "444",
                             description = "Logout Failed",
                             content = @Content(
-                                    examples = {@ExampleObject(value = """
+                                    examples = {@ExampleObject(value =
+                                            """
                                             {
                                                 "code": 444,
                                                 "msg": "Logout failed, please login first!",
