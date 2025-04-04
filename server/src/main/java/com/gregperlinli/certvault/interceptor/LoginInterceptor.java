@@ -83,8 +83,8 @@ public class LoginInterceptor implements HandlerInterceptor {
         if (requiredRoles != null) {
             boolean hasPermission = requiredRoles.contains(account.getRole());
             if (!hasPermission) {
-                log.info("Insufficient permissions: Path [{}] requires role [{}], user role is [{}].", requestURI, requiredRoles, account.getRole());
-                throw new LoginException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "Insufficient permissions");
+                log.info("Insufficient privileges: Path [{}] requires role [{}], user role is [{}].", requestURI, requiredRoles, account.getRole());
+                throw new LoginException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "Insufficient privileges");
             }
         }
 

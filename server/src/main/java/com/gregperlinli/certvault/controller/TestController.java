@@ -5,6 +5,10 @@ import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.TestDTO;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
 import com.gregperlinli.certvault.service.interfaces.ITestService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
  * @className {@code TestController}
  * @date 2025/3/10 16:19
  */
+@Tag(name = "Test Controller", description = "Server Testing API")
 @RestController
 @RequestMapping
 public class TestController {
@@ -29,6 +34,10 @@ public class TestController {
      *
      * @return 测试结果
      */
+    @Operation(
+            summary = "GET Test",
+            description = "Test GET Request",
+            hidden = true)
     @GetMapping(value = {"/api/", "/api"})
     public ResultVO<TestDTO> testGet() {
         TestDTO testDTO = testService.testGet();
@@ -40,6 +49,10 @@ public class TestController {
      *
      * @return 测试结果
      */
+    @Operation(
+            summary = "POST Test",
+            description = "Test POST Request",
+            hidden = true)
     @PostMapping(value = {"/api/", "/api"})
     public ResultVO<TestDTO> testPost() {
         TestDTO testDTO = testService.testPost();
@@ -51,6 +64,10 @@ public class TestController {
      *
      * @return 测试结果
      */
+    @Operation(
+            summary = "PUT Test",
+            description = "Test PUT Request",
+            hidden = true)
     @PutMapping(value = {"/api/", "/api"})
     public ResultVO<TestDTO> testPut() {
         TestDTO testDTO = testService.testPut();
@@ -62,6 +79,10 @@ public class TestController {
      *
      * @return 测试结果
      */
+    @Operation(
+            summary = "DELETE Test",
+            description = "Test DELETE Request",
+            hidden = true)
     @DeleteMapping(value = {"/api/", "/api"})
     public ResultVO<TestDTO> testDelete() {
         TestDTO testDTO = testService.testDelete();
@@ -73,6 +94,9 @@ public class TestController {
      *
      * @return 测试结果
      */
+    @Operation(summary = "PATCH Test",
+            description = "Test PATCH Request",
+            hidden = true)
     @PatchMapping(value = {"/api/", "/api"})
     public ResultVO<TestDTO> testPatch() {
         TestDTO testDTO = testService.testPatch();
@@ -88,8 +112,16 @@ public class TestController {
      * @param response 响应对象
      * @return 加密结果
      */
+    @Operation(
+            summary = "BCrypt Test",
+            description = "Test BCrypt Encryption",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Request success"),
+                    @ApiResponse(responseCode = "400", description = "Request failed")
+            }
+    )
     @GetMapping(value = "/api/v1/test/bcrypt/{password}")
-    public ResultVO<String> testBCrypt(@PathVariable("password") String password,
+    public ResultVO<String> testBCrypt(@Parameter(name = "password", description = "Password need to be encrypted") @PathVariable("password") String password,
                                        HttpServletResponse response) {
         String result = testService.getBCryptedPassword(password);
         if ( result != null ) {

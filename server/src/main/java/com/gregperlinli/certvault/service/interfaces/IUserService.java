@@ -152,7 +152,7 @@ public interface IUserService extends IService<User> {
     /**
      * Count all users
      *
-     * @param role role
+     * @param role role of the user (0: all user, 1: user, 2: admin, 3: superadmin)
      * @return count result
      */
     Long countAllUser(Integer role);

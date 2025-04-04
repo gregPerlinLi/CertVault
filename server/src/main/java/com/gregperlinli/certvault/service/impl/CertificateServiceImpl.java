@@ -70,7 +70,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
                 );
                 List<String> caUuids = uuids.stream().map(Object::toString).toList();
                 if ( caUuids.isEmpty() ) {
-                    throw new ParamValidateException(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "The admin user does not have any CA.");
+                    throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The admin user does not have any CA.");
                 }
                 certificateQueryWrapper.or()
                         .in("ca_uuid", caUuids)
@@ -98,7 +98,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
                         .in("ca_uuid", caUuids)
                         .eq("deleted", false);
                 if ( caUuids.isEmpty() ) {
-                    throw new ParamValidateException(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "The admin user does not have any CA.");
+                    throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The admin user does not have any CA.");
                 }
             } else if ( Objects.equals( AccountTypeConstant.SUPERADMIN.getAccountType(), user.getRole() ) ) {
                 certificateQueryWrapper.and(wrapper -> wrapper
@@ -334,6 +334,9 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
                     .eq("available", true)
                     .eq("deleted", false);
         Ca ca = caService.getOne(caQueryWrapper);
+        if ( ca == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The CA does not exist.");
+        }
         QueryWrapper<CaBinding> caBindingQueryWrapper = new QueryWrapper<>();
         caBindingQueryWrapper.eq("uid", user.getId())
                 .eq("ca_uuid", requestCertDTO.getCaUuid());
@@ -387,19 +390,29 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
             if ( ca == null ) {
                 throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The CA does not exist.");
             }
-            GenResponse genResponse = SslCertGenerator.renewSslCertificate(new CertRenewRequest(EncryptAndDecryptUtils.decrypt(ca.getPrivkey()), ca.getCert(), oldCertUuid, EncryptAndDecryptUtils.decrypt(ca.getPrivkey()), certificate.getCert(), expiry, certificate.getComment()));
-            certificate.setCert(genResponse.getCert());
-            certificate.setNotBefore(genResponse.getNotBefore());
-            certificate.setNotAfter(genResponse.getNotAfter());
-            certificate.setModifiedAt(LocalDateTime.now());
-            UpdateWrapper<Certificate> certificateUpdateWrapper = new UpdateWrapper<>();
-            certificateUpdateWrapper.eq("uuid", oldCertUuid);
-            boolean result = this.update(certificate, certificateUpdateWrapper);
-            if ( result ) {
-                genResponse.setPrivkey(null);
-                return new ResponseCertDTO(genResponse, ca.getUuid());
+            QueryWrapper<CaBinding> caBindingQueryWrapper = new QueryWrapper<>();
+            caBindingQueryWrapper.eq("uid", user.getId())
+                    .eq("ca_uuid", ca.getUuid());
+            if (
+                    ( caBindingService.getOne(caBindingQueryWrapper) != null && ca.getAvailable() ) ||
+                    Objects.equals( ca.getOwner(), user.getId() ) ||
+                    user.getRole() == AccountTypeConstant.SUPERADMIN.getAccountType()
+            ) {
+                GenResponse genResponse = SslCertGenerator.renewSslCertificate(new CertRenewRequest(EncryptAndDecryptUtils.decrypt(ca.getPrivkey()), ca.getCert(), oldCertUuid, EncryptAndDecryptUtils.decrypt(ca.getPrivkey()), certificate.getCert(), expiry, certificate.getComment()));
+                certificate.setCert(genResponse.getCert());
+                certificate.setNotBefore(genResponse.getNotBefore());
+                certificate.setNotAfter(genResponse.getNotAfter());
+                certificate.setModifiedAt(LocalDateTime.now());
+                UpdateWrapper<Certificate> certificateUpdateWrapper = new UpdateWrapper<>();
+                certificateUpdateWrapper.eq("uuid", oldCertUuid);
+                boolean result = this.update(certificate, certificateUpdateWrapper);
+                if (result) {
+                    genResponse.setPrivkey(null);
+                    return new ResponseCertDTO(genResponse, ca.getUuid());
+                }
+                return null;
             }
-            return null;
+            throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The CA is not yours.");
         }
         throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The certificate is not yours.");
     }

@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.domain.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.util.List;
@@ -22,6 +23,13 @@ public class PageDTO<T> {
     /**
      * Total
      */
+    @Schema(
+            name = "total",
+            description = "Total",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "Long",
+            examples = "100"
+    )
     private Long total;
 
     /**
