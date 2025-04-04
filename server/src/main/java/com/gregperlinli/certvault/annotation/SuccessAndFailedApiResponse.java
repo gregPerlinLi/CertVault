@@ -17,25 +17,10 @@ import java.lang.annotation.Target;
  * @className SuccessApiResponse
  * @date 2025/4/4 16:40
  */
-@ApiResponse(
-        responseCode = "200",
-        description = "Request Success"
-)
-@ApiResponse(
-        responseCode = "444",
-        description = "Request Failed",
-        content = @Content(
-                examples = {@ExampleObject(value = """
-                        {
-                            "code": 444,
-                            "msg": "Failed",
-                            "data": null,
-                            "timestamp": "2025-04-04T09:45:34.622698063+08:00"
-                        }
-                        """)}
-        )
-)
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
+@SuccessApiResponse
+@FailedApiResponse
 public @interface SuccessAndFailedApiResponse {
+
 }

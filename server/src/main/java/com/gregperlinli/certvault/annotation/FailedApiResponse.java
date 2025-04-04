@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
  */
 @ApiResponse(
         responseCode = "444",
-        description = "Failed",
+        description = "Request Failed",
         content = @Content(
                 examples = {@ExampleObject(value = """
                         {
@@ -28,8 +28,7 @@ import java.lang.annotation.Target;
                             "data": null,
                             "timestamp": "2025-04-04T09:45:34.622698063+08:00"
                         }
-                        """
-                )}
+                        """)}
         )
 )
 @Target({ElementType.TYPE, ElementType.METHOD})
