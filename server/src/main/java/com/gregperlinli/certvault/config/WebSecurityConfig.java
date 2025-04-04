@@ -200,7 +200,7 @@ public class WebSecurityConfig {
                     AuthUtils.roleIdToRoleName(((UserProfileDTO) request.getSession().getAttribute("account")).getRole()),
                     request.getRequestURI());
             response.setContentType("application/json");
-            response.getWriter().write(new ObjectMapper().writeValueAsString(new ResultVO<Void>(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "Insufficient permissions.")));
+            response.getWriter().write(new ObjectMapper().writeValueAsString(new ResultVO<Void>(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "Insufficient privileges.")));
         }
     }
 
