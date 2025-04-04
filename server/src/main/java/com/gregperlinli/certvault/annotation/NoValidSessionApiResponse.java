@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * No Vaild Session API Response
+ * No Valid Session API Response
  *
  * @author gregPerlinLi
  * @version 1.0.0
