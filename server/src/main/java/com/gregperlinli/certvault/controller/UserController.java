@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
  * @date 2025/3/10 20:37
  */
 @Tag(name = "User", description = "Common User API")
-@InsufficientPrivilegesApiResponse
 @NoValidSessionApiResponse
 @RequestMapping("/api/v1/user")
 @RestController
