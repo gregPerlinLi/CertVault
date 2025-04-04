@@ -336,7 +336,6 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
         }
         QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
         caQueryWrapper.eq("uuid", uuid)
-                    .eq("owner", user.getId())
                     .eq("deleted", false);
         Ca ca = this.getOne(caQueryWrapper);
         if ( ca == null ) {
