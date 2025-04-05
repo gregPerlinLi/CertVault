@@ -6,20 +6,15 @@ import com.gregperlinli.certvault.certificate.CertAnalyzer;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.*;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
-import com.gregperlinli.certvault.service.interfaces.ICaBindingService;
-import com.gregperlinli.certvault.service.interfaces.ICaService;
-import com.gregperlinli.certvault.service.interfaces.ICertificateService;
-import com.gregperlinli.certvault.service.interfaces.IUserService;
+import com.gregperlinli.certvault.service.interfaces.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -48,6 +43,9 @@ public class UserController {
     @Resource
     ICertificateService certificateService;
 
+    @Resource
+    ILoginRecordService loginRecordService;
+
     /**
      * Get user profile
      *
@@ -66,6 +64,42 @@ public class UserController {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "success",
                 userService.getOwnProfile(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername()));
+    }
+
+    /**
+     * Get user's login records
+     *
+     * @param status Login status (-1: all, 0: offline, 1:online)
+     * @param page Page number
+     * @param limit Page limit
+     * @param request {@link HttpServletRequest} Request
+     * @return {@link ResultVO} Result
+     */
+    @Operation(
+            summary = "Get User Login Records",
+            description = "Retrieve user's own login records (paged retrieval)"
+    )
+    @DoesNotExistApiResponse
+    @NoDataListApiResponse
+    @SuccessApiResponse
+    @GetMapping(value = "/session")
+    public ResultVO<PageDTO<LoginRecordDTO>> getLoginRecords(@Parameter(name = "status", description = "Login status (-1: all, 0: offline, 1:online)", example = "-1")
+                                                                 @RequestParam(value = "status", defaultValue = "-1") Integer status,
+                                                             @Parameter(name = "page", description = "Page number", example = "1")
+                                                                 @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                             @Parameter(name = "limit", description = "Page limit", example = "10")
+                                                                 @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                             HttpServletRequest request) {
+        PageDTO<LoginRecordDTO> result = loginRecordService.getUserLoginRecords(
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
+                status,
+                page,
+                limit
+        );
+        if ( result != null && result.getList() != null ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "No data", result);
     }
 
     /**
@@ -108,9 +142,52 @@ public class UserController {
                         updateUserProfileDTO,
                         false)
         ) {
-            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "update success");
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
         }
-        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "update failed");
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Failed");
+    }
+
+    /**
+     * Force logout user's session
+     *
+     * @param uuid Login record UUID
+     * @param request {@link HttpServletRequest} Request
+     * @return {@link ResultVO} Result
+     */
+    @Operation(
+            summary = "User Session Logout",
+            description = "Force logout user's session"
+    )
+    @SuccessAndFailedApiResponse
+    @NotYourResourceApiResponse
+    @DoesNotExistApiResponse
+    @DeleteMapping(value = "/session/{uuid}/logout")
+    public ResultVO<Void> forceLogoutSession(@Parameter(name = "uuid", description = "Login record UUID", example = "ce9aa242-796e-4baa-9f59-c82a918a9380")
+                                                 @PathVariable("uuid") String uuid, HttpServletRequest request) {
+        if ( loginRecordService.sessionForceLogout(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), uuid) ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Failed");
+    }
+
+    /**
+     * Force logout user themselves
+     *
+     * @param request {@link HttpServletRequest} Request
+     * @return {@link ResultVO} Result
+     */
+    @Operation(
+            summary = "Force Logout User",
+            description = "Force logout user's all sessions"
+    )
+    @SuccessAndFailedApiResponse
+    @DoesNotExistApiResponse
+    @DeleteMapping(value = "/logout")
+    private ResultVO<Void> forceLogoutUser(HttpServletRequest request) {
+        if ( loginRecordService.userForceLogout(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername()) ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Failed");
     }
 
     /**
