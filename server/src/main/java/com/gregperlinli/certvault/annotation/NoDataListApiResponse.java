@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
                             "msg": "No data",
                             "data": {
                                 "total": 0,
-                                "list": []
+                                "list": null
                             },
                             "timestamp": "2025-04-04T15:46:18.96845051+08:00"
                         }
