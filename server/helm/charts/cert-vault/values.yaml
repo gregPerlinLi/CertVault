@@ -105,6 +105,12 @@ encrypt:
       publicKey: "changeme"
       privateKey: "changeme"
 
+## API documentation configuration
+## @param apiDocs.enabled Whether the API documentation is enabled
+##
+apiDocs:
+  enabled: true
+
 ## Service configuration
 ## @param service.ports.business [default: 1888] Business port for the application
 ## @param service.ports.management [default: 1999] Management port for the application
@@ -143,6 +149,8 @@ resources:
 ## @param redis.architecture [default: standalone] The architecture of the Redis deployment (standalone or cluster)
 ## @param redis.auth.enabled [default: true] Whether authentication is enabled for Redis
 ## @param redis.auth.password [default: your-redis-password] The password used for Redis authentication
+## @param redis.metrics.enabled [default: true] Whether to enable metrics for Redis
+## @param redis.metrics.serviceMonitor.enabled [default: false] Whether to enable Service Monitor for Prometheus metrics
 ## @param redis.external.host [default: redis-master.example.com] Hostname or IP address of the external Redis instance
 ## @param redis.external.port [default: 6379] Port number of the external Redis instance
 ## @param redis.external.database [default: 0] Database index to use
@@ -155,6 +163,10 @@ redis:
     enabled: true
     password: "your-redis-password"
   architecture: standalone
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: false
   external:
     host: redis-master.example.com
     port: "6379"
@@ -175,6 +187,8 @@ database:
 ## @param mysql.auth.database [default: certvault] Database name to use (both internal and external)
 ## @param mysql.auth.username [default: certvault] Username for MySQL access (used in internal deployment)
 ## @param mysql.auth.password [default: your-mysql-password] Password for the MySQL user (used in internal deployment)
+## @param mysql.metrics.enabled [default: true] Whether to enable metrics for MySQL
+## @param mysql.metrics.serviceMonitor.enabled [default: false] Whether to enable Service Monitor for Prometheus metrics
 ## @param mysql.external.host [default: localhost] Hostname/IP of external MySQL instance
 ## @param mysql.external.port [default: 3306] Port of external MySQL instance
 ## @param mysql.external.database [default: certvault] Database name for external MySQL
@@ -189,6 +203,10 @@ mysql:
     username: certvault
     password: "your-mysql-password"
   architecture: standalone
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: false
   external:
     host: localhost
     port: 3306
@@ -202,11 +220,14 @@ mysql:
 ## @param postgresql.auth.database [default: certvault] Database name to use (both internal and external)
 ## @param postgresql.auth.username [default: certvault] Username for PostgreSQL access (used in internal deployment)
 ## @param postgresql.auth.password [default: your-postgres-password] Password for the PostgreSQL user (used in internal deployment)
+## @param postgresql.metrics.enabled [default: true] Whether to enable metrics for PostgreSQL
+## @param postgresql.metrics.serviceMonitor.enabled [default: false] Whether to enable Service Monitor for Prometheus metrics
 ## @param postgresql.external.host [default: localhost] Hostname/IP of external PostgreSQL instance
 ## @param postgresql.external.port [default: 5432] Port of external PostgreSQL instance
 ## @param postgresql.external.database [default: certvault] Database name for external PostgreSQL
 ## @param postgresql.external.username [default: certvault] Username for PostgreSQL access (used in internal deployment)
 ## @param postgresql.external.password [default: password] Password for PostgreSQL user (used in internal deployment)
+##
 postgresql:
   internal: false
   auth:
@@ -215,6 +236,10 @@ postgresql:
     username: certvault
     password: "your-postgres-password"
   architecture: standalone
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: false
   external:
     host: localhost
     port: 5432
