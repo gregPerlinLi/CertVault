@@ -2,13 +2,11 @@ package com.gregperlinli.certvault.controller;
 
 import com.gregperlinli.certvault.annotation.*;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
-import com.gregperlinli.certvault.domain.dto.CreateUserDTO;
-import com.gregperlinli.certvault.domain.dto.UpdateRoleDTO;
-import com.gregperlinli.certvault.domain.dto.UpdateUserProfileDTO;
-import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
+import com.gregperlinli.certvault.domain.dto.*;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
 import com.gregperlinli.certvault.service.interfaces.ICaService;
 import com.gregperlinli.certvault.service.interfaces.ICertificateService;
+import com.gregperlinli.certvault.service.interfaces.ILoginRecordService;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -45,6 +43,61 @@ public class SuperadminController {
 
     @Resource
     ICertificateService certificateService;
+
+    @Resource
+    ILoginRecordService loginRecordService;
+
+    /**
+     * Get login records
+     *
+     * @param keyword search keywords (username)
+     * @param status the status of the login record (-1: all, 0: offline, 1: online)
+     * @param page the page number
+     * @param limit the number of records per page
+     * @return login records
+     */
+    @Operation(
+            summary = "Get login records",
+            description = "Get all user's login records"
+    )
+    @NoDataListApiResponse
+    @SuccessApiResponse
+    @GetMapping(value = "/user/session")
+    public ResultVO<PageDTO<LoginRecordDTO>> getLoginRecords(@Parameter(name = "keyword", description = "Search keywords (username)", example = "gregPerlinLi")
+                                                                 @RequestParam(value = "keyword", required = false) String keyword,
+                                                             @Parameter(name = "status", description = "Status of the login record (-1: all, 0: offline, 1: online)", example = "-1")
+                                                                 @RequestParam(value = "status", defaultValue = "-1") Integer status,
+                                                             @Parameter(name = "page", description = "Page number", example = "1")
+                                                                 @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                             @Parameter(name = "limit", description = "Number of records per page", example = "10")
+                                                                 @RequestParam(value = "limit", defaultValue = "10") Integer limit) {
+        PageDTO<LoginRecordDTO> result = loginRecordService.getLoginRecords(keyword, status, page, limit);
+        if ( result != null && result.getList() != null ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "No data", result);
+    }
+
+    /**
+     * Force logout a user
+     *
+     * @param username the username of the user to be logged out
+     * @return logout result
+     */
+    @Operation(
+            summary = "Force Logout a User",
+            description = "Force logout a user's all sessions"
+    )
+    @SuccessAndFailedApiResponse
+    @DoesNotExistApiResponse
+    @DeleteMapping(value = "/user/{username}/logout")
+    public ResultVO<Void> userForceLogout(@Parameter(name = "username", description = "Username")
+                                              @PathVariable("username") String username) {
+        if ( loginRecordService.userForceLogout(username) ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Failed");
+    }
 
     /**
      * Create a new user
