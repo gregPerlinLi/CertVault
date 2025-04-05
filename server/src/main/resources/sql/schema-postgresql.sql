@@ -95,3 +95,30 @@ CREATE TABLE IF NOT EXISTS "user" (
 COMMENT ON TABLE "user" IS '用户';
 COMMENT ON COLUMN "user".role IS '角色（默认1）';
 COMMENT ON COLUMN "user".deleted IS '是否被删除';
+
+-- Login Record Table
+CREATE TABLE IF NOT EXISTS login_record (
+    id SERIAL PRIMARY KEY,
+    uuid VARCHAR(100) NOT NULL,
+    uid INT NOT NULL,
+    session_id VARCHAR(100),
+    ip VARCHAR(100) DEFAULT '0.0.0.0',
+    browser VARCHAR(50),
+    os VARCHAR(50),
+    platform VARCHAR(50),
+    login_time TIMESTAMP DEFAULT '1970-01-01 00:00:00.000000',
+    online BOOLEAN DEFAULT TRUE,
+    CONSTRAINT login_record_pk UNIQUE (uuid)
+    );
+
+COMMENT ON TABLE login_record IS '登录记录';
+COMMENT ON COLUMN login_record.id IS '记录ID';
+COMMENT ON COLUMN login_record.uuid IS '记录UUID';
+COMMENT ON COLUMN login_record.uid IS '用户ID';
+COMMENT ON COLUMN login_record.session_id IS '会话ID';
+COMMENT ON COLUMN login_record.ip IS 'IP地址';
+COMMENT ON COLUMN login_record.browser IS '浏览器';
+COMMENT ON COLUMN login_record.os IS '操作系统';
+COMMENT ON COLUMN login_record.platform IS '平台';
+COMMENT ON COLUMN login_record.login_time IS '登录时间';
+COMMENT ON COLUMN login_record.online IS '是否在线';

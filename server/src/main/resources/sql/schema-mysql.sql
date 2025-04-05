@@ -97,3 +97,21 @@ create table if not exists user
 )
     comment '用户';
 
+-- Login Record Table
+create table if not exists login_record
+(
+    id          int auto_increment comment '记录ID'
+        primary key,
+    uuid        varchar(100)                                    not null comment '会话 UUID',
+    uid         int                                             not null comment '用户ID',
+    session_id  varchar(100)                                    null comment '会话ID',
+    ip          varchar(100)    default '0.0.0.0'               null comment 'IP地址',
+    browser     varchar(50)                                     null comment '浏览器',
+    os          varchar(50)                                     null comment '操作系统',
+    platform    varchar(50)                                     null comment '平台',
+    login_time  datetime        default '1970-01-01 00:00:00'   not null comment '登录时间',
+    online      tinyint(1)      default 1                       null comment '是否在线',
+    constraint login_record_pk
+        unique (uuid)
+)
+    comment '用户登录记录';
