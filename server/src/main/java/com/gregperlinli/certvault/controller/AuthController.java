@@ -1,14 +1,18 @@
 package com.gregperlinli.certvault.controller;
 
+import cn.hutool.http.useragent.UserAgent;
+import cn.hutool.http.useragent.UserAgentUtil;
 import com.gregperlinli.certvault.annotation.NoValidSessionApiResponse;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.LoginDTO;
+import com.gregperlinli.certvault.domain.dto.LoginRecordDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
+import com.gregperlinli.certvault.service.interfaces.ILoginRecordService;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import com.gregperlinli.certvault.utils.AuthUtils;
+import com.gregperlinli.certvault.utils.IpUtils;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,6 +24,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Authentication Controller
@@ -37,6 +44,9 @@ public class AuthController {
 
     @Resource
     IUserService userService;
+
+    @Resource
+    ILoginRecordService loginRecordService;
 
     /**
      * Login
@@ -88,10 +98,30 @@ public class AuthController {
                             )
                     )
             );
-            log.info("User: [{}|{}], Session ID: {} login",
+            String userAgent = request.getHeader("User-Agent");
+            UserAgent ua = UserAgentUtil.parse(userAgent);
+            log.info("User-Agent: {}", userAgent);
+            log.info("User: [{}|{}], Session ID: {} login with IP: {}, Browser: {}, OS: {}, Platform: {}",
                     loginResult.getUsername(),
                     AuthUtils.roleIdToRoleName(loginResult.getRole()),
-                    request.getSession().getId());
+                    request.getSession().getId(),
+                    IpUtils.getIpAddress(),
+                    ua.getBrowser().getName(),
+                    ua.getOs().getName(),
+                    ua.getPlatform().getName());
+            loginRecordService.addLoginRecord(
+                    new LoginRecordDTO(
+                            UUID.randomUUID().toString(),
+                            loginDTO.getUsername(),
+                            IpUtils.getIpAddress(),
+                            ua.getBrowser().getName(),
+                            ua.getOs().getName(),
+                            ua.getPlatform().getName(),
+                            LocalDateTime.now(),
+                            true
+                    ),
+                    request.getSession().getId()
+            );
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                     "Login Success!",
                     loginResult);
@@ -139,6 +169,7 @@ public class AuthController {
                     AuthUtils.roleIdToRoleName(account.getRole()),
                     request.getSession().getId());
             userService.logout(request.getSession().getId());
+            loginRecordService.setRecordOffline(request.getSession().getId());
             request.getSession().invalidate();
             SecurityContextHolder.clearContext();
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
