@@ -34,10 +34,10 @@ public class SuperAdminInitializer implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(SuperAdminInitializer.class);
 
-    @Autowired
+    @Resource
     private InitSuperAdminProperties config;
 
-    @Autowired
+    @Resource
     private IUserService userService;
 
     @Override
