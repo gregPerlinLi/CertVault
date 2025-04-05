@@ -1,11 +1,17 @@
 package com.gregperlinli.certvault.controller;
 
+import cn.hutool.http.useragent.UserAgent;
+import cn.hutool.http.useragent.UserAgentUtil;
 import com.gregperlinli.certvault.annotation.OidcDisabledApiResponse;
 import com.gregperlinli.certvault.constant.RedisKeyConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
+import com.gregperlinli.certvault.domain.dto.LoginRecordDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
+import com.gregperlinli.certvault.service.interfaces.ILoginRecordService;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
+import com.gregperlinli.certvault.utils.AuthUtils;
+import com.gregperlinli.certvault.utils.IpUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,8 +50,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -70,6 +78,9 @@ public class OidcAuthController {
 
     @Resource
     IUserService userService;
+
+    @Resource
+    ILoginRecordService loginRecordService;
 
     @Resource
     RedisTemplate redisTemplate;
@@ -281,6 +292,31 @@ public class OidcAuthController {
 
         request.getSession().setAttribute("account", userProfileDTO);
         redisTemplate.opsForValue().set(RedisKeyConstant.USER.joinLoginPrefix(request.getSession().getId()), userProfileDTO, 60, TimeUnit.MINUTES);
+
+        String userAgent = request.getHeader("User-Agent");
+        UserAgent ua = UserAgentUtil.parse(userAgent);
+        log.info("User-Agent: {}", userAgent);
+        log.info("User: [{}|{}], Session ID: {} login with IP: {}, Browser: {}, OS: {}, Platform: {}",
+                userProfileDTO.getUsername(),
+                AuthUtils.roleIdToRoleName(userProfileDTO.getRole()),
+                request.getSession().getId(),
+                IpUtils.getIpAddress(),
+                ua.getBrowser().getName(),
+                ua.getOs().getName(),
+                ua.getPlatform().getName());
+        loginRecordService.addLoginRecord(
+                new LoginRecordDTO(
+                        UUID.randomUUID().toString(),
+                        userProfileDTO.getUsername(),
+                        IpUtils.getIpAddress(),
+                        ua.getBrowser().getName(),
+                        ua.getOs().getName(),
+                        ua.getPlatform().getName(),
+                        LocalDateTime.now(),
+                        true
+                ),
+                request.getSession().getId()
+        );
 
         response.sendRedirect("/");
         return new ResultVO<>(ResultStatusCodeConstant.REDIRECT.getResultCode(), "OIDC login successful.", userProfileDTO);
