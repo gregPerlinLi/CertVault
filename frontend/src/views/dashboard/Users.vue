@@ -1,6 +1,23 @@
+<script setup lang="ts">
+// Async components
+const AsyncUsrMgr = defineAsyncComponent(
+  () => import("@/components/panel/UsrMgr.vue")
+);
+</script>
+
 <template>
-  <h1 class="font-bold text-2xl">
+  <!-- Headers -->
+  <h1 class="font-bold mb-4 text-2xl">
     <i class="mr-2 pi pi-users text-xl"></i>Users
   </h1>
-  <hr class="border-2 border-neutral-200 dark:border-neutral-500 my-2" />
+
+  <!-- Main -->
+  <Suspense>
+    <AsyncUsrMgr />
+    <template #fallback>
+      <div class="flex items-center justify-center py-12">
+        <ProgressSpinner aria-label="Loading" />
+      </div>
+    </template>
+  </Suspense>
 </template>
