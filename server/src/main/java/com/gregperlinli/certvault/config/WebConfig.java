@@ -1,7 +1,9 @@
 package com.gregperlinli.certvault.config;
 
 import com.gregperlinli.certvault.interceptor.LoginInterceptor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -21,5 +23,10 @@ public class WebConfig implements WebMvcConfigurer {
         // Deprecated: Old login verification method with traditional session.
         // registry.addInterceptor(new LoginInterceptor())
         //        .addPathPatterns("/api/*/user/**", "/api/*/admin/**", "/api/*/superadmin/**");
+    }
+
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
     }
 }

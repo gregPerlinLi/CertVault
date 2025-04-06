@@ -31,6 +31,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -86,7 +88,7 @@ public class WebSecurityConfig {
                 .sessionManagement(sess -> {
                     sess.sessionCreationPolicy(SessionCreationPolicy.NEVER);
                     sess.sessionFixation().none();
-                    sess.maximumSessions(1);
+                    // sess.maximumSessions(1);
                 })
                 .authorizeHttpRequests(auth -> {
                     auth
@@ -217,6 +219,11 @@ public class WebSecurityConfig {
             });
             return mappedAuthorities;
         };
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
     }
 
 }

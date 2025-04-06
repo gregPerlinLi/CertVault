@@ -1,6 +1,7 @@
 package com.gregperlinli.certvault.security;
 
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
+import com.gregperlinli.certvault.service.interfaces.ILoginRecordService;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import com.gregperlinli.certvault.utils.AuthUtils;
 import jakarta.annotation.Resource;
@@ -33,6 +34,9 @@ public class SessionAuthFilter extends OncePerRequestFilter {
 
     @Resource
     IUserService userService;
+
+    @Resource
+    ILoginRecordService loginRecordService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -70,11 +74,13 @@ public class SessionAuthFilter extends OncePerRequestFilter {
                     log.warn("Session Info ==> {}", session.getAttribute("account").toString());
                     log.warn("Redis Info ==> {}", redisProfile);
                     userService.logout(sessionId);
+                    loginRecordService.setRecordOffline(sessionId);
                     request.getSession().invalidate();
                     SecurityContextHolder.clearContext();
                 }
             } else {
                 log.warn("Session is expired.");
+                loginRecordService.setRecordOffline(sessionId);
                 request.getSession().invalidate();
                 SecurityContextHolder.clearContext();
             }

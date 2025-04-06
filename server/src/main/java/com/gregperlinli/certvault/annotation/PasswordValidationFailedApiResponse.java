@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  *
  * @author gregPerlinLi
  * @version 1.0.0
- * @className PasswordValidationFialedApiResponse
+ * @className PasswordValidationFailedApiResponse
  * @date 2025/4/4 16:12
  */
 @ApiResponse(
