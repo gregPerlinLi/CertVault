@@ -139,7 +139,7 @@ public class SuperadminController {
     @SuccessAndFailedApiResponse
     @ParamNotNullApiResponse
     @AlreadyExistApiResponse
-    @PostMapping(value = "/users")
+    @PostMapping(value = "/users/create")
     public ResultVO<Void> createUsers(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "List of create user entities")
                                           @RequestBody List<CreateUserDTO> createUserDTOs) throws Exception {
         Boolean result = userService.createUsers(createUserDTOs);
@@ -340,7 +340,7 @@ public class SuperadminController {
     @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
     @ParamNotNullApiResponse
-    @DeleteMapping(value = "/users")
+    @PostMapping(value = "/users/delete")
     public ResultVO<Void> deleteUsers(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Username list of the users to be deleted")
                                           @RequestBody List<String> usernames,
                                       HttpServletRequest request) {
