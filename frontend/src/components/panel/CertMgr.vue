@@ -4,7 +4,7 @@ import {
   deleteCaCert,
   getAllCaInfo,
   toggleCaAvailability
-} from "@/api/admin/ca";
+} from "@/api/admin/cert/ca";
 import { getAllBindedCaInfo } from "@/api/user/cert/ca";
 import { deleteSslCert, getAllSslCertInfo } from "@/api/user/cert/ssl";
 import { useNotify, useRole } from "@/utils/composable";
