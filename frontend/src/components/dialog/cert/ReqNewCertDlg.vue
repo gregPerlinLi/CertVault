@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CaInfoDTO } from "@/api/types";
 import type { VirtualScrollerLazyEvent } from "primevue";
-import { getAllCaInfo, requestCaCert } from "@/api/admin/ca";
+import { getAllCaInfo, requestCaCert } from "@/api/admin/cert/ca";
 import { getAllBindedCaInfo } from "@/api/user/cert/ca";
 import { requestSslCert } from "@/api/user/cert/ssl";
 import { useNotify, useRole } from "@/utils/composable";
