@@ -1,6 +1,6 @@
 import { callRestfulApi } from "@/api";
 
-export const countAllCaCert = (
+export const countAllCaCerts = (
   condition: "available" | "unavailable" | "none" = "none"
 ) =>
   callRestfulApi<number>({
@@ -9,13 +9,13 @@ export const countAllCaCert = (
     searchParams: { condition }
   });
 
-export const countAllSslCert = () =>
+export const countAllSslCerts = () =>
   callRestfulApi<number>({
     method: "GET",
     baseUrl: "/api/v1/superadmin/cert/ssl/count"
   });
 
-export const countAllUsr = (role: 1 | 2 | 3 | 0 = 0) =>
+export const countAllUsrs = (role: 1 | 2 | 3 | 0 = 0) =>
   callRestfulApi<number>({
     method: "GET",
     baseUrl: "/api/v1/superadmin/user/count",

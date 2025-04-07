@@ -1,6 +1,6 @@
 import { callRestfulApi } from "@/api";
 
-export const countRequestedCa = (
+export const countRequestedCaCerts = (
   condition: "available" | "unavailable" | "none" = "none"
 ) =>
   callRestfulApi<number>({
@@ -9,7 +9,7 @@ export const countRequestedCa = (
     searchParams: { condition }
   });
 
-export const countCaRequestedCert = (uuid: string, caOrSsl: boolean) =>
+export const countCaRequestedCerts = (uuid: string, caOrSsl: boolean) =>
   callRestfulApi<number>({
     method: "GET",
     baseUrl: "/api/v1/admin/cert/ca/{uuid}/count",

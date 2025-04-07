@@ -79,17 +79,3 @@ export const deleteCaCert = (uuid: string) =>
     baseUrl: "/api/v1/admin/cert/ca/{uuid}",
     pathNames: { uuid }
   });
-
-export const bindCaToUsr = (caUuid: string, username: string) =>
-  callRestfulApi({
-    method: "POST",
-    baseUrl: "/api/v1/admin/cert/ca/bind",
-    payload: { caUuid, username }
-  });
-
-export const unbindCaFromUsr = (caUuid: string, username: string) =>
-  callRestfulApi({
-    method: "DELETE",
-    baseUrl: "/api/v1/admin/cert/ca/bind",
-    payload: { caUuid, username }
-  });

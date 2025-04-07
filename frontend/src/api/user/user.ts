@@ -7,7 +7,7 @@ export const getProfile = () =>
     baseUrl: "/api/v1/user/profile"
   });
 
-export const getUsrLoginRecords = (
+export const getUsrLoginRecs = (
   page: number,
   limit: number,
   status: number = -1

@@ -1,7 +1,7 @@
-import { callRestfulApi } from "..";
-import type { LoginRecordDTO, PaginationVO } from "../types";
+import type { LoginRecordDTO, PaginationVO } from "@/api/types";
+import { callRestfulApi } from "@/api";
 
-export const getAllLoginRec = (
+export const getAllLoginRecs = (
   page: number,
   limit: number,
   status: -1 | 0 | 1 = -1,
@@ -43,14 +43,14 @@ export const updateUsrInfo = (
     payload
   });
 
-export const updateMultiUsrRole = (role: 1 | 2 | 3, usernames: string[]) =>
+export const updateMultiUsrRoles = (role: 1 | 2 | 3, usernames: string[]) =>
   callRestfulApi({
     method: "PATCH",
     baseUrl: "/api/v1/superadmin/users/role",
     payload: usernames.map((username) => ({ username, role }))
   });
 
-export const deleteMultiUsr = (usernames: string[]) =>
+export const deleteMultiUsrs = (usernames: string[]) =>
   callRestfulApi({
     method: "DELETE",
     baseUrl: "/api/v1/superadmin/users",
