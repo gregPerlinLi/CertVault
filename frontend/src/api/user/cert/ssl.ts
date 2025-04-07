@@ -28,7 +28,7 @@ export const getSslPrivKey = (uuid: string, password: string) =>
     payload: { password }
   });
 
-export interface RequestCertPayload {
+export interface RequestSslCertPayload {
   caUuid?: string;
   country: string;
   province: string;
@@ -43,7 +43,7 @@ export interface RequestCertPayload {
     value: string;
   }[];
 }
-export const requestSslCert = (payload: RequestCertPayload) =>
+export const requestSslCert = (payload: RequestSslCertPayload) =>
   callRestfulApi<ResponseCertDTO>({
     method: "POST",
     baseUrl: "/api/v1/user/cert/ssl",

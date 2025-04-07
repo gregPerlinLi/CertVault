@@ -76,3 +76,14 @@ export interface ResponseCaDTO {
   notAfter: string;
   comment: string;
 }
+
+export interface LoginRecordDTO {
+  uuid: string;
+  username: string;
+  ipAddress: string;
+  browser: string;
+  os: string;
+  platform: string;
+  loginTime: string;
+  isOnline: boolean;
+}

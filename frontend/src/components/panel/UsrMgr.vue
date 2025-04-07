@@ -3,13 +3,13 @@ import type { UserProfileDTO } from "@/api/types";
 import { getAllUsrInfo } from "@/api/admin/user";
 import { useNotify, useRole } from "@/utils/composable";
 import { nanoid } from "nanoid";
-import { useConfirm } from "primevue/useconfirm";
+// import { useConfirm } from "primevue/useconfirm";
 
 // Async components
 const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
 
 // Services
-const confirm = useConfirm();
+// const confirm = useConfirm();
 const { error } = useNotify();
 const { isSuperadmin } = useRole();
 
@@ -45,7 +45,7 @@ const refresh = async () => {
     if (tag === nonce) {
       pagination.total = page.total;
       pagination.data = (page.list ?? []).sort((a, b) =>
-        a.role !== b.role ? a.role - b.role : a.username < b.username ? -1 : 1
+        a.role !== b.role ? b.role - a.role : a.username < b.username ? -1 : 1
       );
     }
   } catch (err: unknown) {
@@ -123,59 +123,76 @@ onBeforeMount(() => refresh());
       <p class="text-sm">Found {{ pagination.total }} User(s) in total</p>
     </template>
 
-    <Column v-if="isSuperadmin" class="w-4" selection-mode="multiple"> </Column>
-    <Column header="Username">
-      <template #body="{ data }">
-        <span
-          :class="
-            data.role === 1
-              ? 'font-bold text-red-500'
-              : data.role === 2
-                ? 'text-blue-500'
-                : ''
-          "
-          >{{ data.username }}</span
-        >
-      </template>
-    </Column>
-    <Column field="displayName" header="Display Name"></Column>
-    <Column field="email" header="Email"></Column>
+    <!-- Selector column -->
+    <Column v-if="isSuperadmin" class="w-4" selection-mode="multiple"></Column>
 
-    <!-- Comment column -->
-    <!-- <Column header="Comment" class="w-0">
+    <!-- Info column -->
+    <Column class="w-0" header="Username">
       <template #body="{ data }">
-        <div class="flex gap-2 min-w-md">
+        <div class="flex w-60">
           <p
-            v-tooltip.bottom="{ value: data.comment, class: 'text-sm' }"
+            v-tooltip.bottom="{ value: data.username, class: 'text-sm' }"
             class="overflow-x-hidden text-ellipsis whitespace-nowrap"
             :class="
-              variant === 'ssl' || aboveUser
-                ? 'max-w-[calc(var(--container-md)-32px)]'
-                : 'max-w-md'
+              data.role === 3
+                ? 'font-bold text-red-500'
+                : data.role === 2
+                  ? 'text-blue-500'
+                  : ''
             ">
-            {{ data.comment }}
+            {{ data.username }}
           </p>
+        </div>
+      </template>
+    </Column>
+    <Column class="w-0" header="Display Name">
+      <template #body="{ data }">
+        <div class="flex w-60">
+          <p
+            v-tooltip.bottom="{ value: data.displayName, class: 'text-sm' }"
+            class="overflow-x-hidden text-ellipsis whitespace-nowrap">
+            {{ data.displayName }}
+          </p>
+        </div>
+      </template>
+    </Column>
+    <Column header="Email">
+      <template #body="{ data }">
+        <div class="flex w-80">
+          <p
+            v-tooltip.bottom="{ value: data.email, class: 'text-sm' }"
+            class="overflow-x-hidden text-ellipsis whitespace-nowrap">
+            {{ data.email }}
+          </p>
+        </div>
+      </template>
+    </Column>
+
+    <!-- Operations column -->
+    <Column v-if="isSuperadmin">
+      <template #body>
+        <div class="gap-2 hidden justify-end group-hover:flex">
           <Button
-            v-if="variant === 'ssl' || aboveUser"
-            v-tooltip.top="{ value: 'Edit', class: 'text-sm' }"
-            aria-label="Edit certificate information"
-            class="h-6 opacity-0 w-6 group-hover:opacity-100"
-            icon="pi pi-pen-to-square"
+            v-tooltip.top="{ value: 'Update Password', class: 'text-sm' }"
+            aria-label="Update Password"
+            class="h-6 w-6"
+            icon="pi pi-key"
+            severity="success"
+            size="small"
+            variant="text"
+            rounded></Button>
+          <Button
+            v-tooltip.top="{ value: 'Update Role', class: 'text-sm' }"
+            aria-label="Update Role"
+            class="h-6 w-6"
+            icon="pi pi-user"
             severity="help"
             size="small"
             variant="text"
-            rounded
-            @click="
-              () => {
-                targetCertData = data;
-                dialog.editComment = true;
-              }
-            "></Button>
+            rounded></Button>
         </div>
       </template>
-    </Column> -->
-
-    <!-- Operations column -->
+    </Column>
     <!-- <Column>
       <template #body="{ data }">
         <div class="gap-2 hidden justify-end group-hover:flex">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
-import { updateCaComment } from "@/api/admin/ca";
+import { updateCaComment } from "@/api/admin/cert/ca";
 import { updateSslCertComment } from "@/api/user/cert/ssl";
 import { useNotify } from "@/utils/composable";
 
