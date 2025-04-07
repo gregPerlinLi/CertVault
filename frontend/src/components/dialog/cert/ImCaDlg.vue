@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FileUploadSelectEvent } from "primevue";
-import { importCa } from "@/api/admin/ca";
+import { importCa } from "@/api/admin/cert/ca";
 import { useNotify } from "@/utils/composable";
 
 // Models

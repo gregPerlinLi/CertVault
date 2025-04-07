@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
-import { renewCaCert } from "@/api/admin/ca";
+import { renewCaCert } from "@/api/admin/cert/ca";
 import { renewSslCert } from "@/api/user/cert/ssl";
 import { useNotify } from "@/utils/composable";
 

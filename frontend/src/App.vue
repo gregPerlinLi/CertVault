@@ -15,7 +15,7 @@ const { initialized } = useUserStore();
   <ConfirmDialog />
   <div
     v-if="!initialized"
-    class="bg-white fixed flex inset-0 items-center justify-center z-[1000]">
+    class="bg-white fixed flex inset-0 items-center justify-center z-[1000] dark:bg-black">
     <ProgressSpinner />
   </div>
   <RouterView />

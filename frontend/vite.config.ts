@@ -18,18 +18,18 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
   return {
     plugins: [
+      tsconfigPaths({ loose: true, projects: ["tsconfig.app.json"] }),
+      vue(),
       autoImport.vite({
         dts: true,
         imports: ["vue", "vue-router", "@vueuse/core"]
       }),
+      vueComponents.vite({ dts: true, resolvers: [PrimeVueResolver()] }),
       tailwindcss(),
-      tsconfigPaths({ loose: true, projects: ["tsconfig.app.json"] }),
       visualizer({
         open: env.VITE_OPEN_VISUALIZER === "1",
         filename: "visualizer.html"
-      }),
-      vue(),
-      vueComponents.vite({ dts: true, resolvers: [PrimeVueResolver()] })
+      })
     ],
     server: {
       proxy: {

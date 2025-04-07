@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
-import { getCaPrivKey } from "@/api/admin/ca";
+import { getCaPrivKey } from "@/api/admin/cert/ca";
 import { getCaCert } from "@/api/user/cert/ca";
 import { getSslCert, getSslPrivKey } from "@/api/user/cert/ssl";
 import { b64ToU8Arr, saveFile } from "@/utils";
