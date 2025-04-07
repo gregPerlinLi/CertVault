@@ -24,12 +24,12 @@ public interface IUserService extends IService<User> {
     /**
      * Login
      *
-     * @param username username
+     * @param account account (can be username or email)
      * @param password password
      * @param sessionId sessionId
      * @return login result
      */
-    UserProfileDTO login(String username, String password, String sessionId);
+    UserProfileDTO login(String account, String password, String sessionId);
 
     /**
      * Login verify from redis
