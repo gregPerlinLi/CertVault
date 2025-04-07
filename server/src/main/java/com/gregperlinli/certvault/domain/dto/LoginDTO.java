@@ -28,7 +28,7 @@ public class LoginDTO {
      */
     @Schema(
             name = "username",
-            description = "Username of the user",
+            description = "User account(can be username or email)",
             example = "testadmin",
             requiredMode = Schema.RequiredMode.REQUIRED,
             type = "String"
