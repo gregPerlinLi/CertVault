@@ -654,4 +654,23 @@ public class AdminController {
                 certificateService.countCaSigned(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), uuid, caOrSsl));
     }
 
+    /**
+     * Count all users
+     *
+     * @param role the role of the user
+     * @return count result
+     */
+    @Operation(
+            summary = "Count all users",
+            description = "Calculate the total number of users"
+    )
+    @SuccessApiResponse
+    @GetMapping(value = "/users/count")
+    public ResultVO<Long> countAllUser(@Parameter(name = "role", description = "Role of the user (0: all user, 1: user, 2: admin, 3: superadmin)", example = "0")
+                                       @RequestParam(value = "role", defaultValue = "0", required = false) Integer role) {
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                "Success",
+                userService.countAllUser(role));
+    }
+
 }
