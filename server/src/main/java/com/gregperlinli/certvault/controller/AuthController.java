@@ -112,7 +112,7 @@ public class AuthController {
             loginRecordService.addLoginRecord(
                     new LoginRecordDTO(
                             UUID.randomUUID().toString(),
-                            loginDTO.getUsername(),
+                            loginResult.getUsername(),
                             IpUtils.getIpAddress(),
                             ua.getBrowser().getName(),
                             ua.getOs().getName(),

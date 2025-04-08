@@ -21,6 +21,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -59,6 +61,7 @@ import java.util.Map;
  * @className {@code WebSecurityConfig}
  * @date 2025/3/10 16:15
  */
+@EnableMethodSecurity
 @EnableWebSecurity
 @Configuration
 @Slf4j
@@ -93,9 +96,9 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth
                             .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                            .requestMatchers("/api/*/superadmin/**").hasRole("SUPERADMIN")
-                            .requestMatchers("/api/*/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
-                            .requestMatchers("/api/*/user/**").hasAnyRole("USER", "ADMIN", "SUPERADMIN")
+//                            .requestMatchers("/api/*/superadmin/**").hasRole("SUPERADMIN")
+//                            .requestMatchers("/api/*/admin/**").hasAnyRole("ADMIN", "SUPERADMIN")
+//                            .requestMatchers("/api/*/user/**").hasAnyRole("USER", "ADMIN", "SUPERADMIN")
                             .anyRequest().permitAll();
                 })
                 .oauth2Login(oauth2 -> oauth2
@@ -109,10 +112,7 @@ public class WebSecurityConfig {
                 // 异常处理配置
                 .exceptionHandling(exceptionHandling -> {
                     exceptionHandling
-                            .defaultAuthenticationEntryPointFor(
-                                    new CustomAuthenticationEntryPoint(),
-                                    new AntPathRequestMatcher("/**")
-                            )
+                            .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                             .accessDeniedHandler(new CustomAccessDeniedHandler());
                 })
                 // 添加自定义过滤器

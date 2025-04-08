@@ -52,14 +52,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     //////////////////////////////////////////////////
 
     @Override
-    public UserProfileDTO login(String username, String password, String sessionId) {
-        if ( !GenericUtils.allOfNullable(username, password) ) {
+    public UserProfileDTO login(String account, String password, String sessionId) {
+        if ( !GenericUtils.allOfNullable(account, password) ) {
             throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The parameter cannot be null.");
         }
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("username", username)
+        // Username Search
+        userQueryWrapper.eq("username", account)
                         .eq("deleted", false);
         User user = this.getOne(userQueryWrapper);
+        if ( user == null ) {
+            // Email Search
+            userQueryWrapper.clear();
+            userQueryWrapper.eq("email", account)
+                    .eq("deleted", false);
+            user = this.getOne(userQueryWrapper);
+        }
         if ( user != null && AuthUtils.matchesPassword(password, user.getPassword()) ) {
             redisTemplate.opsForValue().set(RedisKeyConstant.USER.joinLoginPrefix(sessionId), new UserProfileDTO(user), 60, TimeUnit.MINUTES);
             return new UserProfileDTO(user);

@@ -36,7 +36,7 @@ CertVault is a platform designed to automate the issuance, management, and lifec
   </tr>
   <tr>
     <td><img src="docs/img/Screenshot3.png"></td>
-    <td><img src="docs/img/Screenshot1.png"></td>
+    <td><img src="docs/img/Screenshot4.png"></td>
   </tr>
 </table>
 

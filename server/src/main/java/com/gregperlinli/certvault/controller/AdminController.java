@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +34,7 @@ import java.util.List;
 @Tag(name = "Admin", description = "Admin API")
 @InsufficientPrivilegesApiResponse
 @NoValidSessionApiResponse
+@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
 @RequestMapping("/api/v1/admin")
 @RestController
 public class AdminController {
@@ -652,6 +654,25 @@ public class AdminController {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "Success",
                 certificateService.countCaSigned(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), uuid, caOrSsl));
+    }
+
+    /**
+     * Count all users
+     *
+     * @param role the role of the user
+     * @return count result
+     */
+    @Operation(
+            summary = "Count all users",
+            description = "Calculate the total number of users"
+    )
+    @SuccessApiResponse
+    @GetMapping(value = "/users/count")
+    public ResultVO<Long> countAllUser(@Parameter(name = "role", description = "Role of the user (0: all user, 1: user, 2: admin, 3: superadmin)", example = "0")
+                                       @RequestParam(value = "role", defaultValue = "0", required = false) Integer role) {
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                "Success",
+                userService.countAllUser(role));
     }
 
 }

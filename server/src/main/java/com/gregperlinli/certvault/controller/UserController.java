@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Tag(name = "User", description = "Common User API")
 @NoValidSessionApiResponse
+@PreAuthorize("hasAnyRole('USER', 'ADMIN', 'SUPERADMIN')")
 @RequestMapping("/api/v1/user")
 @RestController
 public class UserController {

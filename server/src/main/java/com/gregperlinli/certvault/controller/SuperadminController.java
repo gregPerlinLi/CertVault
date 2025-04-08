@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.List;
 @Tag(name = "Superadmin", description = "Superadmin API")
 @InsufficientPrivilegesApiResponse
 @NoValidSessionApiResponse
+@PreAuthorize("hasRole('SUPERADMIN')")
 @RequestMapping("/api/v1/superadmin")
 @RestController
 public class SuperadminController {
@@ -139,7 +141,7 @@ public class SuperadminController {
     @SuccessAndFailedApiResponse
     @ParamNotNullApiResponse
     @AlreadyExistApiResponse
-    @PostMapping(value = "/users")
+    @PostMapping(value = "/users/create")
     public ResultVO<Void> createUsers(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "List of create user entities")
                                           @RequestBody List<CreateUserDTO> createUserDTOs) throws Exception {
         Boolean result = userService.createUsers(createUserDTOs);
@@ -340,7 +342,7 @@ public class SuperadminController {
     @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
     @ParamNotNullApiResponse
-    @DeleteMapping(value = "/users")
+    @PostMapping(value = "/users/delete")
     public ResultVO<Void> deleteUsers(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Username list of the users to be deleted")
                                           @RequestBody List<String> usernames,
                                       HttpServletRequest request) {
@@ -396,25 +398,6 @@ public class SuperadminController {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "Success",
                 certificateService.countAllCertificates());
-    }
-
-    /**
-     * Count all users
-     *
-     * @param role the role of the user
-     * @return count result
-     */
-    @Operation(
-            summary = "Count all users",
-            description = "Calculate the total number of users"
-    )
-    @SuccessApiResponse
-    @GetMapping(value = "/user/count")
-    public ResultVO<Long> countAllUser(@Parameter(name = "role", description = "Role of the user (0: all user, 1: user, 2: admin, 3: superadmin)", example = "0")
-                                           @RequestParam(value = "role", defaultValue = "0", required = false) Integer role) {
-        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
-                "Success",
-                userService.countAllUser(role));
     }
 
 }
