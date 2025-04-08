@@ -194,7 +194,8 @@ public class CaGenerator {
             }
 
             // 7. 提取原始证书的主体信息
-            X500Name issuer = new X500Name(String.valueOf(oldCert.getSubject()));
+            X500Name issuer = new X500Name(String.valueOf(oldCert.getIssuer()));
+            X500Name subject = new X500Name(String.valueOf(oldCert.getSubject()));
             PublicKey publicKey = new JcaX509CertificateConverter()
                     .setProvider("BC")
                     .getCertificate(oldCert)
@@ -209,7 +210,7 @@ public class CaGenerator {
                     issuer,
                     BigInteger.probablePrime(128, new SecureRandom()),
                     notBefore, notAfter,
-                    issuer,
+                    subject,
                     publicKey
             );
 
