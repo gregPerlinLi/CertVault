@@ -472,6 +472,9 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
                     .eq("available", true)
                     .eq("deleted", false);
             Ca ca = this.getOne(caQueryWrapper);
+            if ( ca == null ) {
+                throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The CA does not exist.");
+            }
             if ( !ca.getAllowSubCa() ) {
                 throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The CA does not allow sub CA.");
             }
