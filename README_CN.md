@@ -37,7 +37,7 @@ CertVault 是一个专注于自签署 SSL 证书签发与管理的平台，提�
   </tr>
   <tr>
     <td><img src="docs/img/Screenshot3.png"></td>
-    <td><img src="docs/img/Screenshot1.png"></td>
+    <td><img src="docs/img/Screenshot4.png"></td>
   </tr>
 </table>
 
