@@ -7,6 +7,7 @@ import com.gregperlinli.certvault.domain.vo.ResultVO;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -31,7 +32,7 @@ import java.nio.file.AccessDeniedException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
-    public ResultVO<Void> exceptionHandler(HttpServletResponse response, Exception e){
+    public ResultVO<Void> exceptionHandler(HttpServletResponse response, Exception e) throws Exception {
         String msg = e.getMessage();
         if ( e instanceof LoginException) {
             // response.setStatus(ResultStatusCodeConstant.FORBIDDEN);
@@ -88,27 +89,15 @@ public class GlobalExceptionHandler {
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.SERVER_ERROR.getResultCode()));
             return new ResultVO<>(((ServerException) e).getCode(), msg);
         }
+        // 认证异常需要再往上丢给 SpringSecurity 专门处理
+        if ( e instanceof AuthenticationException || e instanceof AccessDeniedException || e instanceof AuthorizationDeniedException) {
+            throw e;
+        }
         // response.setStatus(ResultStatusCodeConstant.SERVER_ERROR);
         log.error("Uncaught Internal Server Error: {}", e.getMessage());
         log.error("Error Stack Trace: ", e);
         response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.SERVER_ERROR.getResultCode()));
         return new ResultVO<>(ResultStatusCodeConstant.SERVER_ERROR.getResultCode(), "Uncaught Internal Server Error");
-    }
-
-    @ExceptionHandler({AuthenticationException.class})
-    public ResultVO<?> handleAuthenticationException(AuthenticationException e) {
-        return new ResultVO<>(
-                ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(),
-                "Unauthorized"
-        );
-    }
-
-    @ExceptionHandler({AccessDeniedException.class})
-    public ResultVO<?> handleAccessDeniedException(AccessDeniedException e) {
-        return new ResultVO<>(
-                ResultStatusCodeConstant.FORBIDDEN.getResultCode(),
-                "Insufficient permissions"
-        );
     }
 
 }
