@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.List;
 @Tag(name = "Superadmin", description = "Superadmin API")
 @InsufficientPrivilegesApiResponse
 @NoValidSessionApiResponse
+@PreAuthorize("hasRole('SUPERADMIN')")
 @RequestMapping("/api/v1/superadmin")
 @RestController
 public class SuperadminController {
