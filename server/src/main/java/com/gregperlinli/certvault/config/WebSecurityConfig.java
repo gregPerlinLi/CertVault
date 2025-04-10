@@ -1,12 +1,10 @@
 package com.gregperlinli.certvault.config;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gregperlinli.certvault.constant.AccountTypeConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.CreateUserDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
-import com.gregperlinli.certvault.domain.entities.User;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
 import com.gregperlinli.certvault.security.SessionAuthFilter;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
@@ -21,7 +19,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -44,11 +41,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +86,7 @@ public class WebSecurityConfig {
                 .sessionManagement(sess -> {
                     sess.sessionCreationPolicy(SessionCreationPolicy.NEVER);
                     sess.sessionFixation().none();
-                    // sess.maximumSessions(1);
+                    sess.maximumSessions(20);
                 })
                 .authorizeHttpRequests(auth -> {
                     auth
@@ -187,6 +182,9 @@ public class WebSecurityConfig {
                              AuthenticationException authException) throws IOException, java.io.IOException {
             log.warn("Unauthenticated request URI: {}", request.getRequestURI());
             response.setContentType("application/json");
+            if ( authException instanceof SessionAuthenticationException) {
+                response.getWriter().write(new ObjectMapper().writeValueAsString(new ResultVO<Void>(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "Exceeds the maximum allowed number of sessions.")));
+            }
             response.getWriter().write(new ObjectMapper().writeValueAsString(new ResultVO<Void>(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "No valid session found.")));
         }
     }

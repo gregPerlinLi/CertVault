@@ -13,31 +13,28 @@ const menuModel = computed(() =>
       {
         label: "Dashboard",
         icon: "pi pi-gauge",
-        command: (): void => {
-          router.push("/dashboard");
-        }
+        command: () => router.push("/dashboard")
       },
       {
         label: "My Profile",
         icon: "pi pi-user",
-        command: (): void => {
-          router.push("/dashboard/profile");
-        }
+        command: () => router.push("/dashboard/profile")
       },
       {
         label: "Users",
         icon: "pi pi-users",
         show: aboveUser.value,
-        command: (): void => {
-          router.push("/dashboard/users");
-        }
+        command: () => router.push("/dashboard/users")
       },
       {
         label: "Certificates",
         icon: "pi pi-verified",
-        command: (): void => {
-          router.push("/dashboard/certificates");
-        }
+        command: () => router.push("/dashboard/certificates")
+      },
+      {
+        label: "Security",
+        icon: "pi pi-shield",
+        command: () => router.push("/dashboard/security")
       }
     ] satisfies MenuItem[]
   ).filter((itm: MenuItem & { only?: string[] }): boolean => itm?.show ?? true)

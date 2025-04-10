@@ -8,7 +8,7 @@ const router = useRouter();
 const { toast, info, error } = useNotify();
 
 // Stores
-const { oidcProvider, signIn } = useUserStore();
+const { oidcProvider, oidcLogo, signIn } = useUserStore();
 
 // Reactive
 const busy = ref(false);
@@ -59,18 +59,19 @@ async function trySignIn(ev: Event): Promise<void> {
       <template #content>
         <form class="flex flex-col gap-4" @submit.prevent="trySignIn">
           <InputText
-            :invalid="errIdx === 0"
             name="username"
             placeholder="Username"
             type="text"
+            :invalid="errIdx === 0"
             @focus="errIdx = null" />
           <Password
-            :feedback="false"
-            :invalid="errIdx === 1"
+            input-class="w-full"
             name="password"
             placeholder="Password"
-            toggle-mask
-            @focus="errIdx = null" />
+            :feedback="false"
+            :invalid="errIdx === 1"
+            @focus="errIdx = null"
+            toggle-mask />
           <Button label="Sign In" type="submit" :loading="busy"></Button>
           <template v-if="oidcProvider !== null">
             <div class="flex items-center justify-center my-4">
@@ -82,10 +83,12 @@ async function trySignIn(ev: Event): Promise<void> {
               </div>
             </div>
             <Button
-              variant="outlined"
-              :label="`Continue with ${oidcProvider}`"
-              :loading="busy"
-              @click="oidcLogin"></Button>
+              class="flex items-center"
+              :disabled="busy"
+              @click="oidcLogin">
+              <img class="h-5" :src="oidcLogo" />
+              <span>Continue with {{ oidcProvider }}</span>
+            </Button>
           </template>
         </form>
       </template>

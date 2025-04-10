@@ -2,10 +2,12 @@ package com.gregperlinli.certvault.controller;
 
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gregperlinli.certvault.annotation.OidcDisabledApiResponse;
 import com.gregperlinli.certvault.constant.RedisKeyConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.LoginRecordDTO;
+import com.gregperlinli.certvault.domain.dto.OidcProviderDTO;
 import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
 import com.gregperlinli.certvault.service.interfaces.ILoginRecordService;
@@ -18,9 +20,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,11 +44,10 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -89,6 +88,9 @@ public class OidcAuthController {
     @Value("${oidc.provider}")
     String provider;
 
+    @Value("${oidc.logo}")
+    String logo;
+
     /**
      * Get OIDC provider
      *
@@ -107,7 +109,10 @@ public class OidcAuthController {
                                             {
                                                 "code": 200,
                                                 "msg": "OIDC Enabled",
-                                                "data": "OpenID Connect",
+                                                "data": {
+                                                    "provider": "OpenID Connect",
+                                                    "logo": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjwhRE9DVFlQRSBzdmcgIFBVQkxJQyAnLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4nICAnaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkJz48c3ZnIGhlaWdodD0iNTEycHgiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTI7IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEycHgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxnIGlkPSJfeDMyXzM5LW9wZW5pZCI+PGc+PHBhdGggZD0iTTIzNC44NDksNDE5djYuNjIzYy03OS4yNjgtOS45NTgtMTM5LjMzNC01My4zOTMtMTM5LjMzNC0xMDUuNzU3ICAgIGMwLTM5LjMxMywzMy44NzMtNzMuNTk1LDg0LjQ4NS05Mi41MTFMMTc4LjAyMywxODBDODguODkyLDIwMi40OTcsMjYuMDAxLDI1Ni42MDcsMjYuMDAxLDMxOS44NjYgICAgYzAsNzYuMjg4LDkwLjg3MSwxMzkuMTI4LDIwOC45NSwxNDkuNzA1bDAuMDE4LTAuMDA5VjQxOUgyMzQuODQ5eiIgc3R5bGU9ImZpbGw6I0IyQjJCMjsiLz48cG9seWdvbiBwb2ludHM9IjMwNC43NzIsNDM2LjcxMyAzMDQuNjcsNDM2LjcxMyAzMDQuNjcsMjIxLjY2NyAzMDQuNjcsMjEzLjY2NyAzMDQuNjcsNDIuNDI5ICAgICAyMzQuODQ5LDc4LjI1IDIzNC44NDksMjIxLjY2NyAyMzQuOTY5LDIyMS42NjcgMjM0Ljk2OSw0NjkuNTYzICAgIiBzdHlsZT0iZmlsbDojRjc5MzFFOyIvPjxwYXRoIGQ9Ik00ODUuOTk5LDI5MS45MzhsLTkuNDQ2LTEwMC4xMTRsLTM1LjkzOCwyMC4zMzFDNDE1LjA4NywxOTYuNjQ5LDM4Mi41LDE3Ny41LDM0MCwxNzcuMjYxICAgIGwwLjAwMiwzNi40MDZ2Ny40OThjMy41MDIsMC45NjgsNi45MjMsMi4wMjQsMTAuMzAxLDMuMTI1YzE0LjE0NSw0LjYxMSwyNy4xNzYsMTAuMzUyLDM4LjY2NiwxNy4xMjhsLTM3Ljc4NiwyMS4yNTQgICAgTDQ4NS45OTksMjkxLjkzOHoiIHN0eWxlPSJmaWxsOiNCMkIyQjI7Ii8+PC9nPjwvZz48ZyBpZD0iTGF5ZXJfMSIvPjwvc3ZnPg=="
+                                                },
                                                 "timestamp": "2025-03-29T00:59:00.06971"
                                             }
                                             """
@@ -118,10 +123,10 @@ public class OidcAuthController {
     )
     @OidcDisabledApiResponse
     @GetMapping(value = "/provider")
-    public ResultVO<String> getOidcProvider() {
+    public ResultVO<OidcProviderDTO> getOidcProvider() {
         if ( isEnabled ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "OIDC Enabled",
-                   provider);
+                   new OidcProviderDTO(provider, logo));
         } else {
             return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "OIDC Disabled");
         }
@@ -255,38 +260,59 @@ public class OidcAuthController {
         DefaultAuthorizationCodeTokenResponseClient tokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
         OAuth2AccessTokenResponse tokenResponse = tokenResponseClient.getTokenResponse(grantRequest);
 
-        // 2. 解析ID Token并创建OidcIdToken
+        UserProfileDTO userProfileDTO = null;
+
+        // 2. 解析ID Token, Access Token并创建OidcIdToken
         String idTokenString = (String) tokenResponse.getAdditionalParameters().get("id_token");
+        if ( idTokenString != null ) {
+            log.debug("OIDC ID Token: {}", idTokenString);
 
-        // 解析JWT获取声明参数
-        SignedJWT signedJWT = SignedJWT.parse(idTokenString);
-        JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
+            // 解析JWT获取声明参数
+            SignedJWT signedJWT = SignedJWT.parse(idTokenString);
+            JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
 
-        // 获取issuedAt和expiredAt（单位：秒）
-        Instant issuedAt = claimsSet.getIssueTime().toInstant();
-        Instant expiredAt = claimsSet.getExpirationTime().toInstant();
+            // 获取issuedAt和expiredAt（单位：秒）
+            Instant issuedAt = claimsSet.getIssueTime().toInstant();
+            Instant expiredAt = claimsSet.getExpirationTime().toInstant();
 
-        // 创建OidcIdToken实例
-        OidcIdToken oidcIdToken = new OidcIdToken(
-                idTokenString, // ID Token原始字符串
-                issuedAt,      // issuedAt时间
-                expiredAt,     // expiredAt时间
-                claimsSet.getClaims() // ID Token的声明参数（claims）
-        );
-        Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new OAuth2UserAuthority(tokenResponse.getAdditionalParameters()));
+            // 创建OidcIdToken实例
+            OidcIdToken oidcIdToken = new OidcIdToken(
+                    idTokenString, // ID Token原始字符串
+                    issuedAt,      // issuedAt时间
+                    expiredAt,     // expiredAt时间
+                    claimsSet.getClaims() // ID Token的声明参数（claims）
+            );
+            Set<GrantedAuthority> authorities = new HashSet<>();
+            authorities.add(new OAuth2UserAuthority(tokenResponse.getAdditionalParameters()));
 
-        log.debug("OIDC ID Token: {}, {}, {}", oidcIdToken.getEmail(), oidcIdToken.getPreferredUsername(), oidcIdToken.getFullName());
+            log.debug("OIDC ID Token: {}, {}, {}", oidcIdToken.getEmail(), oidcIdToken.getPreferredUsername(), oidcIdToken.getFullName());
 
-        OidcUser oidcUser = new DefaultOidcUser(authorities, oidcIdToken);
+            OidcUser oidcUser = new DefaultOidcUser(authorities, oidcIdToken);
 
-        if (oidcUser == null) {
-            // 如果 oidcUser 为空，返回错误信息
-            return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "OIDC user is null.");
+            if (oidcUser == null) {
+                // 如果 oidcUser 为空，返回错误信息
+                return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "OIDC user is null.");
+            }
+            // 保存 OIDC 用户信息到数据库
+            userProfileDTO = userService.integrateOidcUser(oidcUser.getEmail(), oidcUser.getAttributes());
+        } else {
+            // 针对 Github 不使用 ID Token 的问题进行适配
+            // 获取access_token
+            String accessToken = tokenResponse.getAccessToken().getTokenValue();
+
+            // 使用access_token调用GitHub的/user API获取用户信息
+            String userInfoString = AuthUtils.getGitHubUserInfo(accessToken);
+
+            log.debug("GitHub User Info: {}", userInfoString);
+            // 解析用户信息
+            // 根据实际响应结构解析email、username等字段
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> userInfo = mapper.readValue(userInfoString, Map.class);
+
+            // 保存用户信息到数据库
+            userProfileDTO = userService.integrateGitHubUser(userInfo);
+
         }
-
-        // 保存 OIDC 用户信息到数据库
-        UserProfileDTO userProfileDTO = userService.integrateOidcUser(oidcUser.getEmail(), oidcUser.getAttributes());
 
         request.getSession().setAttribute("account", userProfileDTO);
         redisTemplate.opsForValue().set(RedisKeyConstant.USER.joinLoginPrefix(request.getSession().getId()), userProfileDTO, 60, TimeUnit.MINUTES);

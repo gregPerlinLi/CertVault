@@ -13,6 +13,7 @@ export const useUserStore = createGlobalState(() => {
   // States
   const initialized = ref(false);
   const oidcProvider = ref<string | null>(null);
+  const oidcLogo = ref<string>();
   const signedIn = ref(false);
   const username = ref<string | null>(null);
   const displayName = ref<string | null>(null);
@@ -48,7 +49,11 @@ export const useUserStore = createGlobalState(() => {
 
     setNoTimeout(true);
     try {
-      oidcProvider.value = await getOidcProvider();
+      const provider = await getOidcProvider();
+      if (provider !== null) {
+        oidcProvider.value = provider.provider;
+        oidcLogo.value = provider.logo;
+      }
     } catch (err: unknown) {
       toast?.add({
         severity: "error",
@@ -187,6 +192,7 @@ export const useUserStore = createGlobalState(() => {
   return {
     initialized,
     oidcProvider,
+    oidcLogo,
     signedIn,
     username,
     displayName,
