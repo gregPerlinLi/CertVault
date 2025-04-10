@@ -2,7 +2,8 @@ import type { ResultVO } from "@/api/types";
 import { useUserStore } from "@/stores/user";
 import router from "@/router";
 
-export let noTimeout = false;
+let noTimeout = false;
+export const setNoTimeout = (b: boolean) => (noTimeout = b);
 
 export const createURLSearchParams = (
   params: Record<string, any>

@@ -1,5 +1,6 @@
 import type { UpdateProfileRequestPayload } from "@/api/user/user";
 import type { ToastServiceMethods } from "primevue";
+import { setNoTimeout } from "@/api";
 import { login, logout } from "@/api/authentication";
 import { getOidcProvider } from "@/api/authentication/oauth";
 import { getProfile, updateProfile } from "@/api/user/user";
@@ -45,12 +46,21 @@ export const useUserStore = createGlobalState(() => {
       return;
     }
 
+    setNoTimeout(true);
     try {
       oidcProvider.value = await getOidcProvider();
-    } catch {}
+    } catch (err: unknown) {
+      toast?.add({
+        severity: "error",
+        summary: "Failed to Get OIDC Provider",
+        detail: (err as Error).message,
+        life: 5000
+      });
+    }
 
     const err = await syncFromRemote();
     initialized.value = true;
+    setNoTimeout(false);
     if (err !== null) {
       toast?.add({
         severity: "error",
