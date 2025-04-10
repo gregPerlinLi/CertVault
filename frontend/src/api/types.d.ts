@@ -10,6 +10,11 @@ export interface PaginationVO<T> {
   list: T[] | null;
 }
 
+export interface OidcProviderDTO {
+  provider: string;
+  logo: string;
+}
+
 export interface UserProfileDTO {
   username: string;
   displayName: string;
