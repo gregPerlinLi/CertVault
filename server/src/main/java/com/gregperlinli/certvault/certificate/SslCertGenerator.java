@@ -77,7 +77,12 @@ public class SslCertGenerator {
             Date notBefore = new Date();
             Date notAfter = new Date(notBefore.getTime() + request.getExpiry() * 24L * 60 * 60 * 1000);
 
-            // 7. 创建证书构建器
+            // 7. 检查有效期是否超出 CA 有效期
+            if ( notAfter.after(caCert.getNotAfter()) ) {
+                throw new CertGenException(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode(), "Certificate expiry cannot exceed CA expiry");
+            }
+
+            // 8. 创建证书构建器
             X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                     issuer,
                     BigInteger.probablePrime(128, new SecureRandom()),
@@ -86,7 +91,7 @@ public class SslCertGenerator {
                     sslKeyPair.getPublic()
             );
 
-            // 8. 添加Subject Alternative Names
+            // 9. 添加Subject Alternative Names
             if ( request.getSubjectAltNames() != null ) {
                 List<GeneralName> generalNamesList = new ArrayList<>();
                 for (SubjectAltName san : request.getSubjectAltNames()) {
@@ -120,7 +125,7 @@ public class SslCertGenerator {
                 certBuilder.addExtension(Extension.subjectAlternativeName, false, generalNames);
             }
 
-            // 9. 添加其他扩展字段
+            // 10. 添加其他扩展字段
             certBuilder.addExtension(
                     Extension.keyUsage,
                     true,
@@ -137,22 +142,22 @@ public class SslCertGenerator {
                     )
             );
 
-            // 10. 创建签名器（使用CA私钥）
+            // 11. 创建签名器（使用CA私钥）
             ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
                     .build(caPrivateKey);
 
-            // 11. 生成最终证书
+            // 12. 生成最终证书
             X509CertificateHolder sslCertHolder = certBuilder.build(signer);
 
-            // 12. 生成PEM格式的证书和私钥
+            // 13. 生成PEM格式的证书和私钥
             String pemCert = CertUtils.generatePemCertificate(sslCertHolder);
             String pemPrivateKey = CertUtils.generatePemPrivateKey(sslKeyPair.getPrivate());
 
-            // 13. Base64编码
+            // 14. Base64编码
             String certBase64 = CertUtils.encodeBase64(pemCert.getBytes());
             String privKeyBase64 = CertUtils.encodeBase64(pemPrivateKey.getBytes());
 
-            // 14. 返回响应
+            // 15. 返回响应
             return new GenResponse()
                     .setUuid(UUID.randomUUID().toString())
                     .setPrivkey(privKeyBase64)
@@ -195,7 +200,12 @@ public class SslCertGenerator {
             Date notBefore = new Date();
             Date notAfter = new Date(notBefore.getTime() + request.getNewExpiry() * 24L * 60 * 60 * 1000);
 
-            // 5. 创建证书构建器（使用旧公钥）
+            // 5. 检查新有效期是否超过CA有效期
+            if (notAfter.after(caCertHolder.getNotAfter())) {
+                throw new CertGenException(ResultStatusCodeConstant.BUSINESS_EXCEPTION.getResultCode(), "Certificate expiry cannot exceed CA expiry");
+            }
+
+            // 6. 创建证书构建器（使用旧公钥）
             X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                     issuer,
                     BigInteger.probablePrime(128, new SecureRandom()),
@@ -204,7 +214,7 @@ public class SslCertGenerator {
                     publicKey
             );
 
-            // 6. 复制原证书的扩展字段（如 SAN、KeyUsage 等）
+            // 7. 复制原证书的扩展字段（如 SAN、KeyUsage 等）
             Extensions oldExtensions = oldCertHolder.getExtensions();
             if (oldExtensions != null) {
                 // 将 Extensions 转换为 ASN.1 序列并遍历
@@ -215,7 +225,7 @@ public class SslCertGenerator {
                 }
             }
 
-            // 7. 添加关键扩展字段（如 KeyUsage 和 ExtendedKeyUsage）
+            // 8. 添加关键扩展字段（如 KeyUsage 和 ExtendedKeyUsage）
             // 如果旧证书未包含，则补充默认值（如服务器/客户端认证）
             if (!certBuilder.hasExtension(Extension.keyUsage)) {
                 certBuilder.addExtension(
@@ -237,20 +247,20 @@ public class SslCertGenerator {
                 );
             }
 
-            // 8. 使用CA私钥签名新证书
+            // 9. 使用CA私钥签名新证书
             ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
                     .build(caPrivateKey);
             X509CertificateHolder newCertHolder = certBuilder.build(signer);
 
-            // 9. 生成PEM格式的证书和私钥（私钥与原证书一致）
+            // 10. 生成PEM格式的证书和私钥（私钥与原证书一致）
             String pemCert = CertUtils.generatePemCertificate(newCertHolder);
             String pemPrivateKey = CertUtils.generatePemPrivateKey(oldPrivateKey);
 
-            // 10. Base64编码
+            // 11. Base64编码
             String certBase64 = CertUtils.encodeBase64(pemCert.getBytes());
             String privKeyBase64 = CertUtils.encodeBase64(pemPrivateKey.getBytes());
 
-            // 11. 返回响应
+            // 12. 返回响应
             return new GenResponse()
                     .setUuid(request.getUuid())
                     .setPrivkey(privKeyBase64)

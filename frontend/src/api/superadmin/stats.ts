@@ -14,10 +14,3 @@ export const countAllSslCerts = () =>
     method: "GET",
     baseUrl: "/api/v1/superadmin/cert/ssl/count"
   });
-
-export const countAllUsrs = (role: 1 | 2 | 3 | 0 = 0) =>
-  callRestfulApi<number>({
-    method: "GET",
-    baseUrl: "/api/v1/superadmin/user/count",
-    searchParams: { role }
-  });

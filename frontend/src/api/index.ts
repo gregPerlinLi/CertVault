@@ -2,6 +2,9 @@ import type { ResultVO } from "@/api/types";
 import { useUserStore } from "@/stores/user";
 import router from "@/router";
 
+let noTimeout = false;
+export const setNoTimeout = (b: boolean) => (noTimeout = b);
+
 export const createURLSearchParams = (
   params: Record<string, any>
 ): URLSearchParams => {
@@ -35,7 +38,7 @@ export const callRestfulApi = async <U = null>(
         ? { "Content-Type": "application/json" }
         : undefined,
     body: opts.payload !== undefined ? JSON.stringify(opts.payload) : undefined,
-    signal: AbortSignal.timeout(10000)
+    signal: noTimeout ? undefined : AbortSignal.timeout(10000)
   } satisfies RequestInit;
 
   const resp = await fetch(uri, req);

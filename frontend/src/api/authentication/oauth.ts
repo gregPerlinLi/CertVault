@@ -7,5 +7,5 @@ export const getOidcProvider = () =>
   });
 
 export const oidcLogin = async () => {
-  await fetch("/api/v1/auth/oauth/login");
+  window.open("/api/v1/auth/oauth/login", "_self", "noopener=true");
 };
