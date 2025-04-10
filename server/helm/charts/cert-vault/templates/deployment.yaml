@@ -152,6 +152,10 @@ spec:
             - name: OIDC_PROVIDER
               value: "{{ .Values.oidc.provider.name }}"
             {{- end }}
+            {{- if .Values.oidc.provider.logo }}
+            - name: OIDC_LOGO
+              value: "{{ .Values.oidc.provider.logo }}"
+            {{- end }}
             {{- if .Values.oidc.provider.clientId }}
             - name: OIDC_CLIENT_ID
               value: "{{ .Values.oidc.provider.clientId }}"
