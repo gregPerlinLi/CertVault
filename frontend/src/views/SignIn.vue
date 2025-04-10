@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { oidcLogin } from "@/api/authentication/oauth";
 import { useUserStore } from "@/stores/user";
 import { useNotify } from "@/utils/composable";
 
@@ -6,8 +7,11 @@ import { useNotify } from "@/utils/composable";
 const router = useRouter();
 const { toast, info, error } = useNotify();
 
+// Stores
+const { oidcProvider, signIn } = useUserStore();
+
 // Reactive
-const { signIn } = useUserStore();
+const busy = ref(false);
 const errIdx = ref<number | null>(null);
 
 // Actions
@@ -35,15 +39,14 @@ async function trySignIn(ev: Event): Promise<void> {
   }
 
   // Try sign in
-  ((ev as SubmitEvent).submitter! as HTMLButtonElement).disabled = true;
+  busy.value = true;
   info("Info", "Signing in");
 
   const err = await signIn(username, passowrd, toast);
   if (err === null) {
-    router.push("/dashboard");
-  } else {
-    ((ev as SubmitEvent).submitter! as HTMLButtonElement).disabled = false;
+    await router.push("/dashboard");
   }
+  busy.value = false;
 }
 </script>
 
@@ -68,7 +71,21 @@ async function trySignIn(ev: Event): Promise<void> {
             placeholder="Password"
             toggle-mask
             @focus="errIdx = null" />
-          <Button label="Sign In" type="submit"></Button>
+          <Button label="Sign In" type="submit" :loading="busy"></Button>
+          <template v-if="oidcProvider !== null">
+            <div class="flex items-center justify-center my-4">
+              <div
+                class="border-neutral-200 border-t w-full dark:border-neutral-500"></div>
+              <div class="absolute bg-neutral-50 px-2 dark:bg-neutral-800">
+                or
+              </div>
+            </div>
+            <Button
+              variant="outlined"
+              :label="`Continue with ${oidcProvider}`"
+              :loading="busy"
+              @click="oidcLogin"></Button>
+          </template>
         </form>
       </template>
     </Card>

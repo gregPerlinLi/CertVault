@@ -1,6 +1,7 @@
 import type { UpdateProfileRequestPayload } from "@/api/user/user";
 import type { ToastServiceMethods } from "primevue";
 import { login, logout } from "@/api/authentication";
+import { getOidcProvider } from "@/api/authentication/oauth";
 import { getProfile, updateProfile } from "@/api/user/user";
 
 // Type
@@ -10,6 +11,7 @@ export type Role = "User" | "Admin" | "Superadmin";
 export const useUserStore = createGlobalState(() => {
   // States
   const initialized = ref(false);
+  const oidcProvider = ref<string | null>(null);
   const signedIn = ref(false);
   const username = ref<string | null>(null);
   const displayName = ref<string | null>(null);
@@ -42,6 +44,10 @@ export const useUserStore = createGlobalState(() => {
     if (initialized.value) {
       return;
     }
+
+    try {
+      oidcProvider.value = await getOidcProvider();
+    } catch {}
 
     const err = await syncFromRemote();
     initialized.value = true;
@@ -170,6 +176,7 @@ export const useUserStore = createGlobalState(() => {
   // Returns
   return {
     initialized,
+    oidcProvider,
     signedIn,
     username,
     displayName,
