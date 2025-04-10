@@ -164,6 +164,10 @@ spec:
             - name: OIDC_CLIENT_SECRET
               value: "{{ .Values.oidc.provider.clientSecret }}"
             {{- end }}
+            {{- if .Values.oidc.provider.scope }}
+            - name: OIDC_SCOPE
+              value: "{{ .Values.oidc.provider.scope }}"
+            {{- end }}
             {{- if .Values.oidc.provider.authorizationUri }}
             - name: OIDC_AUTHORIZATION_URI
               value: "{{ .Values.oidc.provider.authorizationUri }}"
