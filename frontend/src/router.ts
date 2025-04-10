@@ -34,6 +34,11 @@ const router = createRouter({
           path: "certificates",
           component: () => import("@views/dashboard/Certificates.vue"),
           meta: { title: "Certificates - CertVault" }
+        },
+        {
+          path: "security",
+          component: () => import("@views/dashboard/Security.vue"),
+          meta: { title: "Security - CertVault" }
         }
       ]
     }
