@@ -36,6 +36,7 @@ import java.util.List;
 @NoValidSessionApiResponse
 @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
 @RequestMapping("/api/v1/admin")
+@CrossOrigin
 @RestController
 public class AdminController {
 

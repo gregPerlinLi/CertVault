@@ -42,10 +42,7 @@ import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -66,6 +63,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Tag(name = "OpenID Connect", description = "OpenID Connect Integration API")
 @RequestMapping("/api/v1/auth/oauth")
+@CrossOrigin
 @RestController
 @Slf4j
 public class OidcAuthController {

@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 @NoValidSessionApiResponse
 @PreAuthorize("hasAnyRole('USER', 'ADMIN', 'SUPERADMIN')")
 @RequestMapping("/api/v1/user")
+@CrossOrigin
 @RestController
 public class UserController {
 

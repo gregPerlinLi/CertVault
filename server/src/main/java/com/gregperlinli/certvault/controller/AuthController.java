@@ -38,6 +38,7 @@ import java.util.UUID;
  */
 @Tag(name = "Authentication", description = "Authentication API")
 @RequestMapping("/api/v1/auth")
+@CrossOrigin
 @RestController
 @Slf4j
 public class AuthController {
