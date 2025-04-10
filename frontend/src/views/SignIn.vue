@@ -75,8 +75,9 @@ async function trySignIn(ev: Event): Promise<void> {
           <template v-if="oidcProvider !== null">
             <div class="flex items-center justify-center my-4">
               <div
-                class="border-neutral-200 border-t w-full dark:border-neutral-500"></div>
-              <div class="absolute bg-neutral-50 px-2 dark:bg-neutral-800">
+                class="border-neutral-300 border-t w-full dark:border-neutral-500"></div>
+              <div
+                class="absolute bg-neutral-50 px-2 text-neutral-300 dark:bg-neutral-800 dark:text-neutral-500">
                 or
               </div>
             </div>
