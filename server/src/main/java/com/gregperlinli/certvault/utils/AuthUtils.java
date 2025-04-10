@@ -1,6 +1,11 @@
 package com.gregperlinli.certvault.utils;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Authentication Utils
@@ -31,5 +36,19 @@ public class AuthUtils {
         };
     }
 
+
+    public static String getGitHubUserInfo(String accessToken) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                "https://api.github.com/user",
+                HttpMethod.GET,
+                request,
+                String.class
+        );
+        return response.getBody();
+    }
 
 }
