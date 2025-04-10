@@ -63,6 +63,14 @@ public interface IUserService extends IService<User> {
     UserProfileDTO integrateOidcUser(String email, Map<String, Object> attributes);
 
     /**
+     * Integrate GitHub user
+     *
+     * @param userInfo user info
+     * @return user profile
+     */
+    UserProfileDTO integrateGitHubUser(Map<String, Object> userInfo);
+
+    /**
      * Find user by email
      *
      * @param email email address

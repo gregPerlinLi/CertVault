@@ -108,13 +108,42 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public UserProfileDTO integrateOidcUser(String email, Map<String, Object> attributes) {
         User user = this.getOne(new QueryWrapper<User>().eq("email", email));
-        if (user == null) {
+        if ( user == null ) {
             LocalDateTime now = LocalDateTime.now();
             user = new User();
             user.setUsername((String) attributes.get("preferred_username"));
             user.setEmail(email);
             user.setDisplayName((String) attributes.get("name"));
             user.setRole(AccountTypeConstant.USER.getAccountType()); // 默认角色
+            user.setCreatedAt(now);
+            user.setModifiedAt(now);
+            if ( !this.save(user) ) {
+                QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+                userQueryWrapper.eq("email", user.getEmail())
+                        .eq("deleted", true);
+                User exist = this.getOne(userQueryWrapper);
+                if ( exist != null ) {
+                    user.setId(exist.getId());
+                    user.setDeleted(false);
+                    if ( this.updateById(user) ) {
+                        return new UserProfileDTO(user);
+                    }
+                }
+            }
+        }
+        return new UserProfileDTO(user);
+    }
+
+    @Override
+    public UserProfileDTO integrateGitHubUser(Map<String, Object> userInfo) {
+        User user = this.getOne(new QueryWrapper<User>().eq("email", userInfo.get("email")));
+        if ( user == null ) {
+            LocalDateTime now = LocalDateTime.now();
+            user = new User();
+            user.setUsername((String) userInfo.get("login"));
+            user.setEmail((String) userInfo.get("email"));
+            user.setDisplayName((String) userInfo.get("name"));
+            user.setRole(AccountTypeConstant.USER.getAccountType());
             user.setCreatedAt(now);
             user.setModifiedAt(now);
             if ( !this.save(user) ) {
