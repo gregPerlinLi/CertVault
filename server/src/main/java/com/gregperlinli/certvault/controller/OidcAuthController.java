@@ -2,6 +2,7 @@ package com.gregperlinli.certvault.controller;
 
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gregperlinli.certvault.annotation.OidcDisabledApiResponse;
 import com.gregperlinli.certvault.constant.RedisKeyConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -258,38 +260,59 @@ public class OidcAuthController {
         DefaultAuthorizationCodeTokenResponseClient tokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
         OAuth2AccessTokenResponse tokenResponse = tokenResponseClient.getTokenResponse(grantRequest);
 
-        // 2. 解析ID Token并创建OidcIdToken
+        UserProfileDTO userProfileDTO = null;
+
+        // 2. 解析ID Token, Access Token并创建OidcIdToken
         String idTokenString = (String) tokenResponse.getAdditionalParameters().get("id_token");
+        if ( idTokenString != null ) {
+            log.debug("OIDC ID Token: {}", idTokenString);
 
-        // 解析JWT获取声明参数
-        SignedJWT signedJWT = SignedJWT.parse(idTokenString);
-        JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
+            // 解析JWT获取声明参数
+            SignedJWT signedJWT = SignedJWT.parse(idTokenString);
+            JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
 
-        // 获取issuedAt和expiredAt（单位：秒）
-        Instant issuedAt = claimsSet.getIssueTime().toInstant();
-        Instant expiredAt = claimsSet.getExpirationTime().toInstant();
+            // 获取issuedAt和expiredAt（单位：秒）
+            Instant issuedAt = claimsSet.getIssueTime().toInstant();
+            Instant expiredAt = claimsSet.getExpirationTime().toInstant();
 
-        // 创建OidcIdToken实例
-        OidcIdToken oidcIdToken = new OidcIdToken(
-                idTokenString, // ID Token原始字符串
-                issuedAt,      // issuedAt时间
-                expiredAt,     // expiredAt时间
-                claimsSet.getClaims() // ID Token的声明参数（claims）
-        );
-        Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new OAuth2UserAuthority(tokenResponse.getAdditionalParameters()));
+            // 创建OidcIdToken实例
+            OidcIdToken oidcIdToken = new OidcIdToken(
+                    idTokenString, // ID Token原始字符串
+                    issuedAt,      // issuedAt时间
+                    expiredAt,     // expiredAt时间
+                    claimsSet.getClaims() // ID Token的声明参数（claims）
+            );
+            Set<GrantedAuthority> authorities = new HashSet<>();
+            authorities.add(new OAuth2UserAuthority(tokenResponse.getAdditionalParameters()));
 
-        log.debug("OIDC ID Token: {}, {}, {}", oidcIdToken.getEmail(), oidcIdToken.getPreferredUsername(), oidcIdToken.getFullName());
+            log.debug("OIDC ID Token: {}, {}, {}", oidcIdToken.getEmail(), oidcIdToken.getPreferredUsername(), oidcIdToken.getFullName());
 
-        OidcUser oidcUser = new DefaultOidcUser(authorities, oidcIdToken);
+            OidcUser oidcUser = new DefaultOidcUser(authorities, oidcIdToken);
 
-        if (oidcUser == null) {
-            // 如果 oidcUser 为空，返回错误信息
-            return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "OIDC user is null.");
+            if (oidcUser == null) {
+                // 如果 oidcUser 为空，返回错误信息
+                return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "OIDC user is null.");
+            }
+            // 保存 OIDC 用户信息到数据库
+            userProfileDTO = userService.integrateOidcUser(oidcUser.getEmail(), oidcUser.getAttributes());
+        } else {
+            // 针对 Github 不使用 ID Token 的问题进行适配
+            // 获取access_token
+            String accessToken = tokenResponse.getAccessToken().getTokenValue();
+
+            // 使用access_token调用GitHub的/user API获取用户信息
+            String userInfoString = AuthUtils.getGitHubUserInfo(accessToken);
+
+            log.debug("GitHub User Info: {}", userInfoString);
+            // 解析用户信息
+            // 根据实际响应结构解析email、username等字段
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> userInfo = mapper.readValue(userInfoString, Map.class);
+
+            // 保存用户信息到数据库
+            userProfileDTO = userService.integrateGitHubUser(userInfo);
+
         }
-
-        // 保存 OIDC 用户信息到数据库
-        UserProfileDTO userProfileDTO = userService.integrateOidcUser(oidcUser.getEmail(), oidcUser.getAttributes());
 
         request.getSession().setAttribute("account", userProfileDTO);
         redisTemplate.opsForValue().set(RedisKeyConstant.USER.joinLoginPrefix(request.getSession().getId()), userProfileDTO, 60, TimeUnit.MINUTES);
