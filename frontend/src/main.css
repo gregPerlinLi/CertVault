@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tailwindcss-primeui";
 
+@custom-variant hover (&:hover);
+
 label {
   @apply font-bold;
 
