@@ -607,7 +607,7 @@ public class UserController {
     }
 
     /**
-     * Count Count the number of user requested certificates
+     * Count the number of user requested certificates
      *
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
