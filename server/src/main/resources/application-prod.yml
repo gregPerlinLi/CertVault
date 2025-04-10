@@ -39,10 +39,7 @@ spring:
           oidc:
             client-id: ${OIDC_CLIENT_ID:cert-vault}
             client-secret: ${OIDC_CLIENT_SECRET:changeme}
-            scope:
-              - openid
-              - email
-              - profile
+            scope: ${OIDC_SCOPE:openid,email,profile}
             redirect-uri: "${SERVER_BASE_URL:http://127.0.0.1:1888}/api/v1/auth/oauth/callback"
             authorization-grant-type: authorization_code
             provider: oidc
