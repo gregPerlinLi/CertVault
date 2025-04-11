@@ -103,6 +103,9 @@ CREATE TABLE IF NOT EXISTS login_record (
     uid INT NOT NULL,
     session_id VARCHAR(100),
     ip VARCHAR(100) DEFAULT '0.0.0.0',
+    region VARCHAR(50) DEFAULT 'Unknown',
+    province VARCHAR(50) DEFAULT 'Unknown',
+    city VARCHAR(50) DEFAULT 'Unknown',
     browser VARCHAR(50),
     os VARCHAR(50),
     platform VARCHAR(50),
@@ -117,6 +120,9 @@ COMMENT ON COLUMN login_record.uuid IS '记录UUID';
 COMMENT ON COLUMN login_record.uid IS '用户ID';
 COMMENT ON COLUMN login_record.session_id IS '会话ID';
 COMMENT ON COLUMN login_record.ip IS 'IP地址';
+COMMENT ON COLUMN login_record.region IS '国家/地区';
+COMMENT ON COLUMN login_record.province IS '省份/州';
+COMMENT ON COLUMN login_record.city IS '城市';
 COMMENT ON COLUMN login_record.browser IS '浏览器';
 COMMENT ON COLUMN login_record.os IS '操作系统';
 COMMENT ON COLUMN login_record.platform IS '平台';
