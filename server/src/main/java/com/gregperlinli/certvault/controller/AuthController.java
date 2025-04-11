@@ -26,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -110,11 +111,15 @@ public class AuthController {
                     ua.getBrowser().getName(),
                     ua.getOs().getName(),
                     ua.getPlatform().getName());
+            Map<String, String> location = IpUtils.getLocation(IpUtils.getIpAddress());
             loginRecordService.addLoginRecord(
                     new LoginRecordDTO(
                             UUID.randomUUID().toString(),
                             loginResult.getUsername(),
                             IpUtils.getIpAddress(),
+                            location.get("region"),
+                            location.get("province"),
+                            location.get("city"),
                             ua.getBrowser().getName(),
                             ua.getOs().getName(),
                             ua.getPlatform().getName(),

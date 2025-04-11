@@ -328,11 +328,15 @@ public class OidcAuthController {
                 ua.getBrowser().getName(),
                 ua.getOs().getName(),
                 ua.getPlatform().getName());
+        Map<String, String> location = IpUtils.getLocation(IpUtils.getIpAddress());
         loginRecordService.addLoginRecord(
                 new LoginRecordDTO(
                         UUID.randomUUID().toString(),
                         userProfileDTO.getUsername(),
                         IpUtils.getIpAddress(),
+                        location.get("region"),
+                        location.get("province"),
+                        location.get("city"),
                         ua.getBrowser().getName(),
                         ua.getOs().getName(),
                         ua.getPlatform().getName(),
