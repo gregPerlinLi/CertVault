@@ -86,7 +86,7 @@ public class WebSecurityConfig {
                 .sessionManagement(sess -> {
                     sess.sessionCreationPolicy(SessionCreationPolicy.NEVER);
                     sess.sessionFixation().none();
-                    sess.maximumSessions(20);
+                    sess.maximumSessions(3);
                 })
                 .authorizeHttpRequests(auth -> {
                     auth
