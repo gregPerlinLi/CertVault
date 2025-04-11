@@ -4,13 +4,13 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 /**
  * <p>
  * 用户登录记录
@@ -57,6 +57,24 @@ public class LoginRecord implements Serializable {
      */
     @TableField("ip")
     private String ip;
+
+    /**
+     * 国家/地区
+     */
+    @TableField("region")
+    private String region;
+
+    /**
+     * 省份/州
+     */
+    @TableField("province")
+    private String province;
+
+    /**
+     * 城市
+     */
+    @TableField("city")
+    private String city;
 
     /**
      * 浏览器
