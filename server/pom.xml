@@ -24,7 +24,7 @@
     </description>
     <groupId>com.gregperlinli</groupId>
     <artifactId>certvault-server</artifactId>
-    <version>1.6.1</version>
+    <version>1.7.0</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -194,6 +194,11 @@
             <artifactId>nimbus-jose-jwt</artifactId>
             <version>10.0.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.maxmind.geoip2</groupId>
+            <artifactId>geoip2</artifactId>
+            <version>4.2.1</version>
+        </dependency>
 
         <dependency>
             <groupId>org.freemarker</groupId>
@@ -230,6 +235,7 @@
                 <filtering>true</filtering>
                 <excludes>
                     <exclude>static/**/*</exclude>
+                    <exclude>geoip/**/*.mmdb</exclude>
                 </excludes>
             </resource>
             <resource>
@@ -237,6 +243,7 @@
                 <filtering>false</filtering>
                 <includes>
                     <include>static/**/*</include>
+                    <include>geoip/**/*.mmdb</include>
                 </includes>
             </resource>
         </resources>
