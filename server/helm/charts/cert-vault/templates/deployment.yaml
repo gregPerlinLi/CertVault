@@ -189,6 +189,14 @@ spec:
               value: "{{ .Values.oidc.provider.usernameAttributes }}"
             {{- end }}
             {{- end }}
+            {{- if .Values.geoip.type }}
+            - name: GEOIP_TYPE
+              value: "{{ .Values.geoip.type }}"
+            {{- end }}
+            {{- if eq .Values.geoip.type "mmdb"}}
+            - name: GEOIP_MMDB_PATH
+              value: "{{ .Values.geoip.mmdb.mountPath }}/{{ .Values.geoip.mmdb.subPath}}"
+            {{- end }}
             {{- if .Values.springBoot.logging.level.com_gregperlinli_certvault }}
             - name: SPRING_LOGGING_LEVEL_COM_GREGPERLINLI_CERTVAULT
               value: "{{ .Values.springBoot.logging.level.com_gregperlinli_certvault | default "debug" }}"
@@ -247,3 +255,23 @@ spec:
           command: ["sh", "-c"]
           args:
             - java $JAVA_OPTS -jar /app.jar
+          {{- if eq .Values.geoip.type "mmdb" }}
+          volumeMounts:
+            - name: geoip-volume
+              mountPath: {{ .Values.geoip.mmdb.mountPath }}
+              readOnly: {{ .Values.geoip.mmdb.readOnly }}
+              subPath: {{ .Values.geoip.mmdb.subPath }}
+      volumes:
+        - name: geoip-volume
+          {{- if eq .Values.geoip.mmdb.mountType "hostPath" }}
+          hostPath:
+            path: {{ .Values.geoip.mmdb.existingPath }}
+            type: File
+          {{- else }}
+          configMap:
+            name: {{ include "cert-vault.fullname" . }}-geoip
+            items:
+              - key: GeoLite2-City.mmdb
+                path: GeoLite2-City.mmdb
+          {{- end }}
+          {{- end}}

@@ -1,0 +1,13 @@
+{{- if and ( eq .Values.geoip.type "mmdb")  ( eq .Values.geoip.mmdb.mountType "configMap" ) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cert-vault.fullname" . }}-geoip
+  labels:
+    app.kubernetes.io/name: {{ include "cert-vault.name" . }}
+    helm.sh/chart: {{ include "cert-vault.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  GeoLite2-City.mmdb: |    {{- .Files.Get .Values.geoip.mmdb.existingPath | b64enc -}}
+{{- end }}

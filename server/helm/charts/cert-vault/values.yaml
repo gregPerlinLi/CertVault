@@ -86,6 +86,22 @@ oidc:
     jwkSetUri: "https://oidc-provider.example.com/certs"
     usernameAttributes: "preferred_username"
 
+## GeoIP configuration
+## @param geoip.type (ip-api.com or mmdb) [default: ip-api.com] How to get GeoIP data
+## @param geoip.mmdb.mountType [default: configMap] The type of mount for the GeoIP database
+## @param geoip.mmdb.existingPath The path to the existing GeoIP database
+## @param geoip.mmdb.mountPath The path to mount the GeoIP database
+## @param geoip.mmdb.subPath The subpath to mount the GeoIP database
+## @param geoip.mmdb.readOnlyWhether the GeoIP database is read-only
+geoip:
+  type: "mmdb"
+  mmdb:
+    mountType: "configMap"
+    existingPath: "/Users/gregperlinli/Projects/Java/CertVault/server/src/main/resources/geoip/GeoLite2-City.mmdb"
+    mountPath: "/geoip"
+    subPath: "GeoLite2-City.mmdb"
+    readOnly: true
+
 ## Initialization configuration
 ## @param init.superadmin.username The username for the superadmin user
 ## @param init.superadmin.displayName The display name for the superadmin user
