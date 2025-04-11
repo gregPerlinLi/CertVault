@@ -3,6 +3,8 @@ x-common-certvault: &common_certvault
   image: ghcr.io/gregperlinli/certvault:latest
   ports:
     - ${EXTERNAL_PORT}:1888
+  volumes:
+    - ./GeoLite2-City.mmdb:/GeoLite2-City.mmdb
   restart: always
   environment: &common_certvault_env
     TIME_ZONE: ${TIME_ZONE}
@@ -39,5 +41,7 @@ services:
       SPRING_REDIS_HOST: ${EXTERNAL_REDIS_HOST}
       SPRING_REDIS_PORT: ${EXTERNAL_REDIS_PORT}
       SPRING_REDIS_PASSWORD: ${EXTERNAL_REDIS_PASSWORD}
+    volumes:
+      - ./GeoLite2-City.mmdb:/GeoLite2-City.mmdb
   postgresql:
     <<: *common_postgresql
