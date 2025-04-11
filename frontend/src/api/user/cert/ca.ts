@@ -1,21 +1,29 @@
+import type { AbortOption } from "@/api";
 import type { CaInfoDTO, PaginationVO } from "@/api/types";
 import { callRestfulApi } from "@/api";
 
 export const getAllBindedCaInfo = (
   page: number,
   limit: number,
-  keyword?: string
+  keyword?: string,
+  abort?: AbortOption
 ) =>
   callRestfulApi<PaginationVO<CaInfoDTO>>({
     method: "GET",
     baseUrl: "/api/v1/user/cert/ca",
-    searchParams: { page, limit, keyword }
+    searchParams: { page, limit, keyword },
+    abort
   });
 
-export const getCaCert = (uuid: string, isChain?: boolean) =>
+export const getCaCert = (
+  uuid: string,
+  isChain?: boolean,
+  abort?: AbortOption
+) =>
   callRestfulApi<string>({
     method: "GET",
     baseUrl: "/api/v1/user/cert/ca/{uuid}/cer",
     pathNames: { uuid },
-    searchParams: { isChain }
+    searchParams: { isChain },
+    abort
   });

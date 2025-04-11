@@ -1,6 +1,5 @@
 import type { UpdateProfileRequestPayload } from "@/api/user/user";
 import type { ToastServiceMethods } from "primevue";
-import { setNoTimeout } from "@/api";
 import { login, logout } from "@/api/authentication";
 import { getOidcProvider } from "@/api/authentication/oauth";
 import { getProfile, updateProfile } from "@/api/user/user";
@@ -47,9 +46,8 @@ export const useUserStore = createGlobalState(() => {
       return;
     }
 
-    setNoTimeout(true);
     try {
-      const provider = await getOidcProvider();
+      const provider = await getOidcProvider({ timeout: -1 });
       if (provider !== null) {
         oidcProvider.value = provider.provider;
         oidcLogo.value = provider.logo;
@@ -65,7 +63,6 @@ export const useUserStore = createGlobalState(() => {
 
     const err = await syncFromRemote();
     initialized.value = true;
-    setNoTimeout(false);
     if (err !== null) {
       toast?.add({
         severity: "error",

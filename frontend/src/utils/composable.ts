@@ -24,3 +24,16 @@ export const useRole = () => {
 
   return { role, isUser, isAdmin, isSuperadmin, aboveUser };
 };
+
+export const useAsyncGuard = () => {
+  const isActivate = ref(true);
+  const abort = new AbortController();
+
+  const cancel = () => {
+    isActivate.value = false;
+    abort.abort("Component deactivated");
+  };
+  onBeforeUnmount(cancel);
+
+  return { isActivate, signal: abort.signal, cancel };
+};
