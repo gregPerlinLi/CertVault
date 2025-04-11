@@ -57,6 +57,7 @@ public class SuperadminController {
      * @param status the status of the login record (-1: all, 0: offline, 1: online)
      * @param page the page number
      * @param limit the number of records per page
+     * @param request the request
      * @return login records
      */
     @Operation(
@@ -73,8 +74,9 @@ public class SuperadminController {
                                                              @Parameter(name = "page", description = "Page number", example = "1")
                                                                  @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                              @Parameter(name = "limit", description = "Number of records per page", example = "10")
-                                                                 @RequestParam(value = "limit", defaultValue = "10") Integer limit) {
-        PageDTO<LoginRecordDTO> result = loginRecordService.getLoginRecords(keyword, status, page, limit);
+                                                                 @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                             HttpServletRequest request) {
+        PageDTO<LoginRecordDTO> result = loginRecordService.getLoginRecords(keyword, status, request.getSession().getId(), page, limit);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
