@@ -16,6 +16,7 @@ declare module 'vue' {
     AppSidebar: typeof import('./src/components/AppSidebar.vue')['default']
     Badge: typeof import('primevue/badge')['default']
     Button: typeof import('primevue/button')['default']
+    ButtonGroup: typeof import('primevue/buttongroup')['default']
     Card: typeof import('primevue/card')['default']
     CertMgr: typeof import('./src/components/panel/CertMgr.vue')['default']
     Column: typeof import('primevue/column')['default']
