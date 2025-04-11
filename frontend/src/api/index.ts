@@ -2,9 +2,6 @@ import type { ResultVO } from "@/api/types";
 import { useUserStore } from "@/stores/user";
 import router from "@/router";
 
-let noTimeout = false;
-export const setNoTimeout = (b: boolean) => (noTimeout = b);
-
 export const createURLSearchParams = (
   params: Record<string, any>
 ): URLSearchParams => {
@@ -14,12 +11,17 @@ export const createURLSearchParams = (
   return new URLSearchParams(Object.fromEntries(entries));
 };
 
+export interface AbortOption {
+  timeout?: number;
+  signal?: AbortSignal;
+}
 export interface RestfulApiOption {
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   baseUrl: string;
   pathNames?: Record<string, string>;
   searchParams?: Record<string, any>;
   payload?: any;
+  abort?: AbortOption;
 }
 export const callRestfulApi = async <U = null>(
   opts: RestfulApiOption
@@ -38,7 +40,16 @@ export const callRestfulApi = async <U = null>(
         ? { "Content-Type": "application/json" }
         : undefined,
     body: opts.payload !== undefined ? JSON.stringify(opts.payload) : undefined,
-    signal: noTimeout ? undefined : AbortSignal.timeout(10000)
+    signal: AbortSignal.any(
+      [
+        typeof opts.abort?.timeout === "number"
+          ? opts.abort.timeout < 0
+            ? null
+            : AbortSignal.timeout(opts.abort.timeout)
+          : AbortSignal.timeout(10000),
+        opts.abort?.signal ?? null
+      ].filter((s) => s !== null)
+    )
   } satisfies RequestInit;
 
   const resp = await fetch(uri, req);

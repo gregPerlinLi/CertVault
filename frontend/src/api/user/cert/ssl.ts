@@ -1,31 +1,44 @@
+import type { AbortOption } from "@/api";
 import type { CertInfoDTO, PaginationVO, ResponseCertDTO } from "@/api/types";
 import { callRestfulApi } from "@/api";
 
 export const getAllSslCertInfo = (
   page: number,
   limit: number,
-  keyword?: string
+  keyword?: string,
+  abort?: AbortOption
 ) =>
   callRestfulApi<PaginationVO<CertInfoDTO>>({
     method: "GET",
     baseUrl: "/api/v1/user/cert/ssl",
-    searchParams: { page, limit, keyword }
+    searchParams: { page, limit, keyword },
+    abort
   });
 
-export const getSslCert = (uuid: string, isChain?: boolean) =>
+export const getSslCert = (
+  uuid: string,
+  isChain?: boolean,
+  abort?: AbortOption
+) =>
   callRestfulApi<string>({
     method: "GET",
     baseUrl: "/api/v1/user/cert/ssl/{uuid}/cer",
     pathNames: { uuid },
-    searchParams: { isChain }
+    searchParams: { isChain },
+    abort
   });
 
-export const getSslPrivKey = (uuid: string, password: string) =>
+export const getSslPrivKey = (
+  uuid: string,
+  password: string,
+  abort?: AbortOption
+) =>
   callRestfulApi<string>({
     method: "POST",
     baseUrl: "/api/v1/user/cert/ssl/{uuid}/privkey",
     pathNames: { uuid },
-    payload: { password }
+    payload: { password },
+    abort
   });
 
 export interface RequestSslCertPayload {
@@ -43,32 +56,47 @@ export interface RequestSslCertPayload {
     value: string;
   }[];
 }
-export const requestSslCert = (payload: RequestSslCertPayload) =>
+export const requestSslCert = (
+  payload: RequestSslCertPayload,
+  abort?: AbortOption
+) =>
   callRestfulApi<ResponseCertDTO>({
     method: "POST",
     baseUrl: "/api/v1/user/cert/ssl",
-    payload
+    payload,
+    abort
   });
 
-export const renewSslCert = (uuid: string, expiry: number) =>
+export const renewSslCert = (
+  uuid: string,
+  expiry: number,
+  abort?: AbortOption
+) =>
   callRestfulApi<ResponseCertDTO>({
     method: "PUT",
     baseUrl: "/api/v1/user/cert/ssl/{uuid}",
     pathNames: { uuid },
-    payload: { expiry }
+    payload: { expiry },
+    abort
   });
 
-export const updateSslCertComment = (uuid: string, comment: string) =>
+export const updateSslCertComment = (
+  uuid: string,
+  comment: string,
+  abort?: AbortOption
+) =>
   callRestfulApi({
     method: "PATCH",
     baseUrl: "/api/v1/user/cert/ssl/{uuid}/comment",
     pathNames: { uuid },
-    payload: { comment }
+    payload: { comment },
+    abort
   });
 
-export const deleteSslCert = (uuid: string) =>
+export const deleteSslCert = (uuid: string, abort?: AbortOption) =>
   callRestfulApi({
     method: "DELETE",
     baseUrl: "/api/v1/user/cert/ssl/{uuid}",
-    pathNames: { uuid }
+    pathNames: { uuid },
+    abort
   });
