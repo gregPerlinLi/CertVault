@@ -16,24 +16,26 @@ public interface ILoginRecordService extends IService<LoginRecord> {
     /**
      * Get all login records
      *
-     * @param keyword keyword(also username)
-     * @param status  online status (-1: all, 0: offline, 1:online)
-     * @param page    page
-     * @param limit   limit
+     * @param keyword   keyword(also username)
+     * @param status    online status (-1: all, 0: offline, 1:online)
+     * @param sessionId current session ID
+     * @param page      page
+     * @param limit     limit
      * @return user login records
      */
-    PageDTO<LoginRecordDTO> getLoginRecords(String keyword, Integer status, Integer page, Integer limit);
+    PageDTO<LoginRecordDTO> getLoginRecords(String keyword, Integer status, String sessionId, Integer page, Integer limit);
 
     /**
      * Get user login records
      *
-     * @param username username
-     * @param status   online status (-1: all, 0: offline, 1:online)
-     * @param page     page
-     * @param limit    limit
+     * @param username  username
+     * @param status    online status (-1: all, 0: offline, 1:online)
+     * @param sessionId current session ID
+     * @param page      page
+     * @param limit     limit
      * @return user login records
      */
-    PageDTO<LoginRecordDTO> getUserLoginRecords(String username, Integer status, Integer page, Integer limit);
+    PageDTO<LoginRecordDTO> getUserLoginRecords(String username, Integer status, String sessionId, Integer page, Integer limit);
 
     /**
      * Add user login record

@@ -3,6 +3,7 @@ package com.gregperlinli.certvault.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gregperlinli.certvault.constant.AccountTypeConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.LoginRecordDTO;
@@ -12,13 +13,10 @@ import com.gregperlinli.certvault.domain.entities.User;
 import com.gregperlinli.certvault.domain.exception.ParamValidateException;
 import com.gregperlinli.certvault.mapper.LoginRecordMapper;
 import com.gregperlinli.certvault.service.interfaces.ILoginRecordService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,7 +42,7 @@ public class LoginRecordServiceImpl extends ServiceImpl<LoginRecordMapper, Login
     SessionRegistry sessionRegistry;
 
     @Override
-    public PageDTO<LoginRecordDTO> getLoginRecords(String keyword, Integer status, Integer page, Integer limit) {
+    public PageDTO<LoginRecordDTO> getLoginRecords(String keyword, Integer status, String sessionId, Integer page, Integer limit) {
         if ( status == null ) {
             status = -1;
         }
@@ -78,17 +76,23 @@ public class LoginRecordServiceImpl extends ServiceImpl<LoginRecordMapper, Login
                     dto.setUuid(loginRecord.getUuid());
                     dto.setUsername(userMap.getOrDefault(loginRecord.getUid(), "Unknown"));
                     dto.setIpAddress(loginRecord.getIp());
+                    dto.setRegion(loginRecord.getRegion());
+                    dto.setProvince(loginRecord.getProvince());
+                    dto.setCity(loginRecord.getCity());
                     dto.setBrowser(loginRecord.getBrowser());
                     dto.setOs(loginRecord.getOs());
                     dto.setPlatform(loginRecord.getPlatform());
                     dto.setLoginTime(loginRecord.getLoginTime());
                     dto.setIsOnline(loginRecord.getOnline());
+                    if ( Objects.equals(loginRecord.getSessionId(), sessionId) ) {
+                        dto.setIsCurrentSession(true);
+                    }
                     return dto;
                 }).toList());
     }
 
     @Override
-    public PageDTO<LoginRecordDTO> getUserLoginRecords(String username, Integer status, Integer page, Integer limit) {
+    public PageDTO<LoginRecordDTO> getUserLoginRecords(String username, Integer status, String sessionId, Integer page, Integer limit) {
         if ( status == null ) {
             status = -1;
         }
@@ -117,11 +121,17 @@ public class LoginRecordServiceImpl extends ServiceImpl<LoginRecordMapper, Login
             dto.setUuid(loginRecord.getUuid());
             dto.setUsername(user.getUsername());
             dto.setIpAddress(loginRecord.getIp());
+            dto.setRegion(loginRecord.getRegion());
+            dto.setProvince(loginRecord.getProvince());
+            dto.setCity(loginRecord.getCity());
             dto.setBrowser(loginRecord.getBrowser());
             dto.setOs(loginRecord.getOs());
             dto.setPlatform(loginRecord.getPlatform());
             dto.setLoginTime(loginRecord.getLoginTime());
             dto.setIsOnline(loginRecord.getOnline());
+            if ( Objects.equals(loginRecord.getSessionId(), sessionId) ) {
+                dto.setIsCurrentSession(true);
+            }
             return dto;
         }).toList());
     }
@@ -140,6 +150,9 @@ public class LoginRecordServiceImpl extends ServiceImpl<LoginRecordMapper, Login
         loginRecord.setUid(user.getId());
         loginRecord.setSessionId(sessionId);
         loginRecord.setIp(loginRecordDTO.getIpAddress());
+        loginRecord.setRegion(loginRecordDTO.getRegion());
+        loginRecord.setProvince(loginRecordDTO.getProvince());
+        loginRecord.setCity(loginRecordDTO.getCity());
         loginRecord.setBrowser(loginRecordDTO.getBrowser());
         loginRecord.setOs(loginRecordDTO.getOs());
         loginRecord.setPlatform(loginRecordDTO.getPlatform());
