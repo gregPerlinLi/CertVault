@@ -94,7 +94,7 @@ oidc:
 ## @param geoip.mmdb.subPath The subpath to mount the GeoIP database
 ## @param geoip.mmdb.readOnlyWhether the GeoIP database is read-only
 geoip:
-  type: "mmdb"
+  type: "ip-api.com"
   mmdb:
     mountType: "configMap"
     existingPath: "/Users/gregperlinli/Projects/Java/CertVault/server/src/main/resources/geoip/GeoLite2-City.mmdb"
