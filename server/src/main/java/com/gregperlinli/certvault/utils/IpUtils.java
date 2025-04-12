@@ -92,7 +92,7 @@ public class IpUtils {
                 InetAddress ipAddress = InetAddress.getByName(ip);
                 CityResponse response = reader.city(ipAddress);
 
-                log.debug("Get location information from geo-ip: {}", response.getSubdivisions().toString());
+                log.debug("Get location information from geo-ip: {}", response.toJson());
                 return Map.of(
                         "region", response.getCountry().getName(),
                         "province", response.getLeastSpecificSubdivision().getName(),
