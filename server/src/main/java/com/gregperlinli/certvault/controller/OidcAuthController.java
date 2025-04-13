@@ -4,6 +4,7 @@ import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gregperlinli.certvault.annotation.OidcDisabledApiResponse;
+import com.gregperlinli.certvault.config.properties.OidcProperties;
 import com.gregperlinli.certvault.constant.RedisKeyConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.LoginRecordDTO;
@@ -46,10 +47,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -82,14 +80,8 @@ public class OidcAuthController {
     @Resource
     RedisTemplate redisTemplate;
 
-    @Value("${oidc.enabled}")
-    Boolean isEnabled;
-
-    @Value("${oidc.provider}")
-    String provider;
-
-    @Value("${oidc.logo}")
-    String logo;
+    @Resource
+    OidcProperties oidcProperties;
 
     /**
      * Get OIDC provider
@@ -109,10 +101,13 @@ public class OidcAuthController {
                                             {
                                                 "code": 200,
                                                 "msg": "OIDC Enabled",
-                                                "data": {
-                                                    "provider": "OpenID Connect",
-                                                    "logo": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjwhRE9DVFlQRSBzdmcgIFBVQkxJQyAnLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4nICAnaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkJz48c3ZnIGhlaWdodD0iNTEycHgiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTI7IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEycHgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxnIGlkPSJfeDMyXzM5LW9wZW5pZCI+PGc+PHBhdGggZD0iTTIzNC44NDksNDE5djYuNjIzYy03OS4yNjgtOS45NTgtMTM5LjMzNC01My4zOTMtMTM5LjMzNC0xMDUuNzU3ICAgIGMwLTM5LjMxMywzMy44NzMtNzMuNTk1LDg0LjQ4NS05Mi41MTFMMTc4LjAyMywxODBDODguODkyLDIwMi40OTcsMjYuMDAxLDI1Ni42MDcsMjYuMDAxLDMxOS44NjYgICAgYzAsNzYuMjg4LDkwLjg3MSwxMzkuMTI4LDIwOC45NSwxNDkuNzA1bDAuMDE4LTAuMDA5VjQxOUgyMzQuODQ5eiIgc3R5bGU9ImZpbGw6I0IyQjJCMjsiLz48cG9seWdvbiBwb2ludHM9IjMwNC43NzIsNDM2LjcxMyAzMDQuNjcsNDM2LjcxMyAzMDQuNjcsMjIxLjY2NyAzMDQuNjcsMjEzLjY2NyAzMDQuNjcsNDIuNDI5ICAgICAyMzQuODQ5LDc4LjI1IDIzNC44NDksMjIxLjY2NyAyMzQuOTY5LDIyMS42NjcgMjM0Ljk2OSw0NjkuNTYzICAgIiBzdHlsZT0iZmlsbDojRjc5MzFFOyIvPjxwYXRoIGQ9Ik00ODUuOTk5LDI5MS45MzhsLTkuNDQ2LTEwMC4xMTRsLTM1LjkzOCwyMC4zMzFDNDE1LjA4NywxOTYuNjQ5LDM4Mi41LDE3Ny41LDM0MCwxNzcuMjYxICAgIGwwLjAwMiwzNi40MDZ2Ny40OThjMy41MDIsMC45NjgsNi45MjMsMi4wMjQsMTAuMzAxLDMuMTI1YzE0LjE0NSw0LjYxMSwyNy4xNzYsMTAuMzUyLDM4LjY2NiwxNy4xMjhsLTM3Ljc4NiwyMS4yNTQgICAgTDQ4NS45OTksMjkxLjkzOHoiIHN0eWxlPSJmaWxsOiNCMkIyQjI7Ii8+PC9nPjwvZz48ZyBpZD0iTGF5ZXJfMSIvPjwvc3ZnPg=="
-                                                },
+                                                "data": [
+                                                    {
+                                                        "provider": "oidc",
+                                                        "displayName": "OpenID Connect",
+                                                        "logo": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjwhRE9DVFlQRSBzdmcgIFBVQkxJQyAnLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4nICAnaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkJz48c3ZnIGhlaWdodD0iNTEycHgiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTI7IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEycHgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxnIGlkPSJfeDMyXzM5LW9wZW5pZCI+PGc+PHBhdGggZD0iTTIzNC44NDksNDE5djYuNjIzYy03OS4yNjgtOS45NTgtMTM5LjMzNC01My4zOTMtMTM5LjMzNC0xMDUuNzU3ICAgIGMwLTM5LjMxMywzMy44NzMtNzMuNTk1LDg0LjQ4NS05Mi41MTFMMTc4LjAyMywxODBDODguODkyLDIwMi40OTcsMjYuMDAxLDI1Ni42MDcsMjYuMDAxLDMxOS44NjYgICAgYzAsNzYuMjg4LDkwLjg3MSwxMzkuMTI4LDIwOC45NSwxNDkuNzA1bDAuMDE4LTAuMDA5VjQxOUgyMzQuODQ5eiIgc3R5bGU9ImZpbGw6I0IyQjJCMjsiLz48cG9seWdvbiBwb2ludHM9IjMwNC43NzIsNDM2LjcxMyAzMDQuNjcsNDM2LjcxMyAzMDQuNjcsMjIxLjY2NyAzMDQuNjcsMjEzLjY2NyAzMDQuNjcsNDIuNDI5ICAgICAyMzQuODQ5LDc4LjI1IDIzNC44NDksMjIxLjY2NyAyMzQuOTY5LDIyMS42NjcgMjM0Ljk2OSw0NjkuNTYzICAgIiBzdHlsZT0iZmlsbDojRjc5MzFFOyIvPjxwYXRoIGQ9Ik00ODUuOTk5LDI5MS45MzhsLTkuNDQ2LTEwMC4xMTRsLTM1LjkzOCwyMC4zMzFDNDE1LjA4NywxOTYuNjQ5LDM4Mi41LDE3Ny41LDM0MCwxNzcuMjYxICAgIGwwLjAwMiwzNi40MDZ2Ny40OThjMy41MDIsMC45NjgsNi45MjMsMi4wMjQsMTAuMzAxLDMuMTI1YzE0LjE0NSw0LjYxMSwyNy4xNzYsMTAuMzUyLDM4LjY2NiwxNy4xMjhsLTM3Ljc4NiwyMS4yNTQgICAgTDQ4NS45OTksMjkxLjkzOHoiIHN0eWxlPSJmaWxsOiNCMkIyQjI7Ii8+PC9nPjwvZz48ZyBpZD0iTGF5ZXJfMSIvPjwvc3ZnPg=="
+                                                    }
+                                                ],
                                                 "timestamp": "2025-03-29T00:59:00.06971"
                                             }
                                             """
@@ -123,10 +118,9 @@ public class OidcAuthController {
     )
     @OidcDisabledApiResponse
     @GetMapping(value = "/provider")
-    public ResultVO<OidcProviderDTO> getOidcProvider() {
-        if ( isEnabled ) {
-            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "OIDC Enabled",
-                   new OidcProviderDTO(provider, logo));
+    public ResultVO<List<OidcProviderDTO>> getOidcProvider() {
+        if ( oidcProperties.isEnabled() ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "OIDC Enabled", oidcProperties.toDtoList());
         } else {
             return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "OIDC Disabled");
         }
@@ -162,13 +156,19 @@ public class OidcAuthController {
             }
     )
     @OidcDisabledApiResponse
-    @GetMapping(value = "/login")
-    public ResultVO<Void> login(HttpServletResponse response) throws Exception {
+    @GetMapping(value = {"/login/{provider}", "/login"})
+    public ResultVO<Void> login(@Parameter(name = "provider", description = "OIDC provider")
+                                    @PathVariable(value = "provider", required = false) String provider,
+                                HttpServletResponse response) throws Exception {
         // 这里直接重定向到 Spring Security 的 OAuth2 登录页面
-        if ( !isEnabled ) {
+        if ( !oidcProperties.isEnabled() ) {
             return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "OIDC Disabled");
         }
-        response.sendRedirect("/oauth2/authorization/oidc");
+        if ( provider == null ) {
+//            response.sendRedirect("/oauth2/authorization/oidc");
+        } else {
+            response.sendRedirect("/oauth2/authorization/" + provider);
+        }
         return new ResultVO<>(ResultStatusCodeConstant.REDIRECT.getResultCode(), "Redirect to OIDC Login Page");
     }
 
@@ -226,18 +226,20 @@ public class OidcAuthController {
             }
     )
     @OidcDisabledApiResponse
-    @GetMapping(value = "/callback")
-    public ResultVO<UserProfileDTO> oidcCallback(@Parameter(name = "code", description = "OpenID Connect IdP Response JWT Code", example = "c1ds5v1...")
+    @GetMapping(value = {"/callback/{provider}", "/callback"})
+    public ResultVO<UserProfileDTO> oidcCallback(@Parameter(name = "provider", description = "OIDC provider")
+                                                     @PathVariable(value = "provider", required = false) String provider,
+                                                 @Parameter(name = "code", description = "OpenID Connect IdP Response JWT Code", example = "c1ds5v1...")
                                                      @RequestParam("code") String code,
                                                  @Parameter(name = "state", description = "OpenID Connect IdP Response State", example = "s1ds5v1...")
                                                      @RequestParam("state") String state,
                                                  HttpServletRequest request,
                                                  HttpServletResponse response) throws Exception {
-        if ( !isEnabled ) {
+        if ( !oidcProperties.isEnabled() ) {
             return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "OIDC Disabled");
         }
 
-        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId("oidc");
+        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(provider);
 
         OAuth2AuthorizationRequest authorizationRequest = OAuth2AuthorizationRequest.authorizationCode()
                 .clientId(clientRegistration.getClientId())
@@ -362,7 +364,7 @@ public class OidcAuthController {
     )
     @GetMapping(value = "/success")
     public ResultVO<Void> success() {
-        if ( !isEnabled ) {
+        if ( !oidcProperties.isEnabled() ) {
             return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "OIDC Disabled");
         }
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Login successful.");
@@ -380,7 +382,7 @@ public class OidcAuthController {
     )
     @GetMapping(value = "/failure")
     public ResultVO<Void> failure() {
-        if ( !isEnabled ) {
+        if ( !oidcProperties.isEnabled() ) {
             return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "OIDC Disabled");
         }
         return new ResultVO<>(ResultStatusCodeConstant.FAILED.getResultCode(), "Login failed.");
