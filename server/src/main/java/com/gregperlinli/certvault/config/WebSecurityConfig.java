@@ -125,24 +125,24 @@ public class WebSecurityConfig {
         return new SessionAuthFilter();
     }
 
-    @Bean
-    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
-        DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-        return request -> {
-            OAuth2User oAuth2User = delegate.loadUser(request);
-
-            String clientName = request.getClientRegistration().getClientName();
-            if ("oidc".equals(clientName)) {
-                try {
-                    return processOidcUser(oAuth2User);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            return oAuth2User;
-        };
-    }
+//    @Bean
+//    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
+//        DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
+//        return request -> {
+//            OAuth2User oAuth2User = delegate.loadUser(request);
+//
+//            String clientName = request.getClientRegistration().getClientName();
+//            if ("oidc".equals(clientName)) {
+//                try {
+//                    return processOidcUser(oAuth2User);
+//                } catch (Exception e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//
+//            return oAuth2User;
+//        };
+//    }
 
     private OAuth2User processOidcUser(OAuth2User oAuth2User) throws Exception {
         Map<String, Object> attributes = oAuth2User.getAttributes();
