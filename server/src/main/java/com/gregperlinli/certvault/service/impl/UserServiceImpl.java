@@ -243,6 +243,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         .eq("deleted", true);
         User exist = this.getOne(userQueryWrapper);
         if ( exist != null ) {
+            if ( createUserDTO.getUsername().length() > 14 ) {
+                throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The username is too long.");
+            }
             exist = createUserDTO.updateUser(exist);
             if ( this.updateById(exist) ) {
                 return new UserProfileDTO(exist);
@@ -291,6 +294,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         for (CreateUserDTO dto : createUserDTOs) {
             User existingDeletedUser = deletedUserMap.get(dto.getUsername());
+            if  ( dto.getUsername().length() > 14 ) {
+                throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The username is too long.");
+            }
             if (existingDeletedUser != null) {
                 // Cover deleted users
                 User updateUser = dto.updateUser(existingDeletedUser);
