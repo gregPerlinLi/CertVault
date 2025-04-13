@@ -165,7 +165,7 @@ public class OidcAuthController {
             return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "OIDC Disabled");
         }
         if ( provider == null ) {
-//            response.sendRedirect("/oauth2/authorization/oidc");
+            response.sendRedirect("/oauth2/authorization/oidc");
         } else {
             response.sendRedirect("/oauth2/authorization/" + provider);
         }
@@ -239,7 +239,7 @@ public class OidcAuthController {
             return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "OIDC Disabled");
         }
 
-        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(provider);
+        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(Objects.requireNonNullElse(provider, "oidc"));
 
         OAuth2AuthorizationRequest authorizationRequest = OAuth2AuthorizationRequest.authorizationCode()
                 .clientId(clientRegistration.getClientId())
