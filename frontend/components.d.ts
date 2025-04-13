@@ -19,6 +19,7 @@ declare module 'vue' {
     ButtonGroup: typeof import('primevue/buttongroup')['default']
     Card: typeof import('primevue/card')['default']
     CertMgr: typeof import('./src/components/panel/CertMgr.vue')['default']
+    Checkbox: typeof import('primevue/checkbox')['default']
     Column: typeof import('primevue/column')['default']
     ConfirmDialog: typeof import('primevue/confirmdialog')['default']
     Dialog: typeof import('primevue/dialog')['default']
