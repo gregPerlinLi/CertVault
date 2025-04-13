@@ -1,13 +1,58 @@
-{{- if and ( eq .Values.geoip.type "mmdb")  ( eq .Values.geoip.mmdb.mountType "configMap" ) }}
+{{- if or (and ( eq .Values.geoip.type "mmdb")  ( eq .Values.geoip.mmdb.mountType "configMap" )) (.Values.oidc.enabled) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "cert-vault.fullname" . }}-geoip
+  name: {{ include "cert-vault.fullname" . }}
   labels:
     app.kubernetes.io/name: {{ include "cert-vault.name" . }}
     helm.sh/chart: {{ include "cert-vault.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
-  GeoLite2-City.mmdb: |    {{- .Files.Get .Values.geoip.mmdb.existingPath | b64enc -}}
+  {{- if and ( eq .Values.geoip.type "mmdb")  ( eq .Values.geoip.mmdb.mountType "configMap" ) }}
+  GeoLite2-City.mmdb: |-
+    {{- .Files.Get .Values.geoip.mmdb.existingPath | b64enc -}}
+  {{- end }}
+
+  {{- if .Values.oidc.enabled }}
+  application.yml: |-
+    spring:
+      security:
+        oauth2:
+          client:
+            registration:
+              {{- range $provider, $config := .Values.oidc.providers }}
+              {{ $provider }}:
+                {{- if $config.enabled }}
+                client-id: {{ $config.clientId | quote }}
+                client-secret: {{ $config.clientSecret | quote }}
+                scope: {{ $config.scope | default "openid" | splitList "," | toJson }}
+                redirect-uri: "{{ $.Values.server.baseUrl }}/api/v1/auth/oauth/callback/{{ $provider }}"
+                authorization-grant-type: authorization_code
+                client-authentication-method: client_secret_basic
+                {{- end }}
+              {{- end }}
+            provider:
+              {{- range $provider, $config := .Values.oidc.providers }}
+              {{ $provider }}:
+                {{- if $config.enabled }}
+                token-uri: {{ required (printf "%s.tokenUri required" $provider) $config.tokenUri | quote }}
+                authorization-uri: {{ required (printf "%s.authorizationUri required" $provider) $config.authorizationUri | quote }}
+                user-info-uri: {{ required (printf "%s.userInfoUri required" $provider) $config.userInfoUri | quote }}
+                  {{- if $config.jwkSetUri }}
+                jwk-set-uri: {{ required (printf "%s.jwkSetUri required" $provider) $config.jwkSetUri | quote }}
+                  {{- end }}
+                {{- end }}
+              {{- end }}
+    oidc:
+      enabled: {{ .Values.oidc.enabled }}
+      providers:
+        {{- range $provider, $config := .Values.oidc.providers }}
+        {{ $provider }}:
+          {{- if $config.enabled }}
+          name: {{ $config.name | default (title $provider) | quote }}
+          logo: {{ $config.logo | quote }}
+          {{- end }}
+        {{- end }}
+  {{- end }}
 {{- end }}
