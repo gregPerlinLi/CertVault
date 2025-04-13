@@ -16,21 +16,12 @@ const { info, error } = useNotify();
 // Reactive
 const online = ref<LoginRecordDTO[] | null>(null);
 const offline = ref<LoginRecordDTO[] | null>(null);
-const selectedOnline = ref<LoginRecordDTO[]>([]);
+const selectedOnline = ref<boolean[]>([]);
 
 const loading = reactive({
   online: false,
   offline: false
 });
-
-// Watches
-// watch(
-//   selectedOnline,
-//   () => {
-//     selectedOnline.value = [];
-//   },
-//   { flush: "post" }
-// );
 
 // Actions
 const refreshOnline = async () => {
@@ -42,6 +33,7 @@ const refreshOnline = async () => {
       online.value = (page.list ?? []).sort((a, b) =>
         a.loginTime > b.loginTime ? -1 : 1
       );
+      selectedOnline.value = Array(online.value.length + 1).fill(false);
     }
   } catch (err: unknown) {
     if (isActivate.value) {
@@ -126,7 +118,6 @@ onBeforeMount(() => {
   <hr class="border-2 border-neutral-200 dark:border-neutral-500 my-2" />
   <h2 class="font-bold my-4 text-lg">Online Sessions</h2>
   <AsyncDataTable
-    v-model:selection="selectedOnline"
     data-key="uuid"
     size="small"
     :loading="loading.online"
@@ -152,8 +143,57 @@ onBeforeMount(() => {
         size="small"
         @click="trySignOutAll" />
     </template>
-    <Column class="w-0" selection-mode="multiple" />
-    <Column class="w-65" field="loginTime" header="Login Timestamp" />
+    <Column class="w-0">
+      <template #header>
+        <Checkbox
+          v-model="selectedOnline[selectedOnline.length - 1]"
+          @change="
+            () => {
+              if (selectedOnline[selectedOnline.length - 1]) {
+                selectedOnline = Array(selectedOnline.length)
+                  .fill(true)
+                  .map((_, idx) =>
+                    idx < selectedOnline.length - 1 &&
+                    online![idx].isCurrentSession
+                      ? false
+                      : true
+                  );
+              } else {
+                selectedOnline = Array(selectedOnline.length).fill(false);
+              }
+            }
+          "
+          binary />
+      </template>
+      <template #body="{ data, index }">
+        <Checkbox v-if="data.isCurrentSession" :disabled="true" binary />
+        <Checkbox
+          v-else
+          v-model="selectedOnline[index]"
+          @change="
+            () => {
+              const cnt = selectedOnline.reduce(
+                (cnt, cur) => (cur ? cnt + 1 : cnt),
+                0
+              );
+              if (cnt === selectedOnline.length - 2) {
+                selectedOnline[selectedOnline.length - 1] = true;
+              } else {
+                selectedOnline[selectedOnline.length - 1] = false;
+              }
+            }
+          "
+          binary />
+      </template>
+    </Column>
+    <Column class="w-65" header="Login Timestamp">
+      <template #body="{ data }">
+        <span
+          :class="data.isCurrentSession ? 'font-bold text-green-500' : ''"
+          >{{ data.loginTime }}</span
+        >
+      </template>
+    </Column>
     <Column class="w-90" field="ipAddress" header="IP" />
     <Column field="browser" header="Browser" />
     <Column field="platform" header="Platform" />

@@ -63,6 +63,7 @@ export const callRestfulApi = async <U = null>(
     if (json.code === 401 && signedIn.value) {
       clearSignedInfo();
       router.push("/");
+      return json.data!;
     }
 
     throw Error(`${json.msg} (${json.code})`);
