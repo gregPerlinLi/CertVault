@@ -5,6 +5,7 @@ x-common-certvault: &common_certvault
     - ${EXTERNAL_PORT}:1888
   volumes:
     - ./GeoLite2-City.mmdb:/GeoLite2-City.mmdb
+    - ./application.yml:/application.yml
   restart: always
   environment: &common_certvault_env
     TIME_ZONE: ${TIME_ZONE}
