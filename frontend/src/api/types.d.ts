@@ -91,4 +91,5 @@ export interface LoginRecordDTO {
   platform: string;
   loginTime: string;
   isOnline: boolean;
+  isCurrentSession: boolean;
 }
