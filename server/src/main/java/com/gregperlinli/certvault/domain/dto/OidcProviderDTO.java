@@ -25,9 +25,16 @@ public class OidcProviderDTO {
     @Schema(
             name = "provider",
             description = "OpenID Connect Provider",
-            example = "OpenID Connect"
+            example = "oidc"
     )
     String provider;
+
+    @Schema(
+            name = "displayName",
+            description = "OpenID Connect Display Name",
+            example = "OpenID Connect"
+    )
+    String displayName;
 
     @Schema(
             name = "logo",
