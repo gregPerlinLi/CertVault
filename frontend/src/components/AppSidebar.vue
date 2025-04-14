@@ -68,7 +68,7 @@ const menuModel = computed(() =>
 
 <template>
   <aside>
-    <div class="flex flex-col gap-4 p-4 sticky top-[65px]">
+    <div class="flex flex-col gap-4 p-4 sticky top-[73px]">
       <PanelMenu
         class="w-60"
         :model="menuModel"
