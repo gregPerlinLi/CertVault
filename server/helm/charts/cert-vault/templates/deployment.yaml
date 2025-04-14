@@ -215,7 +215,8 @@ spec:
           volumeMounts:
             {{- if .Values.oidc.enabled }}
             - name: oidc-volume
-              mountPath: /
+              mountPath: /application.yml
+              subPath: application.yml
               readOnly: true
             {{- end }}
             {{- if eq .Values.geoip.type "mmdb" }}
