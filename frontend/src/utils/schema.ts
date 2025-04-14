@@ -1,5 +1,10 @@
 import * as v from "valibot";
 
+export const signInSchema = v.object({
+  username: v.pipe(v.string(), v.trim(), v.nonEmpty()),
+  password: v.pipe(v.string(), v.trim(), v.nonEmpty())
+});
+
 export const reqNewCertSchema = v.pipe(
   v.object({
     country: v.pipe(v.string(), v.trim(), v.regex(/^[A-Z]{2}$/)),

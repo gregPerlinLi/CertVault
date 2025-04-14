@@ -1,53 +1,56 @@
 <script setup lang="ts">
-import { oidcLogin } from "@/api/authentication/oauth";
+import { login } from "@/api/authentication";
+import { useCommonStore } from "@/stores/common";
 import { useUserStore } from "@/stores/user";
-import { useNotify } from "@/utils/composable";
+import { useFormValidator, useNotify } from "@/utils/composable";
+import { signInSchema } from "@/utils/schema";
 
-// Services
+/* Services */
 const router = useRouter();
-const { toast, info, error } = useNotify();
+const { toast, info, success, error } = useNotify();
+const { isInvalid, clearInvalid, validate } = useFormValidator(signInSchema);
 
-// Stores
-const { oidcProvider, oidcLogo, signIn } = useUserStore();
+/* Stores */
+const { oidcProviders } = useCommonStore();
+const user = useUserStore();
 
-// Reactive
+/* Reactive */
 const busy = ref(false);
-const errIdx = ref<number | null>(null);
 
-// Actions
+/* Actions */
 async function trySignIn(ev: Event): Promise<void> {
-  // Parse form data
-  const formData = new FormData(ev.target as HTMLFormElement);
-
-  // Clear error index
-  errIdx.value = null;
-
-  // Validate username
-  const username = formData.get("username")!.toString().trim();
-  if (username.length === 0) {
-    errIdx.value = 0;
-    error("Validation Error", "Username is required");
+  // Validate form
+  const result = validate(ev.target as HTMLFormElement);
+  if (!result.success) {
+    error("Validation Error", result.issues![0].message);
     return;
   }
 
-  // Validate password
-  const passowrd = formData.get("password")!.toString().trim();
-  if (passowrd.length === 0) {
-    errIdx.value = 1;
-    error("Validation Error", "Password is required");
-    return;
-  }
-
-  // Try sign in
+  // Try to sign in
   busy.value = true;
-  info("Info", "Signing in");
+  const msg = info("Info", "Signing in");
 
-  const err = await signIn(username, passowrd, toast);
-  if (err === null) {
-    await router.push("/dashboard");
+  try {
+    const profile = await login(
+      result.output.username,
+      result.output.password,
+      { timeout: 20000 }
+    );
+
+    user.update(profile);
+    success("Success", "Successfully signed in");
+    router.push("/dashboard");
+  } catch (err: unknown) {
+    error("Fail to Sign In", (err as Error).message);
   }
+
+  toast.remove(msg);
   busy.value = false;
 }
+const oidcLogin = (href: string) => {
+  /* TODO: wait for backend API update */
+  window.open(href, "_self", "noopener=true");
+};
 </script>
 
 <template>
@@ -62,18 +65,20 @@ async function trySignIn(ev: Event): Promise<void> {
             name="username"
             placeholder="Username"
             type="text"
-            :invalid="errIdx === 0"
-            @focus="errIdx = null" />
+            :disabled="busy"
+            :invalid="isInvalid('username')"
+            @focus="clearInvalid('username')" />
           <Password
             input-class="w-full"
             name="password"
             placeholder="Password"
+            :disabled="busy"
             :feedback="false"
-            :invalid="errIdx === 1"
-            @focus="errIdx = null"
+            :invalid="isInvalid('password')"
+            @focus="clearInvalid('password')"
             toggle-mask />
           <Button label="Sign In" type="submit" :loading="busy"></Button>
-          <template v-if="oidcProvider !== null">
+          <template v-if="oidcProviders !== null">
             <div class="flex items-center justify-center my-4">
               <div
                 class="border-neutral-300 border-t w-full dark:border-neutral-500"></div>
@@ -82,13 +87,16 @@ async function trySignIn(ev: Event): Promise<void> {
                 or
               </div>
             </div>
-            <Button
-              class="flex items-center"
-              :disabled="busy"
-              @click="oidcLogin">
-              <img class="h-5" :src="oidcLogo" />
-              <span>Continue with {{ oidcProvider }}</span>
-            </Button>
+            <div class="flex flex-col gap-2">
+              <Button
+                v-for="item in oidcProviders"
+                class="flex items-center"
+                :disabled="busy"
+                @click="oidcLogin(item.href)">
+                <img class="h-5" :src="item.logo" />
+                <span>Continue with {{ item.name }}</span>
+              </Button>
+            </div>
           </template>
         </form>
       </template>
