@@ -1,31 +1,46 @@
 <script setup lang="ts">
 import type { LoginRecordDTO } from "@/api/types";
 import { forceLogoutUsr, getUsrLoginRecs } from "@/api/user/user";
+import { useUserStore } from "@/stores/user";
 import { useAsyncGuard, useNotify } from "@/utils/composable";
 import { useConfirm } from "primevue/useconfirm";
 
-// Async components
+/* Async components */
 const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
 
-// Services
+/* Services */
 const router = useRouter();
 const confirm = useConfirm();
 const { isActivate, signal } = useAsyncGuard();
-const { info, error } = useNotify();
+const { toast, info, success, error } = useNotify();
 
-// Reactive
+/* Stores */
+const user = useUserStore();
+
+/* Reactives */
 const online = ref<LoginRecordDTO[] | null>(null);
 const offline = ref<LoginRecordDTO[] | null>(null);
 const selectedOnline = ref<boolean[]>([]);
 
+const busy = reactive({
+  signOutSelected: false,
+  signOutAll: false
+});
 const loading = reactive({
   online: false,
   offline: false
 });
 
-// Actions
+/* Actions */
+const parseIpRegion = (dto: LoginRecordDTO) => {
+  const arr = [dto.region, dto.province, dto.city].filter(
+    (s) => s !== "Unknown"
+  );
+  return arr.length === 0 ? "Unknown" : arr.join(", ");
+};
 const refreshOnline = async () => {
   loading.online = true;
+  online.value = [];
   try {
     const page = await getUsrLoginRecs(0, 5, 1, { signal });
 
@@ -44,6 +59,7 @@ const refreshOnline = async () => {
 };
 const refreshOffline = async () => {
   loading.offline = true;
+  offline.value = [];
   try {
     const page = await getUsrLoginRecs(0, 50, 0, { signal });
 
@@ -79,12 +95,13 @@ const trySignOutSelected = () => {
     },
     accept: async () => {
       info("Info", "Signing out");
+      /* TODO: force sign out selected */
     }
   });
 };
-const trySignOutAll = () => {
+const trySignOutAll = () =>
   confirm.require({
-    header: "Sign Out All Sessions",
+    header: "Sign out ALL Sessions",
     message: "Are you sure to sign out ALL the sessions?",
     icon: "pi pi-exclamation-triangle",
     modal: true,
@@ -96,15 +113,22 @@ const trySignOutAll = () => {
       variant: "outlined"
     },
     accept: async () => {
-      info("Info", "Signing out");
-      loading.online = true;
-      await forceLogoutUsr();
-      router.push("/");
+      busy.signOutAll = true;
+      const msg = info("Info", "Signing out");
+
+      try {
+        await forceLogoutUsr();
+        success("Success", "Successfully signed out, please re-sign in");
+        user.clear();
+        router.push("/");
+      } catch (err: unknown) {}
+
+      toast.remove(msg);
+      busy.signOutAll = false;
     }
   });
-};
 
-// Hooks
+/* Hooks */
 onBeforeMount(() => {
   refreshOnline();
   refreshOffline();
@@ -112,10 +136,28 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <h1 class="font-bold text-2xl">
-    <i class="mr-2 pi pi-shield text-xl"></i>Security
-  </h1>
-  <hr class="border-2 border-neutral-200 dark:border-neutral-500 my-2" />
+  <!-- Header -->
+  <Breadcrumb
+    :home="{ icon: 'pi pi-home' }"
+    :model="[
+      {
+        label: 'My Account',
+        icon: 'pi pi-user'
+      },
+      {
+        label: 'Security',
+        icon: 'pi pi-shield'
+      }
+    ]">
+    <template #item="{ item }">
+      <div class="flex gap-2 items-center">
+        <span :class="item.icon"></span>
+        <span>{{ item.label }}</span>
+      </div>
+    </template>
+  </Breadcrumb>
+
+  <!-- Main -->
   <h2 class="font-bold my-4 text-lg">Online Sessions</h2>
   <AsyncDataTable
     data-key="uuid"
@@ -129,19 +171,21 @@ onBeforeMount(() => {
         label="Refresh"
         severity="info"
         size="small"
-        @click="refreshOnline" />
+        @click="refreshOnline"></Button>
       <Button
         icon="pi pi-sign-out"
         label="Sign out Selected"
         severity="danger"
         size="small"
-        @click="trySignOutSelected" />
+        :loading="busy.signOutSelected"
+        @click="trySignOutSelected"></Button>
       <Button
         icon="pi pi-times"
         label="Sign out All"
         severity="danger"
         size="small"
-        @click="trySignOutAll" />
+        :loading="busy.signOutAll"
+        @click="trySignOutAll"></Button>
     </template>
     <Column class="w-0">
       <template #header>
@@ -194,10 +238,29 @@ onBeforeMount(() => {
         >
       </template>
     </Column>
-    <Column class="w-90" field="ipAddress" header="IP" />
+    <Column class="w-90" header="IP">
+      <template #body="{ data }">
+        <span
+          v-tooltip.bottom="{
+            value: parseIpRegion(data),
+            pt: { text: 'text-sm w-fit whitespace-nowrap' }
+          }"
+          >{{ data.ipAddress }}</span
+        >
+      </template>
+    </Column>
+    <Column class="w-40" header="Platform">
+      <template #body="{ data }">
+        <span
+          v-tooltip.bottom="{
+            value: data.os,
+            pt: { text: 'text-sm w-fit whitespace-nowrap' }
+          }"
+          >{{ data.platform }}</span
+        >
+      </template>
+    </Column>
     <Column field="browser" header="Browser" />
-    <Column field="platform" header="Platform" />
-    <Column field="os" header="OS" />
   </AsyncDataTable>
   <h2 class="font-bold my-4 text-lg">Last 50 Offline Sessions</h2>
   <AsyncDataTable
@@ -214,9 +277,28 @@ onBeforeMount(() => {
         @click="refreshOffline"></Button>
     </template>
     <Column class="w-65" field="loginTime" header="Login Timestamp" />
-    <Column class="w-90" field="ipAddress" header="IP" />
+    <Column class="w-90" header="IP">
+      <template #body="{ data }">
+        <span
+          v-tooltip.bottom="{
+            value: parseIpRegion(data),
+            pt: { text: 'text-sm w-fit whitespace-nowrap' }
+          }"
+          >{{ data.ipAddress }}</span
+        >
+      </template>
+    </Column>
+    <Column class="w-40" header="Platform">
+      <template #body="{ data }">
+        <span
+          v-tooltip.bottom="{
+            value: data.os,
+            pt: { text: 'text-sm w-fit whitespace-nowrap' }
+          }"
+          >{{ data.platform }}</span
+        >
+      </template>
+    </Column>
     <Column field="browser" header="Browser" />
-    <Column field="platform" header="Platform" />
-    <Column field="os" header="OS" />
   </AsyncDataTable>
 </template>

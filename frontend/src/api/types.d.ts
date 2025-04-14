@@ -87,6 +87,9 @@ export interface LoginRecordDTO {
   uuid: string;
   username: string;
   ipAddress: string;
+  region: string;
+  province: string;
+  city: string;
   browser: string;
   os: string;
   platform: string;
