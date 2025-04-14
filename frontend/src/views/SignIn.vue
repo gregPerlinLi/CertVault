@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { login } from "@/api/authentication";
+import { oidcLogin } from "@/api/authentication/oauth";
 import { useCommonStore } from "@/stores/common";
 import { useUserStore } from "@/stores/user";
 import { useFormValidator, useNotify } from "@/utils/composable";
@@ -47,14 +48,10 @@ async function trySignIn(ev: Event): Promise<void> {
   toast.remove(msg);
   busy.value = false;
 }
-const oidcLogin = (href: string) => {
-  /* TODO: wait for backend API update */
-  window.open(href, "_self", "noopener=true");
-};
 </script>
 
 <template>
-  <div class="fixed flex flex-col inset-0 items-center pt-40">
+  <div class="fixed flex flex-col inset-0 items-center justify-center">
     <img class="h-12 mb-4 w-12" draggable="false" src="/favicon.svg" />
     <h1 class="mb-6 text-center text-xl">Sign In to CertVault</h1>
     <Card
@@ -92,9 +89,9 @@ const oidcLogin = (href: string) => {
                 v-for="item in oidcProviders"
                 class="flex items-center"
                 :disabled="busy"
-                @click="oidcLogin(item.href)">
+                @click="oidcLogin(item.provider)">
                 <img class="h-5" :src="item.logo" />
-                <span>Continue with {{ item.name }}</span>
+                <span>Continue with {{ item.displayName }}</span>
               </Button>
             </div>
           </template>

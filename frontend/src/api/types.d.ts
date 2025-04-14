@@ -12,6 +12,7 @@ export interface PaginationVO<T> {
 
 export interface OidcProviderDTO {
   provider: string;
+  displayName: string;
   logo: string;
 }
 
