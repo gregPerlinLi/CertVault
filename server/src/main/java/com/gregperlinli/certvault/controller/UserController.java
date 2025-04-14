@@ -96,9 +96,9 @@ public class UserController {
         PageDTO<LoginRecordDTO> result = loginRecordService.getUserLoginRecords(
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
                 status,
+                request.getSession().getId(),
                 page,
-                limit
-        );
+                limit);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -166,7 +166,8 @@ public class UserController {
     @DoesNotExistApiResponse
     @DeleteMapping(value = "/session/{uuid}/logout")
     public ResultVO<Void> forceLogoutSession(@Parameter(name = "uuid", description = "Login record UUID", example = "ce9aa242-796e-4baa-9f59-c82a918a9380")
-                                                 @PathVariable("uuid") String uuid, HttpServletRequest request) {
+                                                 @PathVariable("uuid") String uuid,
+                                             HttpServletRequest request) {
         if ( loginRecordService.sessionForceLogout(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), uuid) ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
         }
@@ -186,7 +187,7 @@ public class UserController {
     @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
     @DeleteMapping(value = "/logout")
-    private ResultVO<Void> forceLogoutUser(HttpServletRequest request) {
+    public ResultVO<Void> forceLogoutUser(HttpServletRequest request) {
         if ( loginRecordService.userForceLogout(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername()) ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success");
         }

@@ -1,3 +1,4 @@
+import type { AbortOption } from "@/api";
 import type { LoginRecordDTO, PaginationVO } from "@/api/types";
 import { callRestfulApi } from "@/api";
 
@@ -5,12 +6,14 @@ export const getAllLoginRecs = (
   page: number,
   limit: number,
   status: -1 | 0 | 1 = -1,
-  keyword?: string
+  keyword?: string,
+  abort?: AbortOption
 ) =>
   callRestfulApi<PaginationVO<LoginRecordDTO>>({
     method: "GET",
     baseUrl: "/api/v1/superadmin/user/session",
-    searchParams: { page, limit, status, keyword }
+    searchParams: { page, limit, status, keyword },
+    abort
   });
 
 export interface CreateMultiUsrsPayload {
@@ -20,11 +23,15 @@ export interface CreateMultiUsrsPayload {
   password: string;
   role: 1 | 2 | 3;
 }
-export const createMultiUsrs = (payload: CreateMultiUsrsPayload[]) =>
+export const createMultiUsrs = (
+  payload: CreateMultiUsrsPayload[],
+  abort?: AbortOption
+) =>
   callRestfulApi({
     method: "POST",
     baseUrl: "/api/v1/superadmin/users",
-    payload
+    payload,
+    abort
   });
 
 export interface UpdateUsrInfoPayload {
@@ -34,32 +41,41 @@ export interface UpdateUsrInfoPayload {
 }
 export const updateUsrInfo = (
   username: string,
-  payload: UpdateUsrInfoPayload
+  payload: UpdateUsrInfoPayload,
+  abort?: AbortOption
 ) =>
   callRestfulApi({
     method: "PATCH",
     baseUrl: "/api/v1/superadmin/user/{username}",
     pathNames: { username },
-    payload
+    payload,
+    abort
   });
 
-export const updateMultiUsrRoles = (role: 1 | 2 | 3, usernames: string[]) =>
+export const updateMultiUsrRoles = (
+  role: 1 | 2 | 3,
+  usernames: string[],
+  abort?: AbortOption
+) =>
   callRestfulApi({
     method: "PATCH",
     baseUrl: "/api/v1/superadmin/users/role",
-    payload: usernames.map((username) => ({ username, role }))
+    payload: usernames.map((username) => ({ username, role })),
+    abort
   });
 
-export const deleteMultiUsrs = (usernames: string[]) =>
+export const deleteMultiUsrs = (usernames: string[], abort?: AbortOption) =>
   callRestfulApi({
     method: "DELETE",
     baseUrl: "/api/v1/superadmin/users",
-    payload: usernames
+    payload: usernames,
+    abort
   });
 
-export const forceLogoutUsr = (username: string) =>
+export const forceLogoutUsr = (username: string, abort?: AbortOption) =>
   callRestfulApi({
     method: "DELETE",
     baseUrl: "/api/v1/superadmin/user/{username}/logout",
-    pathNames: { username }
+    pathNames: { username },
+    abort
   });

@@ -1,5 +1,6 @@
 - [x] Import CA
+- [x] Support OAuth
+- [ ] Refactor certificate management
 - [ ] User management
 - [ ] Bind/Unbind CA/SSL to user
 - [ ] Dashboard
-- [ ] Support OAuth

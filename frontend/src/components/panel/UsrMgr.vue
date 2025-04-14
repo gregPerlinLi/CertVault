@@ -1,19 +1,22 @@
 <script setup lang="ts">
 import type { UserProfileDTO } from "@/api/types";
 import { getAllUsrInfo } from "@/api/admin/user";
-import { useNotify, useRole } from "@/utils/composable";
+import { useUserStore } from "@/stores/user";
+import { useNotify } from "@/utils/composable";
 import { nanoid } from "nanoid";
 // import { useConfirm } from "primevue/useconfirm";
 
-// Async components
+/* Async components */
 const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
 
-// Services
+/* Services */
 // const confirm = useConfirm();
 const { error } = useNotify();
-const { isSuperadmin } = useRole();
 
-// Reactives
+/* Stores */
+const { isSuperadmin } = useUserStore();
+
+/* Reactives */
 const loading = ref(false);
 const searchKeyword = ref("");
 const selectedUsers = ref([]);
@@ -25,10 +28,10 @@ const pagination = reactive({
   data: [] as UserProfileDTO[]
 });
 
-// Non-reactives
+/* Non-reactives */
 let nonce = nanoid();
 
-// Actions
+/* Actions */
 const refresh = async () => {
   nonce = nanoid();
   const tag = nonce;
@@ -59,14 +62,14 @@ const refresh = async () => {
   }
 };
 
-// Watches
+/* Watches */
 watch(
   () => [pagination.first, pagination.limit],
   () => refresh()
 );
 watchDebounced(searchKeyword, () => refresh(), { debounce: 500 });
 
-// Hooks
+/* Hooks */
 onBeforeMount(() => refresh());
 </script>
 

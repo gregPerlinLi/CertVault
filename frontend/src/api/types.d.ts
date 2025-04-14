@@ -12,6 +12,7 @@ export interface PaginationVO<T> {
 
 export interface OidcProviderDTO {
   provider: string;
+  displayName: string;
   logo: string;
 }
 
@@ -86,9 +87,13 @@ export interface LoginRecordDTO {
   uuid: string;
   username: string;
   ipAddress: string;
+  region: string;
+  province: string;
+  city: string;
   browser: string;
   os: string;
   platform: string;
   loginTime: string;
   isOnline: boolean;
+  isCurrentSession: boolean;
 }

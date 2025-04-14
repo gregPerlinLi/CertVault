@@ -1,37 +1,47 @@
 <script setup lang="ts">
+import { logout } from "@/api/authentication";
 import { useUserStore } from "@/stores/user";
 import { useNotify } from "@/utils/composable";
 import { useConfirm } from "primevue/useconfirm";
 
-// Services
+/* Services */
 const router = useRouter();
 const confirm = useConfirm();
-const { toast, info } = useNotify();
+const { toast, info, success, error } = useNotify();
 
-// Stores
-const { displayName, signOut } = useUserStore();
+/* Stores */
+const user = useUserStore();
 
-// Actions
-const signOutOnClick = (): void => {
+/* Reactives */
+const busy = ref(false);
+
+/* Actions */
+const trySignOut = () =>
   confirm.require({
-    header: "Sign Out",
+    header: "Sign out",
     message: "Are you sure to sign out?",
     icon: "pi pi-exclamation-triangle",
     modal: true,
-    acceptProps: {
-      severity: "danger"
-    },
-    rejectProps: {
-      severity: "secondary",
-      variant: "outlined"
-    },
+    acceptProps: { severity: "danger" },
+    rejectProps: { severity: "secondary", variant: "outlined" },
     accept: async () => {
-      info("Info", "Signing out");
-      await signOut(toast);
-      router.push("/");
+      busy.value = true;
+      const msg = info("Info", "Signing out");
+
+      try {
+        await logout({ timeout: -1 });
+
+        success("Success", "Successfully signed out");
+        user.clear();
+        router.push("/");
+      } catch (err: unknown) {
+        error("Fail to Sign out", (err as Error).message);
+      }
+
+      toast.remove(msg);
+      busy.value = false;
     }
   });
-};
 </script>
 
 <template>
@@ -41,14 +51,17 @@ const signOutOnClick = (): void => {
       <img class="h-10" draggable="false" src="@/assets/logo.svg" />
     </RouterLink>
     <div class="flex gap-4 items-baseline">
-      <p class="italic text-neutral-500 text-sm">Welcome, {{ displayName }}</p>
+      <p class="italic text-neutral-500 text-sm">
+        Welcome, {{ user.displayName }}
+      </p>
       <Button
         v-tooltip.bottom="{ value: 'Sign Out', class: 'text-xs' }"
         aria-label="Sign out"
         icon="pi pi-sign-out"
         severity="danger"
         size="small"
-        @click="signOutOnClick"></Button>
+        :loading="busy"
+        @click="trySignOut"></Button>
     </div>
   </header>
 </template>

@@ -7,11 +7,12 @@ import {
 } from "@/api/admin/cert/ca";
 import { getAllBindedCaInfo } from "@/api/user/cert/ca";
 import { deleteSslCert, getAllSslCertInfo } from "@/api/user/cert/ssl";
-import { useNotify, useRole } from "@/utils/composable";
+import { useUserStore } from "@/stores/user";
+import { useNotify } from "@/utils/composable";
 import { nanoid } from "nanoid";
 import { useConfirm } from "primevue/useconfirm";
 
-// Async components
+/* Async components */
 const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
 const AsyncReqNewCertDlg = defineAsyncComponent(
   () => import("@/components/dialog/cert/ReqNewCertDlg.vue")
@@ -35,12 +36,14 @@ const AsyncRenewCertDlg = defineAsyncComponent(
 // Properties
 const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 
-// Services
+/* Services */
 const confirm = useConfirm();
 const { info, success, error } = useNotify();
-const { isUser, aboveUser } = useRole();
 
-// Reactives
+/* Stores */
+const { isUser, isAdmin, isSuperadmin } = useUserStore();
+
+/* Reactives */
 const loading = ref(false);
 const searchKeyword = ref("");
 const targetCertData = ref<CaInfoDTO | CertInfoDTO>();
@@ -60,7 +63,7 @@ const dialog = reactive({
   editComment: false
 });
 
-// Computed
+/* Computed */
 const getCertInfo = computed(() => {
   if (variant === "ca") {
     if (isUser.value) {
@@ -76,10 +79,10 @@ const delCertFn = computed(() =>
   variant === "ca" ? deleteCaCert : deleteSslCert
 );
 
-// Non-reactives
+/* Non-reactives */
 let nonce = nanoid();
 
-// Actions
+/* Actions */
 const refresh = async () => {
   nonce = nanoid();
   const tag = nonce;
@@ -113,14 +116,14 @@ const refresh = async () => {
   }
 };
 
-// Watches
+/* Watches */
 watch(
   () => [pagination.first, pagination.limit],
   () => refresh()
 );
 watchDebounced(searchKeyword, () => refresh(), { debounce: 500 });
 
-// Actions
+/* Actions */
 const tryToggleCertAvailable = (data: CaInfoDTO) => {
   confirm.require({
     header: "Toggle Certificate Availability",
@@ -167,7 +170,7 @@ const tryDelCert = (data: CertInfoDTO) => {
   });
 };
 
-// Hooks
+/* Hooks */
 onBeforeMount(() => refresh());
 </script>
 
@@ -176,13 +179,13 @@ onBeforeMount(() => refresh());
     <template #start>
       <div class="flex gap-4">
         <Button
-          v-if="variant === 'ssl' || aboveUser"
+          v-if="variant === 'ssl' || isAdmin || isSuperadmin"
           icon="pi pi-plus"
           label="Request New"
           size="small"
           @click="dialog.reqNewCert = true"></Button>
         <Button
-          v-if="variant === 'ca' && aboveUser"
+          v-if="variant === 'ca' && (isAdmin || isSuperadmin)"
           icon="pi pi-upload"
           label="Upload New"
           size="small"
@@ -234,14 +237,14 @@ onBeforeMount(() => refresh());
             v-tooltip.bottom="{ value: data.comment, class: 'text-sm' }"
             class="overflow-x-hidden text-ellipsis whitespace-nowrap"
             :class="
-              variant === 'ssl' || aboveUser
+              variant === 'ssl' || isAdmin || isSuperadmin
                 ? 'max-w-[calc(var(--container-md)-32px)]'
                 : 'max-w-md'
             ">
             {{ data.comment }}
           </p>
           <Button
-            v-if="variant === 'ssl' || aboveUser"
+            v-if="variant === 'ssl' || isAdmin || isSuperadmin"
             v-tooltip.top="{ value: 'Edit', class: 'text-sm' }"
             aria-label="Edit certificate information"
             class="h-6 opacity-0 w-6 group-hover:opacity-100"
@@ -261,7 +264,10 @@ onBeforeMount(() => refresh());
     </Column>
 
     <!-- Owner column -->
-    <Column v-if="variant === 'ca' || aboveUser" header="Owner" class="w-50">
+    <Column
+      v-if="variant === 'ca' || isAdmin || isSuperadmin"
+      header="Owner"
+      class="w-50">
       <template #body="{ data }">
         <p
           v-tooltip.bottom="{ value: data.owner, class: 'text-sm' }"
@@ -344,7 +350,7 @@ onBeforeMount(() => refresh());
               }
             "></Button>
           <Button
-            v-if="variant === 'ssl' || aboveUser"
+            v-if="variant === 'ssl' || isAdmin || isSuperadmin"
             v-tooltip.top="{ value: 'Renew', class: 'text-sm' }"
             aria-label="Renew certificate"
             class="h-6 w-6"
@@ -360,7 +366,7 @@ onBeforeMount(() => refresh());
               }
             "></Button>
           <Button
-            v-if="variant === 'ca' && aboveUser"
+            v-if="variant === 'ca' && (isAdmin || isSuperadmin)"
             v-tooltip.top="{
               value: data.available ? 'Disable' : 'Enable',
               class: 'text-sm'
@@ -374,7 +380,7 @@ onBeforeMount(() => refresh());
             rounded
             @click="tryToggleCertAvailable(data)"></Button>
           <Button
-            v-if="variant === 'ssl' || aboveUser"
+            v-if="variant === 'ssl' || isAdmin || isSuperadmin"
             v-tooltip.top="{ value: 'Delete', class: 'text-sm' }"
             aria-label="Delete certificate"
             class="h-6 w-6"

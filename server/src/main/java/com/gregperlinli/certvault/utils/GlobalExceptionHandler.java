@@ -89,6 +89,11 @@ public class GlobalExceptionHandler {
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.SERVER_ERROR.getResultCode()));
             return new ResultVO<>(((ServerException) e).getCode(), msg);
         }
+        if ( e instanceof IllegalStateException && msg.contains("Session already invalidated") ) {
+            // response.setStatus(ResultStatusCodeConstant.UNAUTHORIZED);
+            response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode()));
+            return new ResultVO<>(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), msg);
+        }
         // 认证异常需要再往上丢给 SpringSecurity 专门处理
         if ( e instanceof AuthenticationException || e instanceof AccessDeniedException || e instanceof AuthorizationDeniedException) {
             throw e;

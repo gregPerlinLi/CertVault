@@ -14,7 +14,7 @@ const AsyncEditPasswd = defineAsyncComponent(
 );
 
 // Stores
-const { username, displayName, email, role } = useUserStore();
+const user = useUserStore();
 
 // Services
 const { error } = useNotify();
@@ -42,20 +42,35 @@ const onSubmitNewPassword = () => {
 
 <template>
   <!-- Header -->
-  <h1 class="font-bold text-2xl">
-    <i class="mr-2 pi pi-user text-xl"></i>My profile
-  </h1>
-  <hr class="border-2 border-neutral-200 dark:border-neutral-500 my-2" />
+  <Breadcrumb
+    :home="{ icon: 'pi pi-home' }"
+    :model="[
+      {
+        label: 'My Account',
+        icon: 'pi pi-user'
+      },
+      {
+        label: 'Profile',
+        icon: 'pi pi-user-edit'
+      }
+    ]">
+    <template #item="{ item }">
+      <div class="flex gap-2 items-center">
+        <span :class="item.icon"></span>
+        <span>{{ item.label }}</span>
+      </div>
+    </template>
+  </Breadcrumb>
 
   <!-- Main -->
   <section>
     <h2>Username</h2>
-    <p>{{ username }}</p>
+    <p>{{ user.username }}</p>
   </section>
   <section>
     <h2>Display Name</h2>
     <p>
-      {{ displayName }}
+      {{ user.displayName }}
       <Button
         icon="pi pi-pen-to-square"
         severity="help"
@@ -68,7 +83,7 @@ const onSubmitNewPassword = () => {
   <section>
     <h2>Email</h2>
     <p>
-      {{ email }}
+      {{ user.email }}
       <Button
         icon="pi pi-pen-to-square"
         severity="help"
@@ -80,7 +95,7 @@ const onSubmitNewPassword = () => {
   </section>
   <section>
     <h2>Role</h2>
-    <p>{{ role }}</p>
+    <p :class="user.getRoleClass.value()">{{ user.displayRole }}</p>
   </section>
   <section>
     <h2>New Password</h2>
@@ -104,8 +119,10 @@ const onSubmitNewPassword = () => {
   <!-- Dialogs -->
   <AsyncEditDispName
     v-model:visible="dialog.editDispName"
-    :value="displayName ?? ''" />
-  <AsyncEditEmail v-model:visible="dialog.editEmail" :value="email ?? ''" />
+    :value="user.displayName.value ?? ''" />
+  <AsyncEditEmail
+    v-model:visible="dialog.editEmail"
+    :value="user.email.value ?? ''" />
   <AsyncEditPasswd
     v-model:visible="dialog.editPasswd"
     v-model:new-password="newPassword" />

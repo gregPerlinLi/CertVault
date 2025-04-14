@@ -94,6 +94,8 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
                                 .like("uuid", keyword)
                                 .or()
                                 .like("comment", keyword)
+                                .or()
+                                .like("ca_uuid", keyword)
                                 )
                         .in("ca_uuid", caUuids)
                         .eq("deleted", false);
@@ -104,13 +106,17 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
                 certificateQueryWrapper.and(wrapper -> wrapper
                                 .like("uuid", keyword)
                                 .or()
-                                .like("comment", keyword))
+                                .like("comment", keyword)
+                                .or()
+                                .like("ca_uuid", keyword))
                         .eq("deleted", false);
             } else {
                 certificateQueryWrapper.and(wrapper -> wrapper
                                 .like("uuid", keyword)
                                 .or()
-                                .like("comment", keyword))
+                                .like("comment", keyword)
+                                .or()
+                                .like("ca_uuid", keyword))
                         .eq("owner", user.getId())
                         .eq("deleted", false);
             }

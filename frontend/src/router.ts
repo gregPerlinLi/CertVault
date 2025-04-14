@@ -1,3 +1,4 @@
+import { useCommonStore } from "@/stores/common";
 import { useUserStore } from "@stores/user";
 import { useNotify } from "@/utils/composable";
 import { createRouter, createWebHashHistory } from "vue-router";
@@ -21,9 +22,14 @@ const router = createRouter({
           meta: { title: "Dashboard - CertVault" }
         },
         {
-          path: "profile",
-          component: () => import("@views/dashboard/Profile.vue"),
-          meta: { title: "Profile - CertVault" }
+          path: "account/profile",
+          component: () => import("@/views/dashboard/account/Profile.vue"),
+          meta: { title: "Profile - My Account - CertVault" }
+        },
+        {
+          path: "account/security",
+          component: () => import("@/views/dashboard/account/Security.vue"),
+          meta: { title: "Security - My Account - CertVault" }
         },
         {
           path: "users",
@@ -36,9 +42,9 @@ const router = createRouter({
           meta: { title: "Certificates - CertVault" }
         },
         {
-          path: "security",
-          component: () => import("@views/dashboard/Security.vue"),
-          meta: { title: "Security - CertVault" }
+          path: "binding",
+          component: () => import("@views/dashboard/Binding.vue"),
+          meta: { title: "CA Binding - CertVault" }
         }
       ]
     }
@@ -47,21 +53,31 @@ const router = createRouter({
 
 // Set guards
 router.beforeEach(async (to) => {
-  const { signedIn, init } = useUserStore();
-  const { toast } = useNotify();
+  /* Services */
+  const toast = (() => {
+    try {
+      const { toast } = useNotify();
+      return toast;
+    } catch {
+      return undefined;
+    }
+  })();
+
+  /* Stores */
+  const common = useCommonStore();
+  const user = useUserStore();
 
   // Set title
   useTitle(to.meta.title as string);
 
-  // Initialize user
-  await init(to.path === "/" ? undefined : toast);
+  // Initialize
+  await common.initialize(to.path === "/" ? undefined : toast);
 
   // Redirect
-  if (signedIn.value) {
-    if (to.path === "/") {
-      return "/dashboard";
-    }
-  } else if (to.path !== "/") {
+  if (to.path === "/" && user.isSignedIn.value) {
+    return "/dashboard";
+  }
+  if (to.path !== "/" && !user.isSignedIn.value) {
     return "/";
   }
 });

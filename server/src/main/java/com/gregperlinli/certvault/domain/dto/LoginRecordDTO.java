@@ -1,6 +1,5 @@
 package com.gregperlinli.certvault.domain.dto;
 
-import com.gregperlinli.certvault.domain.entities.LoginRecord;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -58,6 +57,36 @@ public class LoginRecordDTO {
     private String ipAddress;
 
     /**
+     * Region
+     */
+    @Schema(
+            name = "region",
+            description = "Region",
+            example = "China"
+    )
+    private String region;
+
+    /**
+     * Province
+     */
+    @Schema(
+            name = "province",
+            description = "Province",
+            example = "Guangdong"
+    )
+    private String province;
+
+    /**
+     * City
+     */
+    @Schema(
+            name = "city",
+            description = "City",
+            example = "Canton"
+    )
+    private String city;
+
+    /**
      * Browser
      */
     @Schema(
@@ -106,5 +135,28 @@ public class LoginRecordDTO {
             example = "true"
     )
     private Boolean isOnline;
+
+    /**
+     * Is current session
+     */
+    @Schema(
+            name = "isCurrentSession",
+            description = "Current session status",
+            example = "false"
+    )
+    private Boolean isCurrentSession = false;
+
+    public LoginRecordDTO(String uuid, String username, String ipAddress, String region, String province, String city, String browser, String os, String platform, LocalDateTime loginTime, Boolean isOnline) {
+        this.uuid = uuid;
+        this.username = username;
+        this.ipAddress = ipAddress;
+        this.region = region;
+        this.province = province;
+        this.city = city;
+        this.browser = browser;
+        this.os = os;
+        this.platform = platform;
+       this.loginTime = loginTime;
+    }
 
 }
