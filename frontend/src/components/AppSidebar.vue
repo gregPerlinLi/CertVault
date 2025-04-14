@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import type { MenuItem } from "primevue/menuitem";
-import { useRole } from "@/utils/composable";
+import { useUserStore } from "@/stores/user";
 
-// Services
+/* Services */
 const router = useRouter();
-const { role, aboveUser } = useRole();
 
-// Computed
+/* Stores */
+const { displayRole, isAdmin, isSuperadmin } = useUserStore();
+
+/* Computed */
 const menuModel = computed(() =>
   (
     [
@@ -16,25 +18,48 @@ const menuModel = computed(() =>
         command: () => router.push("/dashboard")
       },
       {
-        label: "My Profile",
+        label: "My Account",
         icon: "pi pi-user",
-        command: () => router.push("/dashboard/profile")
+        items: [
+          {
+            label: "Profile",
+            icon: "pi pi-user-edit",
+            command: () => router.push("/dashboard/account/profile")
+          },
+          {
+            label: "Security",
+            icon: "pi pi-shield",
+            command: () => router.push("/dashboard/account/security")
+          }
+        ]
       },
       {
         label: "Users",
         icon: "pi pi-users",
-        show: aboveUser.value,
+        show: isAdmin.value || isSuperadmin.value,
         command: () => router.push("/dashboard/users")
       },
       {
         label: "Certificates",
         icon: "pi pi-verified",
-        command: () => router.push("/dashboard/certificates")
+        items: [
+          {
+            label: "CA Certificates",
+            icon: "pi pi-building-columns",
+            command: () => router.push("/dashboard/certificates/ca")
+          },
+          {
+            label: "SSL Certificates",
+            icon: "pi pi-receipt",
+            command: () => router.push("/dashboard/certificates/ca")
+          }
+        ]
       },
       {
-        label: "Security",
-        icon: "pi pi-shield",
-        command: () => router.push("/dashboard/security")
+        label: "CA Binding",
+        icon: "pi pi-link",
+        show: isAdmin.value || isSuperadmin.value,
+        command: () => router.push("/dashboard/binding")
       }
     ] satisfies MenuItem[]
   ).filter((itm: MenuItem & { only?: string[] }): boolean => itm?.show ?? true)
@@ -44,10 +69,14 @@ const menuModel = computed(() =>
 <template>
   <aside>
     <div class="flex flex-col gap-4 p-4 sticky top-[65px]">
-      <PanelMenu :model="menuModel" />
+      <PanelMenu
+        class="w-60"
+        :model="menuModel"
+        :pt="{ submenuIcon: { class: 'hidden!' } }"
+        multiple />
       <hr class="border-neutral-200 border-t-2 dark:border-neutral-500" />
       <p class="leading-none select-none text-center text-neutral-400 text-sm">
-        {{ role }} View
+        {{ displayRole }} View
       </p>
     </div>
   </aside>
