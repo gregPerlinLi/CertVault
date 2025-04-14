@@ -1,22 +1,23 @@
 <script setup lang="ts">
-import { useUserStore } from "@/stores/user";
+import { useCommonStore } from "@/stores/common";
 
-// Stores
-const { initialized } = useUserStore();
+/* Stores */
+const { initialized } = useCommonStore();
 </script>
 
 <template>
+  <RouterView />
+  <ConfirmDialog :pt="{ root: { class: 'z-[250]' } }" />
   <Toast
+    position="bottom-right"
     :pt="{
       root: { class: 'z-[500]' },
       summary: { class: 'leading-none' },
       detail: { class: 'leading-none' }
     }" />
-  <ConfirmDialog />
   <div
     v-if="!initialized"
     class="bg-white fixed flex inset-0 items-center justify-center z-[1000] dark:bg-black">
     <ProgressSpinner />
   </div>
-  <RouterView />
 </template>

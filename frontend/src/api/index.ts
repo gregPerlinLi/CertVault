@@ -59,9 +59,9 @@ export const callRestfulApi = async <U = null>(
 
   const json: ResultVO<U> = await resp.json();
   if (json.code < 200 || json.code >= 300) {
-    const { signedIn, clearSignedInfo } = useUserStore();
-    if (json.code === 401 && signedIn.value) {
-      clearSignedInfo();
+    const user = useUserStore();
+    if (json.code === 401 && user.isSignedIn.value) {
+      user.clear();
       router.push("/");
       return json.data!;
     }
