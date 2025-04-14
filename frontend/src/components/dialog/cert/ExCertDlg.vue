@@ -3,10 +3,11 @@ import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
 import { getCaPrivKey } from "@/api/admin/cert/ca";
 import { getCaCert } from "@/api/user/cert/ca";
 import { getSslCert, getSslPrivKey } from "@/api/user/cert/ssl";
+import { useUserStore } from "@/stores/user";
 import { b64ToU8Arr, saveFile } from "@/utils";
-import { useNotify, useRole } from "@/utils/composable";
+import { useNotify } from "@/utils/composable";
 
-// Models
+/* Models */
 const visible = defineModel<boolean>("visible");
 
 // Properties
@@ -15,18 +16,20 @@ const { variant, data } = defineProps<{
   data?: CaInfoDTO | CertInfoDTO;
 }>();
 
-// Services
+/* Services */
 const { info, success, error } = useNotify();
-const { aboveUser } = useRole();
 
-// Reactive
+/* Stores */
+const { isAdmin, isSuperadmin } = useUserStore();
+
+/* Reactives */
 const busy = reactive({
   exportCert: false,
   exportChain: false,
   exportPrivKey: false
 });
 
-// Computed
+/* Computed */
 const canClose = computed(
   () => !busy.exportCert && !busy.exportChain && !busy.exportPrivKey
 );
@@ -35,7 +38,7 @@ const getPrivKeyFn = computed(() =>
   variant === "ca" ? getCaPrivKey : getSslPrivKey
 );
 
-// Actions
+/* Actions */
 const exportCert = async (fullchain: boolean = false) => {
   try {
     if (fullchain) {
@@ -87,7 +90,7 @@ const onSumbit = async (ev: Event) => {
   }
 };
 
-// Watch
+/* Watch */
 watch(visible, (v) => {
   if (v) {
     busy.exportCert = false;
@@ -120,7 +123,7 @@ watch(visible, (v) => {
           @click="exportCert(true)"></Button>
       </div>
     </section>
-    <section v-if="variant === 'ssl' || aboveUser" class="mt-8">
+    <section v-if="variant === 'ssl' || isAdmin || isSuperadmin" class="mt-8">
       <h1 class="font-bold my-2 text-lg">Private Key</h1>
       <form class="flex flex-col gap-2" @submit.prevent="onSumbit">
         <Password

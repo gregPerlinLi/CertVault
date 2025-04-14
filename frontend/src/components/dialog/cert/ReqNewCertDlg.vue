@@ -4,12 +4,13 @@ import type { VirtualScrollerLazyEvent } from "primevue";
 import { getAllCaInfo, requestCaCert } from "@/api/admin/cert/ca";
 import { getAllBindedCaInfo } from "@/api/user/cert/ca";
 import { requestSslCert } from "@/api/user/cert/ssl";
-import { useNotify, useRole } from "@/utils/composable";
+import { useUserStore } from "@/stores/user";
+import { useNotify } from "@/utils/composable";
 import { reqNewCertSchema } from "@/utils/schema";
 import { validateForm } from "@/utils/validate";
 import { nanoid } from "nanoid";
 
-// Models
+/* Models */
 const visible = defineModel<boolean>("visible");
 
 // Properties
@@ -18,11 +19,13 @@ const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 // Emits
 const emits = defineEmits<{ success: [] }>();
 
-// Services
+/* Services */
 const { info, success, error } = useNotify();
-const { isUser } = useRole();
 
-// Reactives
+/* Stores */
+const { isUser } = useUserStore();
+
+/* Reactives */
 const busy = ref(false);
 const errField = ref<string>();
 
@@ -32,15 +35,15 @@ const allowSubCa = ref(true);
 const caList = ref<CaInfoDTO[]>([]);
 const loadingCaList = ref(false);
 
-// Computed
+/* Computed */
 const reqNewCertFn = computed(() =>
   variant === "ca" ? requestCaCert : requestSslCert
 );
 
-// Non-reactive
+/* Non-reactive */
 let nonce = nanoid();
 
-// Actions
+/* Actions */
 const clearErr = (field: string) => {
   if (errField.value === field) {
     errField.value = undefined;
@@ -119,7 +122,7 @@ const onSubmit = async (ev: Event) => {
   }
 };
 
-// Watches
+/* Watches */
 watch(visible, (v) => {
   if (v) {
     busy.value = false;
