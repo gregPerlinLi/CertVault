@@ -17,7 +17,6 @@ declare module 'vue' {
     Badge: typeof import('primevue/badge')['default']
     Breadcrumb: typeof import('primevue/breadcrumb')['default']
     Button: typeof import('primevue/button')['default']
-    ButtonGroup: typeof import('primevue/buttongroup')['default']
     Card: typeof import('primevue/card')['default']
     CertMgr: typeof import('./src/components/panel/CertMgr.vue')['default']
     Checkbox: typeof import('primevue/checkbox')['default']
