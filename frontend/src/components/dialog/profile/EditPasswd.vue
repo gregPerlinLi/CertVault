@@ -1,24 +1,21 @@
 <script setup lang="ts">
-import { useUserStore } from "@/stores/user";
+import { updateProfile } from "@/api/user/user";
 import { useNotify } from "@/utils/composable";
 
-// Models
+/* Models */
 const visible = defineModel<boolean>("visible");
 const newPassword = defineModel<string>("new-password");
 
-// Stores
-const { syncToRemote } = useUserStore();
+/* Services */
+const { toast, info, success, error } = useNotify();
 
-// Services
-const { toast, info, error } = useNotify();
-
-// Reactive
+/* Reactive */
 const invalid = ref(false);
 const busy = ref(false);
 
 const oldPassword = ref("");
 
-// Actions
+/* Actions */
 const submit = async () => {
   // Clear error flag
   invalid.value = false;
@@ -32,18 +29,32 @@ const submit = async () => {
 
   // Try update
   busy.value = true;
-  info("Info", "Updating");
+  const msg = info("Info", "Updating");
 
-  const err = await syncToRemote(
-    { oldPassword: oldPassword.value, newPassword: newPassword.value },
-    toast
-  );
-  if (err === null) {
-    newPassword.value = "";
+  try {
+    await updateProfile({
+      oldPassword: oldPassword.value,
+      newPassword: newPassword.value
+    });
+    success("Success", "Successfully updated profile");
     visible.value = false;
+  } catch (err: unknown) {
+    error("Fail to Update Profile", (err as Error).message);
   }
+
+  toast.remove(msg);
   busy.value = false;
 };
+
+/* Watches */
+watch(visible, () => {
+  if (!visible.value) {
+    invalid.value = false;
+    busy.value = false;
+    oldPassword.value = "";
+    newPassword.value = "";
+  }
+});
 </script>
 
 <template>
@@ -66,12 +77,7 @@ const submit = async () => {
           size="small"
           type="button"
           :disabled="busy"
-          @click="
-            () => {
-              newPassword = '';
-              visible = false;
-            }
-          "></Button>
+          @click="visible = false"></Button>
         <Button
           label="Confirm"
           size="small"

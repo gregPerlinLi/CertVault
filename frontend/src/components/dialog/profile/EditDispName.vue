@@ -1,26 +1,27 @@
 <script setup lang="ts">
+import { getProfile, updateProfile } from "@/api/user/user";
 import { useUserStore } from "@/stores/user";
 import { useNotify } from "@/utils/composable";
 
-// Models
+/* Models */
 const visible = defineModel<boolean>("visible");
 
 // Properties
 const props = defineProps<{ value: string }>();
 
-// Stores
-const { syncToRemote } = useUserStore();
+/* Services */
+const { toast, info, success, error } = useNotify();
 
-// Services
-const { toast, info, error } = useNotify();
+/* Stores */
+const user = useUserStore();
 
-// Reactive
+/* Reactive */
 const invalid = ref(false);
 const busy = ref(false);
 
 const newDisplayName = ref(props.value);
 
-// Actions
+/* Actions */
 const submit = async () => {
   // Clear error flag
   invalid.value = false;
@@ -37,16 +38,32 @@ const submit = async () => {
     return;
   }
 
-  // Try update
+  // Try to update
   busy.value = true;
-  info("Info", "Updating");
+  const msg = info("Info", "Updating");
 
-  const err = await syncToRemote({ displayName: newDisplayName.value }, toast);
-  if (err === null) {
+  try {
+    await updateProfile({ displayName: newDisplayName.value });
+    const profile = await getProfile({ timeout: -1 });
+    user.update(profile);
+    success("Success", "Successfully updated profile");
     visible.value = false;
+  } catch (err: unknown) {
+    error("Fail to Update Profile", (err as Error).message);
   }
+
+  toast.remove(msg);
   busy.value = false;
 };
+
+/* Watches */
+watch(visible, () => {
+  if (!visible.value) {
+    invalid.value = false;
+    busy.value = false;
+    newDisplayName.value = props.value;
+  }
+});
 </script>
 
 <template>
