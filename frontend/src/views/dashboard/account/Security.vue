@@ -191,7 +191,8 @@ onBeforeMount(() => {
     size="small"
     :loading="loading.online"
     :pt="{ header: { class: 'flex gap-4' } }"
-    :value="online">
+    :value="online"
+    row-hover>
     <template #header>
       <Button
         icon="pi pi-refresh"
@@ -289,12 +290,14 @@ onBeforeMount(() => {
     </Column>
     <Column field="browser" header="Browser" />
   </AsyncDataTable>
+
   <h2 class="font-bold my-4 text-lg">Last 20 Offline Sessions</h2>
   <AsyncDataTable
     data-key="uuid"
     size="small"
     :loading="loading.offline"
-    :value="offline">
+    :value="offline"
+    row-hover>
     <template #header>
       <Button
         icon="pi pi-refresh"
