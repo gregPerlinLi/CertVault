@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { LoginRecordDTO } from "@/api/types";
-import { forceLogoutUsr, getUsrLoginRecs } from "@/api/user/user";
+import {
+  forceLogoutSession,
+  forceLogoutUsr,
+  getUsrLoginRecs
+} from "@/api/user/user";
 import { useUserStore } from "@/stores/user";
 import { useAsyncGuard, useNotify } from "@/utils/composable";
 import { useConfirm } from "primevue/useconfirm";
@@ -61,7 +65,7 @@ const refreshOffline = async () => {
   loading.offline = true;
   offline.value = [];
   try {
-    const page = await getUsrLoginRecs(0, 50, 0, { signal });
+    const page = await getUsrLoginRecs(0, 20, 0, { signal });
 
     if (isActivate.value) {
       offline.value = (page.list ?? []).sort((a, b) =>
@@ -76,13 +80,16 @@ const refreshOffline = async () => {
   loading.offline = false;
 };
 const trySignOutSelected = () => {
-  if (selectedOnline.value.length === 0) {
+  const cnt = selectedOnline.value
+    .slice(0, -1)
+    .reduce((prev, cur) => (cur ? prev + 1 : prev), 0);
+  if (cnt === 0) {
     error("Fail to Sign out Selected Session", "No session selected");
     return;
   }
 
   confirm.require({
-    header: "Sign Out Selected Sessions",
+    header: "Sign out Selected Sessions",
     message: "Are you sure to sign out the selected sessions?",
     icon: "pi pi-exclamation-triangle",
     modal: true,
@@ -94,15 +101,33 @@ const trySignOutSelected = () => {
       variant: "outlined"
     },
     accept: async () => {
-      info("Info", "Signing out");
-      /* TODO: force sign out selected */
+      busy.signOutSelected = true;
+      const msg = info("Info", "Signing out");
+
+      try {
+        await Promise.allSettled(
+          selectedOnline.value
+            .slice(0, -1)
+            .map((v, i) => {
+              return v ? forceLogoutSession(online.value![i].uuid) : null;
+            })
+            .filter((v) => v !== null)
+        );
+        success("Success", "Successfully signed out");
+      } catch (err: unknown) {
+        error("Fail to Sign out", (err as Error).message);
+      }
+
+      refreshOnline();
+      toast.remove(msg);
+      busy.signOutSelected = false;
     }
   });
 };
 const trySignOutAll = () =>
   confirm.require({
-    header: "Sign out ALL Sessions",
-    message: "Are you sure to sign out ALL the sessions?",
+    header: "Sign out all Sessions",
+    message: "Are you sure to sign out all the sessions?",
     icon: "pi pi-exclamation-triangle",
     modal: true,
     acceptProps: {
@@ -121,7 +146,9 @@ const trySignOutAll = () =>
         success("Success", "Successfully signed out, please re-sign in");
         user.clear();
         router.push("/");
-      } catch (err: unknown) {}
+      } catch (err: unknown) {
+        error("Fail to Sign out", (err as Error).message);
+      }
 
       toast.remove(msg);
       busy.signOutAll = false;
@@ -181,7 +208,7 @@ onBeforeMount(() => {
         @click="trySignOutSelected"></Button>
       <Button
         icon="pi pi-times"
-        label="Sign out All"
+        label="Sign out all"
         severity="danger"
         size="small"
         :loading="busy.signOutAll"
@@ -262,7 +289,7 @@ onBeforeMount(() => {
     </Column>
     <Column field="browser" header="Browser" />
   </AsyncDataTable>
-  <h2 class="font-bold my-4 text-lg">Last 50 Offline Sessions</h2>
+  <h2 class="font-bold my-4 text-lg">Last 20 Offline Sessions</h2>
   <AsyncDataTable
     data-key="uuid"
     size="small"
