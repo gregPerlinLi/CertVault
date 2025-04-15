@@ -42,7 +42,7 @@ async function trySignIn(ev: Event): Promise<void> {
     success("Success", "Successfully signed in");
     router.push("/dashboard");
   } catch (err: unknown) {
-    error("Fail to Sign In", (err as Error).message);
+    error("Fail to Sign in", (err as Error).message);
   }
 
   toast.remove(msg);
@@ -53,7 +53,7 @@ async function trySignIn(ev: Event): Promise<void> {
 <template>
   <div class="fixed flex flex-col inset-0 items-center justify-center">
     <img class="h-12 mb-4 w-12" draggable="false" src="/favicon.svg" />
-    <h1 class="mb-6 text-center text-xl">Sign In to CertVault</h1>
+    <h1 class="mb-6 text-center text-xl">Sign in to CertVault</h1>
     <Card
       class="bg-neutral-50 border border-neutral-200 dark:bg-neutral-800 dark:border-neutral-500">
       <template #content>
@@ -74,7 +74,7 @@ async function trySignIn(ev: Event): Promise<void> {
             :invalid="isInvalid('password')"
             @focus="clearInvalid('password')"
             toggle-mask />
-          <Button label="Sign In" type="submit" :loading="busy"></Button>
+          <Button label="Sign in" type="submit" :loading="busy"></Button>
           <template v-if="oidcProviders !== null">
             <div class="flex items-center justify-center my-4">
               <div
