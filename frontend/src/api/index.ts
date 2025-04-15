@@ -62,8 +62,7 @@ export const callRestfulApi = async <U = null>(
     const user = useUserStore();
     if (json.code === 401 && user.isSignedIn.value) {
       user.clear();
-      router.push("/");
-      return json.data!;
+      setTimeout(() => router.push("/"));
     }
 
     throw Error(`${json.msg} (${json.code})`);
