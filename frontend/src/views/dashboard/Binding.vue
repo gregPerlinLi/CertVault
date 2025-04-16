@@ -1,23 +1,22 @@
-<script setup lang="ts">
-// Async components
-const AsyncUsrMgr = defineAsyncComponent(
-  () => import("@/components/panel/UsrMgr.vue")
-);
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <!-- Headers -->
-  <h1 class="font-bold mb-4 text-2xl">
-    <i class="mr-2 pi pi-users text-xl"></i>Users
-  </h1>
-
-  <!-- Main -->
-  <Suspense>
-    <AsyncUsrMgr />
-    <template #fallback>
-      <div class="flex items-center justify-center py-12">
-        <ProgressSpinner aria-label="Loading" />
+  <Breadcrumb
+    :home="{ icon: 'pi pi-home' }"
+    :model="[
+      {
+        label: 'CA Binding',
+        icon: 'pi pi-link'
+      }
+    ]">
+    <template #item="{ item }">
+      <div class="flex gap-2 items-center">
+        <span :class="item.icon"></span>
+        <span>{{ item.label }}</span>
       </div>
     </template>
-  </Suspense>
+  </Breadcrumb>
+
+  <!-- Main -->
 </template>
