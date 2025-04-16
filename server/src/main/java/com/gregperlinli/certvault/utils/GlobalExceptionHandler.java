@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
             return new ResultVO<>(((BusinessException) e).getCode(), msg);
         }
         if ( e instanceof NoResourceFoundException) {
-            // response.setStatus(ResultStatusCodeConstant.FORBIDDEN);
+            response.setStatus(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode());
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode()));
             return new ResultVO<>(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), msg);
         }
