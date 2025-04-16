@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import type { CaInfoDTO } from "@/api/types";
-import type { VirtualScrollerLazyEvent } from "primevue";
+import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 import { getAllCaInfo, requestCaCert } from "@/api/admin/cert/ca";
 import { getAllBindedCaInfo } from "@/api/user/cert/ca";
 import { requestSslCert } from "@/api/user/cert/ssl";
 import { useUserStore } from "@/stores/user";
-import { useNotify } from "@/utils/composable";
+import {
+  useFormValidator,
+  useNotify,
+  useReloadableAsyncGuard
+} from "@/utils/composable";
 import { reqNewCertSchema } from "@/utils/schema";
-import { validateForm } from "@/utils/validate";
-import { nanoid } from "nanoid";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -20,14 +22,16 @@ const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 const emits = defineEmits<{ success: [] }>();
 
 /* Services */
-const { info, success, error } = useNotify();
+const { toast, info, success, error } = useNotify();
+const { isActivate, reload, cancel, getSignal } = useReloadableAsyncGuard();
+const { isInvalid, setInvalid, clearInvalid, validate } =
+  useFormValidator(reqNewCertSchema);
 
 /* Stores */
 const { isUser } = useUserStore();
 
 /* Reactives */
 const busy = ref(false);
-const errField = ref<string>();
 
 const caUuid = ref<string | null>(null);
 const allowSubCa = ref(true);
@@ -40,27 +44,20 @@ const reqNewCertFn = computed(() =>
   variant === "ca" ? requestCaCert : requestSslCert
 );
 
-/* Non-reactive */
-let nonce = nanoid();
-
 /* Actions */
-const clearErr = (field: string) => {
-  if (errField.value === field) {
-    errField.value = undefined;
-  }
-};
-
 const onLazyLoadCaList = async (ev: VirtualScrollerLazyEvent) => {
-  nonce = nanoid();
-  const tag = nonce;
+  loadingCaList.value = true;
 
   try {
-    loadingCaList.value = true;
-
     const page = isUser.value
-      ? await getAllBindedCaInfo(Math.trunc(ev.first / 30) + 1, 30)
-      : await getAllCaInfo(Math.trunc(ev.first / 30) + 1, 30);
-    if (tag === nonce && page.list !== null) {
+      ? await getAllBindedCaInfo(Math.trunc(ev.first / 30) + 1, 30, undefined, {
+          signal: getSignal()
+        })
+      : await getAllCaInfo(Math.trunc(ev.first / 30) + 1, 30, undefined, {
+          signal: getSignal()
+        });
+
+    if (isActivate.value && page.list !== null) {
       const tmp = caList.value.slice();
       for (let i = ev.first; i < ev.first + page.list.length; i++) {
         tmp[i] = page.list[i - ev.first];
@@ -73,41 +70,35 @@ const onLazyLoadCaList = async (ev: VirtualScrollerLazyEvent) => {
         );
     }
   } catch (err: unknown) {
-    if (tag === nonce && visible) {
+    if (isActivate.value) {
       error("Fail to Get Binded CA List", (err as Error).message);
     }
-  } finally {
-    if (tag === nonce) {
-      loadingCaList.value = false;
-    }
   }
+
+  loadingCaList.value = false;
 };
 
 const onSubmit = async (ev: Event) => {
-  errField.value = undefined;
-  const {
-    success: validateOk,
-    data,
-    error: validateErr
-  } = validateForm(ev.target as HTMLFormElement, reqNewCertSchema);
-  if (!validateOk) {
-    error("Validation Error", validateErr!.issues[0].message);
-    errField.value = validateErr!.issues[0].path[0].key;
+  // Validate form
+  const result = validate(ev.target as HTMLFormElement);
+  if (!result.success) {
+    error("Validation Error", result.issues![0].message);
     return;
   }
 
   if (variant === "ssl" && caUuid.value === null) {
-    errField.value = "ca-uuid";
+    setInvalid("ca-uuid");
     error("Validation Error", "CA is required");
     return;
   }
 
-  try {
-    busy.value = true;
-    info("Info", "Requesting");
+  // Try to require
+  busy.value = true;
+  const msg = info("Info", "Requesting");
 
+  try {
     await reqNewCertFn.value({
-      ...data,
+      ...result.output,
       caUuid: caUuid.value,
       allowSubCa: allowSubCa.value
     });
@@ -117,25 +108,27 @@ const onSubmit = async (ev: Event) => {
     visible.value = false;
   } catch (err: unknown) {
     error("Fail to Request", (err as Error).message);
-  } finally {
-    busy.value = false;
   }
+
+  toast.remove(msg);
+  busy.value = false;
 };
 
 /* Watches */
-watch(visible, (v) => {
-  if (v) {
+watch(visible, () => {
+  if (visible.value) {
+    reload();
+  } else {
+    cancel();
     busy.value = false;
-    errField.value = undefined;
     caUuid.value = null;
     allowSubCa.value = true;
     caList.value = [];
     loadingCaList.value = false;
-    nonce = nanoid();
   }
 });
-watch(caUuid, (v) => {
-  allowSubCa.value = v === null;
+watch(caUuid, () => {
+  allowSubCa.value = caUuid.value === null;
 });
 </script>
 
@@ -159,7 +152,7 @@ watch(caUuid, (v) => {
             option-value="uuid"
             placeholder="Select a CA"
             size="small"
-            :invalid="errField === 'ca-uuid'"
+            :invalid="isInvalid('ca-uuid')"
             :options="caList"
             :show-clear="variant === 'ca'"
             :virtual-scroller-options="{
@@ -170,7 +163,7 @@ watch(caUuid, (v) => {
               onLazyLoad: onLazyLoadCaList,
               showLoader: true
             }"
-            @focus="clearErr('ca-uuid')"
+            @focus="clearInvalid('ca-uuid')"
             checkmark>
             <template #option="slotProps">
               <p
@@ -201,8 +194,8 @@ watch(caUuid, (v) => {
             name="country"
             placeholder="e.g. CN"
             size="small"
-            :invalid="errField === 'country'"
-            @focus="clearErr('country')"
+            :invalid="isInvalid('country')"
+            @focus="clearInvalid('country')"
             required />
         </section>
         <section class="w-1/3">
@@ -212,8 +205,8 @@ watch(caUuid, (v) => {
             name="province"
             placeholder="e.g. Guangdong"
             size="small"
-            :invalid="errField === 'province'"
-            @focus="clearErr('province')"
+            :invalid="isInvalid('province')"
+            @focus="clearInvalid('province')"
             required />
         </section>
         <section class="w-1/3">
@@ -223,8 +216,8 @@ watch(caUuid, (v) => {
             name="city"
             placeholder="e.g. Guangzhou"
             size="small"
-            :invalid="errField === 'city'"
-            @focus="clearErr('city')"
+            :invalid="isInvalid('city')"
+            @focus="clearInvalid('city')"
             required />
         </section>
       </div>
@@ -236,8 +229,8 @@ watch(caUuid, (v) => {
             id="organization"
             name="organization"
             size="small"
-            :invalid="errField === 'organization'"
-            @focus="clearErr('organization')"
+            :invalid="isInvalid('organization')"
+            @focus="clearInvalid('organization')"
             required />
         </section>
         <section class="w-1/2">
@@ -246,8 +239,8 @@ watch(caUuid, (v) => {
             id="organizational-unit"
             name="organizational-unit"
             size="small"
-            :invalid="errField === 'organizational-unit'"
-            @focus="clearErr('organizational-unit')"
+            :invalid="isInvalid('organizational-unit')"
+            @focus="clearInvalid('organizational-unit')"
             required />
         </section>
       </div>
@@ -259,8 +252,8 @@ watch(caUuid, (v) => {
             id="common-name"
             name="common-name"
             size="small"
-            :invalid="errField === 'common-name'"
-            @focus="clearErr('common-name')"
+            :invalid="isInvalid('common-name')"
+            @focus="clearInvalid('common-name')"
             required />
         </section>
         <section class="w-1/3">
@@ -271,10 +264,10 @@ watch(caUuid, (v) => {
             size="small"
             suffix=" day(s)"
             :default-value="30"
-            :invalid="errField === 'expiry'"
+            :invalid="isInvalid('expiry')"
             :max="365"
             :min="1"
-            @focus="clearErr('expiry')"
+            @focus="clearInvalid('expiry')"
             required
             show-buttons />
         </section>
@@ -287,8 +280,8 @@ watch(caUuid, (v) => {
           id="subject-alt-names"
           name="subject-alt-names"
           :placeholder="'Each line is a key-value pair seperated by a \'=\'\ne.g. \'IP_ADDRESS=1.1.1.1\''"
-          :invalid="errField === 'subject-alt-names'"
-          @focus="clearErr('subject-alt-names')"
+          :invalid="isInvalid('subject-alt-names')"
+          @focus="clearInvalid('subject-alt-names')"
           size="small"></Textarea>
       </section>
 
@@ -298,8 +291,8 @@ watch(caUuid, (v) => {
           id="comment"
           name="comment"
           size="small"
-          :invalid="errField === 'comment'"
-          @focus="clearErr('comment')"
+          :invalid="isInvalid('comment')"
+          @focus="clearInvalid('comment')"
           required />
       </section>
 

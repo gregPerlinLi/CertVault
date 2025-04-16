@@ -3,10 +3,9 @@ import type { CaInfoDTO, CertDetailDTO, CertInfoDTO } from "@/api/types";
 import { analyzeCert } from "@/api/user/cert";
 import { getCaCert } from "@/api/user/cert/ca";
 import { getSslCert } from "@/api/user/cert/ssl";
-import { useNotify } from "@/utils/composable";
-import { nanoid } from "nanoid";
+import { useNotify, useReloadableAsyncGuard } from "@/utils/composable";
 
-// Models
+/* Models */
 const visible = defineModel<boolean>("visible");
 
 // Properties
@@ -15,57 +14,57 @@ const { variant, data } = defineProps<{
   data?: CaInfoDTO | CertInfoDTO;
 }>();
 
-// Services
+/* Services */
 const { error } = useNotify();
+const { isActivate, getSignal, reload, cancel } = useReloadableAsyncGuard();
 
-// Reactive
+/* Reactive */
 const details = ref<CertDetailDTO>();
 const canRetry = ref(false);
 
-// Non-reactive
-let nonce = nanoid();
-
-// Computed
+/* Computed */
 const getCertFn = computed(() => (variant === "ca" ? getCaCert : getSslCert));
 
-// Actions
+/* Actions */
 const fetchDetails = async () => {
   if (data === undefined) {
     return;
   }
 
-  nonce = nanoid();
-  const tag = nonce;
-
   details.value = undefined;
   canRetry.value = false;
 
   try {
-    const cert = await getCertFn.value(data!.uuid);
-    if (tag !== nonce) {
+    const cert = await getCertFn.value(data!.uuid, undefined, {
+      signal: getSignal()
+    });
+    if (!isActivate.value) {
       return;
     }
 
-    const result = await analyzeCert(cert);
-    if (tag !== nonce) {
+    const result = await analyzeCert(cert, { signal: getSignal() });
+    if (!isActivate.value) {
       return;
     }
 
     details.value = result;
   } catch (err: unknown) {
-    if (tag === nonce && visible) {
+    if (isActivate.value) {
       canRetry.value = true;
       error("Fail to Get Detailed Info", (err as Error).message);
     }
   }
 };
 
-// Watch
-watch(visible, async (v) => {
-  if (v) {
+/* Watch */
+watch(visible, async () => {
+  if (visible.value) {
+    reload();
+    await fetchDetails();
+  } else {
+    cancel();
     details.value = undefined;
     canRetry.value = false;
-    await fetchDetails();
   }
 });
 </script>
