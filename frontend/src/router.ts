@@ -37,9 +37,14 @@ const router = createRouter({
           meta: { title: "Users - CertVault" }
         },
         {
-          path: "certificates",
-          component: () => import("@views/dashboard/Certificates.vue"),
-          meta: { title: "Certificates - CertVault" }
+          path: "certificates/ca",
+          component: () => import("@views/dashboard/certificates/CA.vue"),
+          meta: { title: "CA Certificates - Certificates - CertVault" }
+        },
+        {
+          path: "certificates/ssl",
+          component: () => import("@views/dashboard/certificates/SSL.vue"),
+          meta: { title: "SSL Certificates - Certificates - CertVault" }
         },
         {
           path: "binding",

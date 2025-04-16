@@ -51,7 +51,7 @@ const menuModel = computed(() =>
           {
             label: "SSL Certificates",
             icon: "pi pi-receipt",
-            command: () => router.push("/dashboard/certificates/ca")
+            command: () => router.push("/dashboard/certificates/ssl")
           }
         ]
       },

@@ -17,7 +17,7 @@ const { variant, data } = defineProps<{
 }>();
 
 /* Services */
-const { info, success, error } = useNotify();
+const { toast, info, success, error } = useNotify();
 
 /* Stores */
 const { isAdmin, isSuperadmin } = useUserStore();
@@ -40,15 +40,17 @@ const getPrivKeyFn = computed(() =>
 
 /* Actions */
 const exportCert = async (fullchain: boolean = false) => {
-  try {
+  const msg = (() => {
     if (fullchain) {
       busy.exportChain = true;
-      info("Info", "Exporting fullchain");
+      return info("Info", "Exporting fullchain");
     } else {
       busy.exportCert = true;
-      info("Info", "Exporting");
+      return info("Info", "Exporting");
     }
+  })();
 
+  try {
     const cert = await getCertFn.value(data!.uuid, fullchain);
     const pem = new TextDecoder().decode(b64ToU8Arr(cert));
     const file = new Blob([pem], { type: "application/x-pem-file" });
@@ -60,19 +62,20 @@ const exportCert = async (fullchain: boolean = false) => {
     );
   } catch (err: unknown) {
     error("Fail to Export SSL Certificate", (err as Error).message);
-  } finally {
-    if (fullchain) {
-      busy.exportChain = false;
-    } else {
-      busy.exportCert = false;
-    }
+  }
+
+  toast.remove(msg);
+  if (fullchain) {
+    busy.exportChain = false;
+  } else {
+    busy.exportCert = false;
   }
 };
 const onSumbit = async (ev: Event) => {
-  try {
-    busy.exportPrivKey = true;
-    info("Info", "Exporting private key");
+  busy.exportPrivKey = true;
+  const msg = info("Info", "Exporting private key");
 
+  try {
     const formData = new FormData(ev.target as HTMLFormElement);
     const password = formData.get("password")!.toString();
 
@@ -85,14 +88,15 @@ const onSumbit = async (ev: Event) => {
     success("Success", "Successfully exported private key");
   } catch (err: unknown) {
     error("Fail to Export SSL Private Key", (err as Error).message);
-  } finally {
-    busy.exportPrivKey = false;
   }
+
+  toast.remove(msg);
+  busy.exportPrivKey = false;
 };
 
 /* Watch */
-watch(visible, (v) => {
-  if (v) {
+watch(visible, () => {
+  if (!visible.value) {
     busy.exportCert = false;
     busy.exportChain = false;
     busy.exportPrivKey = false;

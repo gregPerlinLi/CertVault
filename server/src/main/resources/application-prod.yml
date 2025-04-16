@@ -31,7 +31,7 @@ spring:
     init:
       platform: ${DATABASE_TYPE:mysql}
       mode: always
-      schema-locations: classpath:/sql/schema-${DATABASE_TYPE:mysql}.sql
+      schema-locations: classpath:/sql/schema-${spring.sql.init.platform}.sql
   security:
     oauth2:
       client:

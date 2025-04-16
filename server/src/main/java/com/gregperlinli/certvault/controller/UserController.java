@@ -3,6 +3,7 @@ package com.gregperlinli.certvault.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.gregperlinli.certvault.annotation.*;
 import com.gregperlinli.certvault.certificate.CertAnalyzer;
+import com.gregperlinli.certvault.certificate.CertConverter;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.dto.*;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
@@ -587,6 +588,41 @@ public class UserController {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "success",
                 new CertificateDetailsDTO(CertAnalyzer.analyzeCertificate(certBase64.get("cert").asText())));
+    }
+
+    /**
+     * Convert PEM to PKCS12
+     *
+     * @param pemCertPrivkeyPassword {@link JsonNode} PEM certificate and private key and password
+     * @return {@link ResultVO} Result
+     * @throws Exception e exception
+     */
+    @ParamNotNullApiResponse
+    @SuccessApiResponse
+    @PostMapping(value = "/cert/convert/pem/to/pfx")
+    public ResultVO<String> convertPemToPfx(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                    description = "Certificate Base64",
+                                                    content = @Content(
+                                                            examples = {@ExampleObject(value =
+                                                                    """
+                                                                    {
+                                                                        "cert": "MIIB+zCCAVigAwIBAgIQJz+JlZg97kbB6ZnzUfe8pYDANBgk...",
+                                                                        "privkey": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2Z0lCQU...",
+                                                                        "password": "password"
+                                                                    }
+                                                                    """
+                                                            )}
+                                                    )
+                                            )
+                                                @RequestBody JsonNode pemCertPrivkeyPassword) throws Exception {
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                "Success",
+                CertConverter.convertFromPemToPfx(
+                        pemCertPrivkeyPassword.get("cert").asText(),
+                        ( pemCertPrivkeyPassword.get("privkey") != null ) ? pemCertPrivkeyPassword.get("privkey").asText() : null,
+                        ( pemCertPrivkeyPassword.get("password") != null) ? pemCertPrivkeyPassword.get("password").asText() : null
+                )
+        );
     }
 
     /**

@@ -4,7 +4,7 @@ import { renewCaCert } from "@/api/admin/cert/ca";
 import { renewSslCert } from "@/api/user/cert/ssl";
 import { useNotify } from "@/utils/composable";
 
-// Models
+/* Models */
 const visible = defineModel<boolean>("visible");
 
 // Emits
@@ -16,30 +16,27 @@ const { variant, data } = defineProps<{
   data?: CaInfoDTO | CertInfoDTO;
 }>();
 
-// Services
-const { info, success, error } = useNotify();
+/* Services */
+const { toast, info, success, error } = useNotify();
 
-// Reactive
+/* Reactive */
 const busy = ref(false);
 
-// Computed
+/* Computed */
 const renewCertFn = computed(() =>
   variant === "ca" ? renewCaCert : renewSslCert
 );
 
-// Actions
+/* Actions */
 const onSubmit = async (ev: Event) => {
   // Parse form data
   const formData = new FormData(ev.target as HTMLFormElement);
-
-  // Validate data
   const expiry = parseInt(formData.get("expiry")!.toString().trim());
 
-  // Try renew
+  // Try to renew
+  busy.value = true;
+  const msg = info("Info", "Requesting");
   try {
-    busy.value = true;
-    info("Info", "Requesting");
-
     await renewCertFn.value(data!.uuid, expiry);
 
     success("Success", "Successfully renewed");
@@ -47,14 +44,15 @@ const onSubmit = async (ev: Event) => {
     visible.value = false;
   } catch (err: unknown) {
     error("Fail to Renew", (err as Error).message);
-  } finally {
-    busy.value = false;
   }
+
+  toast.remove(msg);
+  busy.value = false;
 };
 
-// Watch
-watch(visible, (v) => {
-  if (v) {
+/* Watch */
+watch(visible, () => {
+  if (!visible.value) {
     busy.value = false;
   }
 });

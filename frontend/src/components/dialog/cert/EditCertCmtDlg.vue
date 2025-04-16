@@ -4,7 +4,7 @@ import { updateCaComment } from "@/api/admin/cert/ca";
 import { updateSslCertComment } from "@/api/user/cert/ssl";
 import { useNotify } from "@/utils/composable";
 
-// Models
+/* Models */
 const visible = defineModel<boolean>("visible");
 
 // Emits
@@ -16,19 +16,19 @@ const { variant, data } = defineProps<{
   data?: CaInfoDTO | CertInfoDTO;
 }>();
 
-// Services
-const { info, success, error } = useNotify();
+/* Services */
+const { toast, info, success, error } = useNotify();
 
-// Reactive
+/* Reactive */
 const busy = ref(false);
 const invalid = ref(false);
 
-// Computed
+/* Computed */
 const updCertCmtFn = computed(() =>
   variant === "ca" ? updateCaComment : updateSslCertComment
 );
 
-// Actions
+/* Actions */
 const onSubmit = async (ev: Event) => {
   invalid.value = false;
   const formData = new FormData(ev.target as HTMLFormElement);
@@ -46,11 +46,11 @@ const onSubmit = async (ev: Event) => {
     return;
   }
 
-  // Try update
-  try {
-    busy.value = true;
-    info("Info", "Updating");
+  // Try to update
+  busy.value = true;
+  const msg = info("Info", "Updating");
 
+  try {
     await updCertCmtFn.value(data!.uuid, comment);
 
     success("Success", "Successfully updated comment");
@@ -58,14 +58,15 @@ const onSubmit = async (ev: Event) => {
     visible.value = false;
   } catch (err: unknown) {
     error("Fail to Update Comment", (err as Error).message);
-  } finally {
-    busy.value = false;
   }
+
+  toast.remove(msg);
+  busy.value = false;
 };
 
-// Watch
-watch(visible, (v) => {
-  if (v) {
+/* Watch */
+watch(visible, () => {
+  if (!visible.value) {
     busy.value = false;
     invalid.value = false;
   }

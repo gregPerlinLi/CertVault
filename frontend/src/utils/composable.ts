@@ -7,6 +7,7 @@ export const useFormValidator = (
   const errField = ref<string | null>(null);
 
   const isInvalid = (field: string) => errField.value === field;
+  const setInvalid = (s: string) => (errField.value = s);
   const clearInvalid = (field: string) => {
     if (errField.value === field) {
       errField.value = null;
@@ -32,7 +33,7 @@ export const useFormValidator = (
     return { success, output, issues: issues ?? null };
   };
 
-  return { isInvalid, clearInvalid, validate };
+  return { isInvalid, setInvalid, clearInvalid, validate };
 };
 
 export const useNotify = () => {
@@ -62,4 +63,22 @@ export const useAsyncGuard = () => {
   onBeforeUnmount(cancel);
 
   return { isActivate, signal: abort.signal, cancel };
+};
+
+export const useReloadableAsyncGuard = () => {
+  const isActivate = ref(true);
+  let abort = new AbortController();
+
+  const reload = () => {
+    isActivate.value = true;
+    abort = new AbortController();
+  };
+  const cancel = () => {
+    isActivate.value = false;
+    abort.abort("Component deactivated");
+  };
+  const getSignal = () => abort.signal;
+  onBeforeUnmount(cancel);
+
+  return { isActivate, reload, cancel, getSignal };
 };

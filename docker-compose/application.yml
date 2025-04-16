@@ -1,3 +1,4 @@
+#OpenID Connect Configuration
 spring:
   security:
     oauth2:

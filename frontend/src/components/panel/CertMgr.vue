@@ -8,8 +8,7 @@ import {
 import { getAllBindedCaInfo } from "@/api/user/cert/ca";
 import { deleteSslCert, getAllSslCertInfo } from "@/api/user/cert/ssl";
 import { useUserStore } from "@/stores/user";
-import { useNotify } from "@/utils/composable";
-import { nanoid } from "nanoid";
+import { useAsyncGuard, useNotify } from "@/utils/composable";
 import { useConfirm } from "primevue/useconfirm";
 
 /* Async components */
@@ -38,7 +37,8 @@ const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 
 /* Services */
 const confirm = useConfirm();
-const { info, success, error } = useNotify();
+const { toast, info, success, error } = useNotify();
+const { isActivate, signal } = useAsyncGuard();
 
 /* Stores */
 const { isUser, isAdmin, isSuperadmin } = useUserStore();
@@ -79,29 +79,24 @@ const delCertFn = computed(() =>
   variant === "ca" ? deleteCaCert : deleteSslCert
 );
 
-/* Non-reactives */
-let nonce = nanoid();
-
 /* Actions */
 const refresh = async () => {
-  nonce = nanoid();
-  const tag = nonce;
+  loading.value = true;
 
   try {
-    loading.value = true;
-
     const page = await getCertInfo.value(
       pagination.first / pagination.limit + 1,
       pagination.limit,
-      searchKeyword.value.length === 0 ? undefined : searchKeyword.value
+      searchKeyword.value.length === 0 ? undefined : searchKeyword.value,
+      { signal }
     );
 
-    if (tag === nonce) {
+    if (isActivate.value) {
       pagination.total = page.total;
       pagination.data = page.list ?? [];
     }
   } catch (err: unknown) {
-    if (tag === nonce) {
+    if (isActivate.value) {
       error(
         variant === "ca"
           ? "Fail to Fetch CA Certificates List"
@@ -109,11 +104,9 @@ const refresh = async () => {
         (err as Error).message
       );
     }
-  } finally {
-    if (tag === nonce) {
-      loading.value = false;
-    }
   }
+
+  loading.value = false;
 };
 
 /* Watches */
@@ -124,7 +117,7 @@ watch(
 watchDebounced(searchKeyword, () => refresh(), { debounce: 500 });
 
 /* Actions */
-const tryToggleCertAvailable = (data: CaInfoDTO) => {
+const tryToggleCertAvailable = (data: CaInfoDTO) =>
   confirm.require({
     header: "Toggle Certificate Availability",
     message: "Are you sure to toggle the availability?",
@@ -134,20 +127,21 @@ const tryToggleCertAvailable = (data: CaInfoDTO) => {
     acceptProps: { severity: "danger" },
     rejectProps: { severity: "secondary" },
     accept: async () => {
+      const msg = info("Info", "Toggling");
+
       try {
-        info("Info", "Toggling availability");
         await toggleCaAvailability(data.uuid);
         success("Success", "Successfully toggled");
+        refresh();
       } catch (err: unknown) {
         error("Fail to Delete", (err as Error).message);
-      } finally {
-        await refresh();
       }
+
+      toast.remove(msg);
     }
   });
-};
 
-const tryDelCert = (data: CertInfoDTO) => {
+const tryDelCert = (data: CertInfoDTO) =>
   confirm.require({
     header: "Delete Certificate",
     message: "Are you sure to delete the certificate?",
@@ -157,18 +151,19 @@ const tryDelCert = (data: CertInfoDTO) => {
     acceptProps: { severity: "danger" },
     rejectProps: { severity: "secondary" },
     accept: async () => {
+      const msg = info("Info", "Deleting");
+
       try {
-        info("Info", "Deleting");
         await delCertFn.value(data.uuid);
         success("Success", "Successfully deleted");
+        refresh();
       } catch (err: unknown) {
         error("Fail to Delete", (err as Error).message);
-      } finally {
-        await refresh();
       }
+
+      toast.remove(msg);
     }
   });
-};
 
 /* Hooks */
 onBeforeMount(() => refresh());
@@ -195,6 +190,7 @@ onBeforeMount(() => refresh());
           label="Refresh"
           severity="info"
           size="small"
+          :loading="loading"
           @click="refresh"></Button>
       </div>
     </template>
@@ -225,7 +221,8 @@ onBeforeMount(() => refresh());
     row-hover>
     <template #header>
       <p class="text-sm">
-        Found {{ pagination.total }} SSL certificate(s) in total
+        Found {{ pagination.total }} {{ variant.toUpperCase() }} certificate(s)
+        in total
       </p>
     </template>
 
@@ -234,7 +231,10 @@ onBeforeMount(() => refresh());
       <template #body="{ data }">
         <div class="flex gap-2 min-w-md">
           <p
-            v-tooltip.bottom="{ value: data.comment, class: 'text-sm' }"
+            v-tooltip.bottom="{
+              value: data.comment,
+              pt: { text: 'text-sm w-fit whitespace-nowrap' }
+            }"
             class="overflow-x-hidden text-ellipsis whitespace-nowrap"
             :class="
               variant === 'ssl' || isAdmin || isSuperadmin
@@ -270,7 +270,10 @@ onBeforeMount(() => refresh());
       class="w-50">
       <template #body="{ data }">
         <p
-          v-tooltip.bottom="{ value: data.owner, class: 'text-sm' }"
+          v-tooltip.bottom="{
+            value: data.owner,
+            pt: { text: 'text-sm w-fit whitespace-nowrap' }
+          }"
           class="max-w-50 overflow-x-hidden text-ellipsis whitespace-nowrap w-fit">
           {{ data.owner }}
         </p>
