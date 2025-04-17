@@ -73,7 +73,7 @@ public class GlobalExceptionHandler {
         if ( e instanceof NoResourceFoundException) {
             response.setStatus(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode());
             if ( !request.getRequestURI().startsWith("/api/") ) {
-                response.sendRedirect("/index.html");
+                request.getRequestDispatcher("/index.html").forward(request, response);
             }
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode()));
             return new ResultVO<>(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), msg);
