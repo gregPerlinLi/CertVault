@@ -4,6 +4,7 @@ import com.gregperlinli.certvault.constant.GeneralConstant;
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
 import com.gregperlinli.certvault.domain.exception.*;
 import com.gregperlinli.certvault.domain.vo.ResultVO;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -32,7 +33,7 @@ import java.nio.file.AccessDeniedException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
-    public ResultVO<Void> exceptionHandler(HttpServletResponse response, Exception e) throws Exception {
+    public ResultVO<Void> exceptionHandler(HttpServletRequest request, HttpServletResponse response, Exception e) throws Exception {
         String msg = e.getMessage();
         if ( e instanceof LoginException) {
             // response.setStatus(ResultStatusCodeConstant.FORBIDDEN);
@@ -71,6 +72,9 @@ public class GlobalExceptionHandler {
         }
         if ( e instanceof NoResourceFoundException) {
             response.setStatus(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode());
+            if ( !request.getRequestURI().startsWith("/api/") ) {
+                response.sendRedirect("/index.html");
+            }
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode()));
             return new ResultVO<>(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), msg);
         }
