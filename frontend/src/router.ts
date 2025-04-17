@@ -1,11 +1,14 @@
 import { useCommonStore } from "@/stores/common";
 import { useUserStore } from "@stores/user";
 import { useNotify } from "@/utils/composable";
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
+
+// Sync views
+import NotFound from "@/views/NotFound.vue";
 
 // Create router
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes: [
     {
       path: "/",
@@ -52,6 +55,10 @@ const router = createRouter({
           meta: { title: "CA Binding - CertVault" }
         }
       ]
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      component: NotFound
     }
   ]
 });
