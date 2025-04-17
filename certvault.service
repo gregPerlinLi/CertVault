@@ -1,0 +1,21 @@
+[Unit]
+Description=CertVault Certificate Management Service
+After=network.target
+[Service]
+User=root
+WorkingDirectory=/etc/certvault
+ExecStart=/usr/bin/java -jar /etc/certvault/certvault.jar \
+    -Xmx512m \
+    -Xms256m \
+    -XX:+UseZGC \
+    -XX:ZCollectionInterval=120 \
+    -XX:ZAllocationSpikeTolerance=4 \
+    -XX:-ZProactive \
+    -XX:+HeapDumpOnOutOfMemoryError \
+    -XX:HeapDumpPath=./errorDump.hprof \
+    --spring.profiles.active=prod
+SuccessExitStatus=143
+Restart=always
+RestartSec=30
+[Install]
+WantedBy=multi-user.target
