@@ -568,7 +568,7 @@ public class AdminController {
     )
     @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
-    @DeleteMapping(value = "/cert/ca/bind")
+    @PostMapping(value = "/cert/ca/bind")
     public ResultVO<Void> unbindCaFromUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "CA-User binding entity")
                                                @RequestBody CaBindingDTO caBindingDTO) {
         Boolean result = caBindingService.deleteBinding(caBindingDTO);
@@ -592,7 +592,7 @@ public class AdminController {
     @SuccessAndFailedApiResponse
     @ParamNotNullApiResponse
     @DoesNotExistApiResponse
-    @DeleteMapping(value = "/cert/ca/binds")
+    @PostMapping(value = "/cert/ca/binds")
     public ResultVO<Void> unbindCasFromUsers(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "List of CA-User binding entities")
                                                  @RequestBody List<CaBindingDTO> caBindingDTOs) throws Exception {
         Boolean result = caBindingService.deleteBindings(caBindingDTOs);
