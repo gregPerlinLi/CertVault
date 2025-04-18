@@ -269,7 +269,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
         if ( !AuthUtils.matchesPassword(confirmPassword, user.getPassword()) ) {
-            throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "Password validation failed.");
+            throw new LoginException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "Password validation failed.");
         }
         QueryWrapper<Certificate> certificateQueryWrapper = new QueryWrapper<>();
         certificateQueryWrapper.eq("uuid", uuid)
