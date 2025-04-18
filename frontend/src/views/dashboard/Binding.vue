@@ -9,8 +9,8 @@ import { getAllCaBindedUsrs } from "@/api/admin/cert/binding";
 const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
 
 /* Services */
-const { toast, info, success, error } = useNotify();
-const { isActivate, reload, cancel, getSignal } = useReloadableAsyncGuard();
+const { error } = useNotify();
+const { isActivate, getSignal } = useReloadableAsyncGuard();
 
 /* Reactives */
 //const busy = ref(false);
