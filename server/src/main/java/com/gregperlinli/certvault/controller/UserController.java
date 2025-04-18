@@ -597,6 +597,10 @@ public class UserController {
      * @return {@link ResultVO} Result
      * @throws Exception e exception
      */
+    @Operation(
+            summary = "Convert PEM to PFX(PKCS12)",
+            description = "Convert PEM format certificate and private key to PFX(PKCS12) format"
+    )
     @ParamNotNullApiResponse
     @SuccessApiResponse
     @PostMapping(value = "/cert/convert/pem/to/pfx")
@@ -621,6 +625,60 @@ public class UserController {
                         pemCertPrivkeyPassword.get("cert").asText(),
                         ( pemCertPrivkeyPassword.get("privkey") != null ) ? pemCertPrivkeyPassword.get("privkey").asText() : null,
                         ( pemCertPrivkeyPassword.get("password") != null) ? pemCertPrivkeyPassword.get("password").asText() : null
+                )
+        );
+    }
+
+    /**
+     * Convert PEM to DER
+     *
+     * @param certPrivkeyDTO {@link CertPrivkeyDTO} Certificate and private key
+     * @return {@link ResultVO} Result
+     * @throws Exception e exception
+     */
+    @Operation(
+            summary = "Convert PEM to DER",
+            description = "Convert PEM format certificate and private key to DER format"
+    )
+    @ParamNotNullApiResponse
+    @SuccessApiResponse
+    @PostMapping(value = "/cert/convert/pem/to/der")
+    public ResultVO<CertPrivkeyDTO> convertPemToDer(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Base64 encoded Certificate and Private Key Information")
+                                                        @RequestBody CertPrivkeyDTO certPrivkeyDTO) throws Exception {
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                "Success",
+                new CertPrivkeyDTO(
+                        CertConverter.convertFromPemToDer(
+                                certPrivkeyDTO.getCert(),
+                                certPrivkeyDTO.getPrivkey()
+                        )
+                )
+        );
+    }
+
+    /**
+     * Convert DER to PEM
+     *
+     * @param certPrivkeyDTO {@link CertPrivkeyDTO} Certificate and private key
+     * @return {@link ResultVO} Result
+     * @throws Exception e exception
+     */
+    @Operation(
+            summary = "Convert DER to PEM",
+            description = "Convert DER format certificate and private key to PEM format"
+    )
+    @ParamNotNullApiResponse
+    @SuccessApiResponse
+    @PostMapping(value = "/cert/convert/der/to/pem")
+    public ResultVO<CertPrivkeyDTO> convertDerToPem(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Base64 encoded Certificate and Private Key Information")
+                                                        @RequestBody CertPrivkeyDTO certPrivkeyDTO) throws Exception {
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                "Success",
+                new CertPrivkeyDTO(
+                        CertConverter.convertFromDerToPem(
+                                certPrivkeyDTO.getCert(),
+                                certPrivkeyDTO.getPrivkey()
+                        )
                 )
         );
     }
