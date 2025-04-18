@@ -1,5 +1,6 @@
 package com.gregperlinli.certvault.domain.entities;
 
+import com.gregperlinli.certvault.domain.dto.CertPrivkeyDTO;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -8,7 +9,7 @@ import lombok.experimental.Accessors;
  *
  * @author gregPerlinLi
  * @version 1.0.0
- * @className {@code PemResult}
+ * @className {@code CertPrivkeyResult}
  * @date 2025/4/15 00:47
  */
 @Accessors(chain = true)
@@ -17,7 +18,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Data
-public class PemResult {
+public class CertPrivkeyResult {
 
     /**
      * Certificate Base64
