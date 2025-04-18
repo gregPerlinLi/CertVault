@@ -213,12 +213,12 @@ onBeforeMount(() => refresh());
     size="small"
     :loading="loading"
     :row-class="() => 'group'"
+    :row-hover="pagination.data.length > 0"
     :rows-per-page-options="[10, 20, 50]"
     :total-records="pagination.total"
     :value="pagination.data"
     lazy
-    paginator
-    row-hover>
+    paginator>
     <template #header>
       <p class="text-sm">
         Found {{ pagination.total }} {{ variant.toUpperCase() }} certificate(s)
