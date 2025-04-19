@@ -13,24 +13,6 @@ import { useConfirm } from "primevue/useconfirm";
 
 /* Async components */
 const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
-const AsyncReqNewCertDlg = defineAsyncComponent(
-  () => import("@/components/dialog/cert/ReqNewCertDlg.vue")
-);
-const AsyncImCaDlg = defineAsyncComponent(
-  () => import("@/components/dialog/cert/ImCaDlg.vue")
-);
-const AsyncEditCertCmtDlg = defineAsyncComponent(
-  () => import("@/components/dialog/cert/EditCertCmtDlg.vue")
-);
-const AsyncDispCertInfoDlg = defineAsyncComponent(
-  () => import("@/components/dialog/cert/DispCertInfoDlg.vue")
-);
-const AsyncExCertDlg = defineAsyncComponent(
-  () => import("@/components/dialog/cert/ExCertDlg.vue")
-);
-const AsyncRenewCertDlg = defineAsyncComponent(
-  () => import("@/components/dialog/cert/RenewCertDlg.vue")
-);
 
 // Properties
 const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
@@ -399,25 +381,25 @@ onBeforeMount(() => refresh());
   </AsyncDataTable>
 
   <!-- Dialogs -->
-  <AsyncReqNewCertDlg
+  <ReqNewCertDlg
     v-model:visible="dialog.reqNewCert"
     :variant="variant"
     @success="refresh" />
-  <AsyncImCaDlg v-model:visible="dialog.uplNewCert" @success="refresh" />
-  <AsyncEditCertCmtDlg
+  <ImCaDlg v-model:visible="dialog.uplNewCert" @success="refresh" />
+  <EditCertCmtDlg
     v-model:visible="dialog.editComment"
     :data="targetCertData"
     :variant="variant"
     @success="refresh" />
-  <AsyncDispCertInfoDlg
+  <DispCertInfoDlg
     v-model:visible="dialog.showInfo"
     :data="targetCertData"
     :variant="variant" />
-  <AsyncExCertDlg
+  <ExCertDlg
     v-model:visible="dialog.exportCert"
     :data="targetCertData"
     :variant="variant" />
-  <AsyncRenewCertDlg
+  <RenewCertDlg
     v-model:visible="dialog.renewCert"
     :data="targetCertData"
     :variant="variant"
