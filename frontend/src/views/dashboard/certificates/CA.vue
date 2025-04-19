@@ -1,10 +1,3 @@
-<script setup lang="ts">
-// Async components
-const AsyncCertMgr = defineAsyncComponent(
-  () => import("@/components/panel/CertMgr.vue")
-);
-</script>
-
 <template>
   <!-- Header -->
   <Breadcrumb
@@ -29,12 +22,5 @@ const AsyncCertMgr = defineAsyncComponent(
   </Breadcrumb>
 
   <!-- Main -->
-  <Suspense>
-    <AsyncCertMgr variant="ca" />
-    <template #fallback>
-      <div class="flex items-center justify-center py-12">
-        <ProgressSpinner aria-label="Loading" />
-      </div>
-    </template>
-  </Suspense>
+  <CertMgr variant="ca" />
 </template>
