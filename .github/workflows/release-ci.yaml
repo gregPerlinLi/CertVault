@@ -81,6 +81,8 @@ jobs:
           "https://api.github.com/repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}" | jq '.body')
           formatted_comments=$(echo -e $comments | sed 's/^"//; s/"$//')
           echo -e $formatted_comments > comments.md
+          sed -i 's/Pull Request/Release/g' comments.md
+          sed -i 's/pull request/release/g' comments.md
           cat comments.md
 
       - name: Create and Upload Release

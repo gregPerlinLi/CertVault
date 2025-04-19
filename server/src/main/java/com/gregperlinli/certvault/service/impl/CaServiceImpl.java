@@ -332,7 +332,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
         if ( !AuthUtils.matchesPassword(confirmPassword, user.getPassword()) ) {
-            throw new LoginException(ResultStatusCodeConstant.UNAUTHORIZED.getResultCode(), "Password validation failed.");
+            throw new LoginException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "Password validation failed.");
         }
         QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
         caQueryWrapper.eq("uuid", uuid)

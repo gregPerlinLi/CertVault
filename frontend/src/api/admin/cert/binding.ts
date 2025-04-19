@@ -24,7 +24,7 @@ export const bindCaToUsrs = (
 ) =>
   callRestfulApi({
     method: "POST",
-    baseUrl: "/api/v1/admin/cert/ca/binds",
+    baseUrl: "/api/v1/admin/cert/ca/binds/create",
     payload: usernames.map((username) => ({ caUuid, username })),
     abort
   });
@@ -36,7 +36,7 @@ export const unbindCaFromUsrs = (
 ) =>
   callRestfulApi({
     method: "POST",
-    baseUrl: "/api/v1/admin/cert/ca/binds",
+    baseUrl: "/api/v1/admin/cert/ca/binds/delete",
     payload: usernames.map((username) => ({ caUuid, username })),
     abort
   });

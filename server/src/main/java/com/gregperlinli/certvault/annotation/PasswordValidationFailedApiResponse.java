@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
         content = @Content(
                 examples = {@ExampleObject(value = """
                         {
-                            "code": 401,
+                            "code": 403,
                             "msg": "Password validation failed",
                             "data": null,
                             "timestamp": "2025-04-04T09:45:34.622698063+08:00"

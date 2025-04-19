@@ -1,7 +1,7 @@
 package com.gregperlinli.certvault.certificate;
 
 import com.gregperlinli.certvault.constant.ResultStatusCodeConstant;
-import com.gregperlinli.certvault.domain.entities.PemResult;
+import com.gregperlinli.certvault.domain.entities.CertPrivkeyResult;
 import com.gregperlinli.certvault.domain.exception.ParamValidateException;
 import com.gregperlinli.certvault.utils.CertUtils;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -21,6 +21,8 @@ import org.bouncycastle.pkcs.*;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS12SafeBagBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCS12MacCalculatorBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEInputDecryptorProviderBuilder;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemWriter;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
@@ -99,7 +101,7 @@ public class CertConverter {
      * @param password  PFX密码（可为空）
      * @return 包含PEM证书和私钥的Base64编码结果对象
      */
-    public static PemResult convertFromPfxToPem(String pfxBase64, String password) throws Exception {
+    public static CertPrivkeyResult convertFromPfxToPem(String pfxBase64, String password) throws Exception {
         ASN1InputStream asn1In = null;
         try {
             byte[] pfxBytes = Base64.getDecoder().decode(pfxBase64);
@@ -177,7 +179,7 @@ public class CertConverter {
             }
 
             // 4. 生成结果
-            return new PemResult(
+            return new CertPrivkeyResult(
                     Base64.getEncoder().encodeToString(certWriter.toString().getBytes()),
                     (!keyWriter.toString().isEmpty()) ?
                             Base64.getEncoder().encodeToString(keyWriter.toString().getBytes()) :
@@ -188,6 +190,74 @@ public class CertConverter {
                 asn1In.close();
             }
         }
+    }
+
+    /**
+     * 将 PEM 格式的证书和私钥转换为 DER 格式的证书和私钥
+     * @param encodedCertPem PEM 格式的证书
+     * @param encodedKeyPem PEM 格式的私钥
+     * @return DER 格式的证书和私钥
+     * @throws Exception 抛出异常
+     */
+    public static CertPrivkeyResult convertFromPemToDer(String encodedCertPem, String encodedKeyPem) throws Exception {
+        // 参数校验：证书 PEM 数据必须存在
+        if (encodedCertPem == null || encodedCertPem.isEmpty()) {
+            throw new ParamValidateException(
+                    ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(),
+                    "PEM Certificate data cannot be empty"
+            );
+        }
+
+        // 处理证书部分（必选）
+        X509CertificateHolder certHolder = CertUtils.parseCertificate(encodedCertPem);
+        byte[] certDerBytes = certHolder.getEncoded();
+        String certBase64 = Base64.getEncoder().encodeToString(certDerBytes);
+
+        // 处理私钥部分（可选）
+        String keyBase64 = null;
+        if (encodedKeyPem != null && !encodedKeyPem.isEmpty()) {
+            PrivateKey privateKey = CertUtils.parsePrivateKey(encodedKeyPem);
+            PrivateKeyInfo keyInfo = PrivateKeyInfo.getInstance(privateKey.getEncoded());
+            byte[] keyDerBytes = keyInfo.getEncoded();
+            keyBase64 = Base64.getEncoder().encodeToString(keyDerBytes);
+        }
+
+        return new CertPrivkeyResult()
+                .setCertBase64(certBase64)
+                .setPrivateKeyBase64(keyBase64);
+
+    }
+
+    public static CertPrivkeyResult convertFromDerToPem(String encodedCertDer, String encodedKeyDer) throws Exception {
+        // 参数校验：证书 DER 数据必须存在
+        if (encodedCertDer == null || encodedCertDer.isEmpty()) {
+            throw new ParamValidateException(
+                    ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(),
+                    "DER Certificate data cannot be empty"
+            );
+        }
+
+        // 处理证书部分（必选）
+        byte[] certDerBytes = Base64.getDecoder().decode(encodedCertDer);
+        X509CertificateHolder certHolder = new X509CertificateHolder(certDerBytes);
+        String pemCert = CertUtils.generatePemCertificate(certHolder);
+        String certBase64 = CertUtils.encodeBase64(pemCert.getBytes());
+
+        // 处理私钥部分（可选）
+        String keyBase64 = null;
+        if (encodedKeyDer != null && !encodedKeyDer.isEmpty()) {
+            byte[] keyDerBytes = Base64.getDecoder().decode(encodedKeyDer);
+            try (StringWriter keyWriter = new StringWriter()) {
+                try (PemWriter pemWriter = new PemWriter(keyWriter)) {
+                    pemWriter.writeObject(new PemObject("PRIVATE KEY", keyDerBytes));
+                }
+                keyBase64 = CertUtils.encodeBase64(keyWriter.toString().getBytes());
+            }
+        }
+
+        return new CertPrivkeyResult()
+                .setCertBase64(certBase64)
+                .setPrivateKeyBase64(keyBase64);
     }
 
 }
