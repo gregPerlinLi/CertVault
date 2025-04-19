@@ -6,10 +6,25 @@ const user = useUserStore();
 </script>
 
 <template>
-  <h1 class="font-bold text-2xl">
-    <i class="mr-2 pi pi-gauge text-xl"></i>Dashboard
-  </h1>
-  <hr class="border-2 border-neutral-200 dark:border-neutral-500 my-2" />
+  <!-- Headers -->
+  <Breadcrumb
+    class="mb-4"
+    :home="{ icon: 'pi pi-home' }"
+    :model="[
+      {
+        label: 'Dashboard',
+        icon: 'pi pi-gauge'
+      }
+    ]">
+    <template #item="{ item }">
+      <div class="flex gap-2 items-center">
+        <span :class="item.icon"></span>
+        <span>{{ item.label }}</span>
+      </div>
+    </template>
+  </Breadcrumb>
+
+  <!-- Main -->
   <h1 class="font-bold text-xl">
     Welcome to use CertVault,
     <span :class="user.getRoleClass.value()">{{ user.displayName }}</span>
