@@ -2,7 +2,6 @@
 import type { CaInfoDTO } from "@/api/types";
 import { getAllCaInfo } from "@/api/admin/cert/ca";
 import { getAllBindedCaInfo } from "@/api/user/cert/ca";
-import { useUserStore } from "@/stores/user";
 import { useNotify, useReloadableAsyncGuard } from "@/utils/composable";
 
 /* Models */
@@ -24,9 +23,6 @@ defineEmits<{ focus: [] }>();
 const { error } = useNotify();
 const { isActivate, reload, cancel, getSignal } = useReloadableAsyncGuard();
 
-/* Stores */
-const { isAdmin } = useUserStore();
-
 /* Reactives */
 const caList = reactive({
   first: 0,
@@ -38,11 +34,7 @@ const caList = reactive({
 
 /* Computed */
 const fetchFn = computed(() =>
-  props.variant === "binding"
-    ? isAdmin.value
-      ? getAllBindedCaInfo
-      : getAllCaInfo
-    : getAllBindedCaInfo
+  props.variant === "binding" ? getAllCaInfo : getAllBindedCaInfo
 );
 
 /* Actions */
