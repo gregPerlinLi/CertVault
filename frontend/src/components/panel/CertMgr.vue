@@ -194,6 +194,7 @@ onBeforeMount(() => refresh());
     data-key="uuid"
     size="small"
     :loading="loading"
+    :pt="{ pcPaginator: { root: { class: 'rounded-none' } } }"
     :row-class="() => 'group'"
     :row-hover="pagination.data.length > 0"
     :rows-per-page-options="[10, 20, 50]"
