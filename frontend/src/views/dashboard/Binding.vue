@@ -59,11 +59,15 @@ const refreshCaList = async () => {
   caList.loading = false;
 };
 const refreshUser = async () => {
+  if (caList.selection === null) {
+    return;
+  }
+
   userList.loading = true;
   userList.selections = [];
   try {
     const page = await getAllCaBindedUsrs(
-      caList.selection!,
+      caList.selection,
       Math.floor(userList.first / userList.limit) + 1,
       userList.limit,
       userList.search,
