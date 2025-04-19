@@ -2,26 +2,15 @@
 import { useUserStore } from "@/stores/user";
 import { useNotify } from "@/utils/composable";
 
-// Async components
-const AsyncEditDispName = defineAsyncComponent(
-  () => import("@/components/dialog/profile/EditDispName.vue")
-);
-const AsyncEditEmail = defineAsyncComponent(
-  () => import("@/components/dialog/profile/EditEmail.vue")
-);
-const AsyncEditPasswd = defineAsyncComponent(
-  () => import("@/components/dialog/profile/EditPasswd.vue")
-);
-
-// Stores
-const user = useUserStore();
-
-// Services
+/* Services */
 const { error } = useNotify();
 
-// Reactive
+/* Stores */
+const user = useUserStore();
+
+/* Reactive */
 const newPassword = ref("");
-const invalid = ref(false);
+const newPasswordInvalid = ref(false);
 
 const dialog = reactive({
   editDispName: false,
@@ -29,10 +18,10 @@ const dialog = reactive({
   editPasswd: false
 });
 
-// Action
+/* Action */
 const onSubmitNewPassword = () => {
   if (newPassword.value.length === 0) {
-    invalid.value = true;
+    newPasswordInvalid.value = true;
     error("Validation Error", "New password is required");
     return;
   }
@@ -105,8 +94,8 @@ const onSubmitNewPassword = () => {
       <Password
         v-model:model-value="newPassword"
         size="small"
-        :invalid="invalid"
-        @change="invalid = false" />
+        :invalid="newPasswordInvalid"
+        @focus="newPasswordInvalid = false" />
       <Button
         icon="pi pi-check"
         severity="help"
@@ -117,13 +106,13 @@ const onSubmitNewPassword = () => {
   </section>
 
   <!-- Dialogs -->
-  <AsyncEditDispName
+  <EditDispNameDlg
     v-model:visible="dialog.editDispName"
     :value="user.displayName.value ?? ''" />
-  <AsyncEditEmail
+  <EditEmailDlg
     v-model:visible="dialog.editEmail"
     :value="user.email.value ?? ''" />
-  <AsyncEditPasswd
+  <EditPasswdDlg
     v-model:visible="dialog.editPasswd"
     v-model:new-password="newPassword" />
 </template>
