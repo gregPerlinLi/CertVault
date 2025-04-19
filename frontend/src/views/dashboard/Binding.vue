@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { CaInfoDTO, UserProfileDTO } from "@/api/types";
-import { getAllCaInfo } from "@/api/admin/cert/ca";
 import { useNotify, useReloadableAsyncGuard } from "@/utils/composable";
 import { getAllCaBindedUsrs, unbindCaFromUsrs } from "@/api/admin/cert/binding";
 import { useConfirm } from "primevue/useconfirm";
@@ -15,15 +14,7 @@ const { isActivate, getSignal } = useReloadableAsyncGuard();
 
 /* Reactives */
 const busyUnbind = ref(false);
-
-const caList = reactive({
-  first: 0,
-  total: 0,
-  search: "",
-  data: [] as CaInfoDTO[],
-  selection: null as string | null,
-  loading: false
-});
+const caSelection = ref<CaInfoDTO | null>(null);
 
 const userList = reactive({
   first: 0,
@@ -36,30 +27,8 @@ const userList = reactive({
 });
 
 /* Actions */
-const refreshCaList = async () => {
-  caList.loading = true;
-  caList.selection = null;
-  try {
-    const data = await getAllCaInfo(
-      Math.floor(caList.first / 10) + 1,
-      10,
-      caList.search,
-      { signal: getSignal() }
-    );
-
-    if (isActivate.value) {
-      caList.total = data.total;
-      caList.data = data.list ?? [];
-    }
-  } catch (err: unknown) {
-    if (isActivate.value) {
-      error("Fail to Fetch CA List", (err as Error).message);
-    }
-  }
-  caList.loading = false;
-};
 const refreshUser = async () => {
-  if (caList.selection === null) {
+  if (caSelection.value === null) {
     return;
   }
 
@@ -67,7 +36,7 @@ const refreshUser = async () => {
   userList.selections = [];
   try {
     const page = await getAllCaBindedUsrs(
-      caList.selection,
+      caSelection.value.uuid,
       Math.floor(userList.first / userList.limit) + 1,
       userList.limit,
       userList.search,
@@ -101,7 +70,7 @@ const tryUnbind = () =>
 
       try {
         await unbindCaFromUsrs(
-          caList.selection!,
+          caSelection.value!.uuid,
           userList.selections.map(({ username }) => username)
         );
 
@@ -118,22 +87,10 @@ const tryUnbind = () =>
   });
 
 /* Watches */
-watch(
-  () => caList.first,
-  () => refreshCaList()
-);
-watchDebounced(
-  () => caList.search,
-  () => refreshCaList(),
-  { debounce: 500, maxWait: 1000 }
-);
-watch(
-  () => caList.selection,
-  () => {
-    userList.search = "";
-    refreshUser();
-  }
-);
+watch(caSelection, () => {
+  userList.search = "";
+  refreshUser();
+});
 watch(
   () => [userList.first, userList.limit],
   () => refreshUser()
@@ -143,9 +100,6 @@ watchDebounced(
   () => refreshUser(),
   { debounce: 500, maxWait: 1000 }
 );
-
-/* Hooks */
-onBeforeMount(() => refreshCaList());
 </script>
 
 <template>
@@ -175,14 +129,14 @@ onBeforeMount(() => refreshCaList());
           icon="pi pi-link"
           label="Bind"
           size="small"
-          :disabled="caList.selection === null || userList.loading"></Button>
+          :disabled="caSelection === null || userList.loading"></Button>
         <Button
           icon="pi pi-trash"
           label="Unbind Selected"
           severity="danger"
           size="small"
           :disabled="
-            caList.selection === null ||
+            caSelection === null ||
             userList.loading ||
             userList.selections.length === 0
           "
@@ -192,68 +146,21 @@ onBeforeMount(() => refreshCaList());
           label="Refresh"
           severity="info"
           size="small"
-          :disabled="caList.selection === null || userList.loading"
+          :disabled="caSelection === null || userList.loading"
           @click="refreshUser"></Button>
       </div>
     </template>
     <template #end>
-      <Select
-        v-model="caList.selection"
+      <SelectCa
+        v-model:selection="caSelection"
         class="w-120"
         option-label="comment"
-        option-value="uuid"
-        placeholder="Select a CA"
-        size="small"
-        :options="caList.data"
-        :pt="{
-          virtualScroller: {
-            root: { class: 'overflow-hidden! [&_.p-select-list]:w-full' }
-          }
-        }"
-        :virtual-scroller-options="{
-          itemSize: 30,
-          lazy: true,
-          loading: caList.loading,
-          showLoader: true
-        }"
-        checkmark>
-        <template #header>
-          <div class="px-4 py-2">
-            <IconField>
-              <InputIcon class="pi pi-search" />
-              <InputText
-                v-model.trim="caList.search"
-                class="w-full"
-                placeholder="Search"
-                size="small" />
-            </IconField>
-          </div>
-        </template>
-        <template #option="{ option }">
-          <p
-            v-tooltip.left="{
-              value: option.comment,
-              class: 'text-sm -translate-x-8'
-            }"
-            class="overflow-hidden text-ellipsis w-100">
-            {{ option.comment }}
-          </p>
-        </template>
-        <template #footer>
-          <Paginator
-            v-model:first="caList.first"
-            current-page-report-template="{currentPage}/{totalPages}"
-            template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-            :rows="10"
-            :total-records="caList.total" />
-        </template>
-      </Select>
+        variant="binding"
+        :visible="true" />
     </template>
   </Toolbar>
 
-  <div
-    v-if="caList.selection === null"
-    class="font-bold py-24 text-2xl text-center">
+  <div v-if="caSelection === null" class="font-bold py-24 text-2xl text-center">
     Please Select a CA
   </div>
   <AsyncDataTable
