@@ -1,6 +1,13 @@
+# Milestones
+
 - [x] Import CA
 - [x] Support OAuth
 - [x] Refactor certificate management
-- [ ] Bind/Unbind CA/SSL to user
+- [x] Bind/Unbind CA/SSL to user
 - [ ] User management
 - [ ] Dashboard
+
+# Issues
+
+- [ ] Get all users with filter of binded CA
+- [ ] Extract user table component

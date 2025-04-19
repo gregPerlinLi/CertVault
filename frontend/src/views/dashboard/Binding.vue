@@ -26,6 +26,8 @@ const userList = reactive({
   loading: false
 });
 
+const dialogBind = ref(false);
+
 /* Actions */
 const refreshUser = async () => {
   if (caSelection.value === null) {
@@ -121,7 +123,7 @@ watchDebounced(
     </template>
   </Breadcrumb>
 
-  <!-- Main -->
+  <!-- Tools -->
   <Toolbar class="border-none mb-4">
     <template #start>
       <div class="flex gap-4">
@@ -129,7 +131,8 @@ watchDebounced(
           icon="pi pi-link"
           label="Bind"
           size="small"
-          :disabled="caSelection === null || userList.loading"></Button>
+          :disabled="caSelection === null || userList.loading"
+          @click="dialogBind = true"></Button>
         <Button
           icon="pi pi-trash"
           label="Unbind Selected"
@@ -160,6 +163,7 @@ watchDebounced(
     </template>
   </Toolbar>
 
+  <!-- User table -->
   <div v-if="caSelection === null" class="font-bold py-24 text-2xl text-center">
     Please Select a CA
   </div>
@@ -195,7 +199,7 @@ watchDebounced(
     <!-- Selector column -->
     <Column class="w-4" selection-mode="multiple"></Column>
 
-    <!-- Info column -->
+    <!-- Info columns -->
     <Column class="w-60" header="Username">
       <template #body="{ data }">
         <div class="flex w-60">
@@ -237,4 +241,10 @@ watchDebounced(
       </template>
     </Column>
   </AsyncDataTable>
+
+  <!-- Dialogs -->
+  <BindUsrsDlg
+    v-model:visible="dialogBind"
+    :ca="caSelection"
+    @success="refreshUser" />
 </template>
