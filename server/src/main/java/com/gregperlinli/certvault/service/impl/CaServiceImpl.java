@@ -211,6 +211,56 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     }
 
     @Override
+    public PageDTO<UserProfileDTO> getNotBoundUsers(String keyword, String uuid, String owner, Integer page, Integer limit) {
+        Page<User> userPage = new Page<>(page, limit);
+        Page<User> resultPage;
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("username", owner)
+                .eq("deleted", false);
+        User user = userService.getOne(userQueryWrapper);
+        if ( user == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
+        }
+        QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
+        caQueryWrapper.eq("uuid", uuid)
+                .eq("deleted", false);
+        Ca ca = this.getOne(caQueryWrapper);
+        if ( ca == null) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The CA does not exist.");
+        }
+        if (
+                !Objects.equals( ca.getOwner(), user.getId() ) &&
+                        !(user.getRole() == AccountTypeConstant.SUPERADMIN.getAccountType())
+        ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The CA is not yours.");
+        }
+        QueryWrapper<CaBinding> caBindingQueryWrapper = new QueryWrapper<>();
+        caBindingQueryWrapper.eq("ca_uuid", uuid);
+        List<CaBinding> caBindings = caBindingService.list(caBindingQueryWrapper);
+        Set<Integer> uids = caBindings.stream().map(CaBinding::getUid).collect(Collectors.toSet());
+        userQueryWrapper.clear();
+        if ( keyword == null || keyword.isEmpty() ) {
+            userQueryWrapper.notIn("id", uids)
+                    .eq("deleted", false);
+        } else {
+            userQueryWrapper.and(wrapper -> wrapper.like("username", keyword)
+                            .or()
+                            .like("display_name", keyword)
+                            .or()
+                            .like("email", keyword)
+                    )
+                    .notIn("id", uids)
+                    .eq("deleted", false);
+        }
+        resultPage = userService.page(userPage, userQueryWrapper);
+        if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
+            return new PageDTO<>(resultPage.getTotal(), null);
+        }
+        return new PageDTO<>(resultPage.getTotal(),
+                resultPage.getRecords().stream().map(UserProfileDTO::new).toList());
+    }
+
+    @Override
     public String getCaCert(String uuid, String owner) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username", owner)
