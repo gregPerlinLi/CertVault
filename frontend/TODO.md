@@ -9,5 +9,5 @@
 
 # Issues
 
-- [ ] Get all users with filter of binded CA
+- [x] Get all users with filter of binded CA
 - [ ] Extract user table component

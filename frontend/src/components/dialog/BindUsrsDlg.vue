@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { CaInfoDTO, UserProfileDTO } from "@/api/types";
-import { getAllUsrInfo } from "@/api/admin/user";
 import { useNotify, useReloadableAsyncGuard } from "@/utils/composable";
-import { bindCaToUsrs } from "@/api/admin/cert/binding";
+import { bindCaToUsrs, getAllCaNotBindedUsrs } from "@/api/admin/cert/binding";
 
 /* Async components */
 const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
@@ -38,7 +37,8 @@ const refresh = async () => {
   userList.loading = true;
   userList.selections = [];
   try {
-    const page = await getAllUsrInfo(
+    const page = await getAllCaNotBindedUsrs(
+      props.ca!.uuid,
       Math.floor(userList.first / userList.limit) + 1,
       userList.limit,
       userList.search,
