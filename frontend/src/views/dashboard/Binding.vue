@@ -1,63 +1,27 @@
 <script setup lang="ts">
 import type { CaInfoDTO, UserProfileDTO } from "@/api/types";
-import { useNotify, useReloadableAsyncGuard } from "@/utils/composable";
+import { useNotify } from "@/utils/composable";
 import { getAllCaBindedUsrs, unbindCaFromUsrs } from "@/api/admin/cert/binding";
 import { useConfirm } from "primevue/useconfirm";
-
-/* Async components */
-const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
 
 /* Services */
 const confirm = useConfirm();
 const { toast, info, success, error } = useNotify();
-const { isActivate, getSignal } = useReloadableAsyncGuard();
+
+const refUsrTable = useTemplateRef("usr-table");
 
 /* Reactives */
 const busyUnbind = ref(false);
+const dialogBind = ref(false);
 const caSelection = ref<CaInfoDTO | null>(null);
 
-const userList = reactive({
-  first: 0,
-  total: 0,
-  limit: 10,
+const usrTable = reactive({
   search: "",
-  data: [] as UserProfileDTO[],
-  selections: [] as UserProfileDTO[],
+  selection: [] as UserProfileDTO[],
   loading: false
 });
 
-const dialogBind = ref(false);
-
 /* Actions */
-const refreshUser = async () => {
-  if (caSelection.value === null) {
-    return;
-  }
-
-  userList.loading = true;
-  userList.selections = [];
-  try {
-    const page = await getAllCaBindedUsrs(
-      caSelection.value.uuid,
-      Math.floor(userList.first / userList.limit) + 1,
-      userList.limit,
-      userList.search,
-      { signal: getSignal() }
-    );
-
-    if (isActivate.value) {
-      userList.total = page.total;
-      userList.data = (page.list ?? []).sort((a, b) =>
-        a.role !== b.role ? b.role - a.role : a.username < b.username ? -1 : 1
-      );
-    }
-  } catch (err: unknown) {
-    if (isActivate.value) {
-      error("Fail to Fetch User List", (err as Error).message);
-    }
-  }
-  userList.loading = false;
-};
 const tryUnbind = () =>
   confirm.require({
     header: "Unbind Selected Users",
@@ -73,12 +37,12 @@ const tryUnbind = () =>
       try {
         await unbindCaFromUsrs(
           caSelection.value!.uuid,
-          userList.selections.map(({ username }) => username)
+          usrTable.selection.map(({ username }) => username)
         );
 
         success("Success", "Successfully unbinded");
-        userList.selections = [];
-        refreshUser();
+        usrTable.selection = [];
+        refUsrTable.value?.refresh();
       } catch (err: unknown) {
         error("Fail to Unbind", (err as Error).message);
       }
@@ -89,19 +53,11 @@ const tryUnbind = () =>
   });
 
 /* Watches */
-watch(caSelection, () => {
-  userList.search = "";
-  refreshUser();
+watch(caSelection, async () => {
+  usrTable.search = "";
+  await nextTick();
+  refUsrTable.value?.refresh();
 });
-watch(
-  () => [userList.first, userList.limit],
-  () => refreshUser()
-);
-watchDebounced(
-  () => userList.search,
-  () => refreshUser(),
-  { debounce: 500, maxWait: 1000 }
-);
 </script>
 
 <template>
@@ -131,7 +87,7 @@ watchDebounced(
           icon="pi pi-link"
           label="Bind"
           size="small"
-          :disabled="caSelection === null || userList.loading"
+          :disabled="caSelection === null || usrTable.loading"
           @click="dialogBind = true"></Button>
         <Button
           icon="pi pi-trash"
@@ -140,8 +96,8 @@ watchDebounced(
           size="small"
           :disabled="
             caSelection === null ||
-            userList.loading ||
-            userList.selections.length === 0
+            usrTable.loading ||
+            usrTable.selection.length === 0
           "
           @click="tryUnbind"></Button>
         <Button
@@ -149,8 +105,8 @@ watchDebounced(
           label="Refresh"
           severity="info"
           size="small"
-          :disabled="caSelection === null || userList.loading"
-          @click="refreshUser"></Button>
+          :disabled="caSelection === null || usrTable.loading"
+          @click="refUsrTable?.refresh()"></Button>
       </div>
     </template>
     <template #end>
@@ -167,84 +123,21 @@ watchDebounced(
   <div v-if="caSelection === null" class="font-bold py-24 text-2xl text-center">
     Please Select a CA
   </div>
-  <AsyncDataTable
+  <UsrTable
     v-else
-    v-model:first="userList.first"
-    v-model:rows="userList.limit"
-    v-model:selection="userList.selections"
-    data-key="username"
-    size="small"
-    :loading="userList.loading"
-    :pt="{ pcPaginator: { root: { class: 'rounded-none' } } }"
-    :row-class="() => 'group'"
-    :row-hover="userList.data.length > 0"
-    :rows-per-page-options="[10, 20, 50]"
-    :total-records="userList.total"
-    :value="userList.data"
-    lazy
-    paginator>
-    <template #header>
-      <div class="flex items-end justify-between">
-        <p class="text-sm">Found {{ userList.total }} User(s) in total</p>
-        <IconField>
-          <InputIcon class="pi pi-search" />
-          <InputText
-            v-model.trim="userList.search"
-            placeholder="Search"
-            size="small" />
-        </IconField>
-      </div>
-    </template>
-
-    <!-- Selector column -->
-    <Column class="w-4" selection-mode="multiple"></Column>
-
-    <!-- Info columns -->
-    <Column class="w-60" header="Username">
-      <template #body="{ data }">
-        <div class="flex w-60">
-          <p
-            v-tooltip.bottom="{ value: data.username, class: 'text-sm' }"
-            class="overflow-x-hidden text-ellipsis whitespace-nowrap"
-            :class="
-              data.role === 3
-                ? 'font-bold text-red-500'
-                : data.role === 2
-                  ? 'text-blue-500'
-                  : ''
-            ">
-            {{ data.username }}
-          </p>
-        </div>
-      </template>
-    </Column>
-    <Column class="w-60" header="Display Name">
-      <template #body="{ data }">
-        <div class="flex w-60">
-          <p
-            v-tooltip.bottom="{ value: data.displayName, class: 'text-sm' }"
-            class="overflow-x-hidden text-ellipsis whitespace-nowrap">
-            {{ data.displayName }}
-          </p>
-        </div>
-      </template>
-    </Column>
-    <Column header="Email">
-      <template #body="{ data }">
-        <div class="flex w-80">
-          <p
-            v-tooltip.bottom="{ value: data.email, class: 'text-sm' }"
-            class="overflow-x-hidden text-ellipsis whitespace-nowrap">
-            {{ data.email }}
-          </p>
-        </div>
-      </template>
-    </Column>
-  </AsyncDataTable>
+    v-model:search="usrTable.search"
+    v-model:selection="usrTable.selection"
+    v-model:loading="usrTable.loading"
+    ref="usr-table"
+    :refresh-fn="
+      (page, limit, keyword, abort) =>
+        getAllCaBindedUsrs(caSelection!.uuid, page, limit, keyword, abort)
+    "
+    selectable />
 
   <!-- Dialogs -->
   <BindUsrsDlg
     v-model:visible="dialogBind"
     :ca="caSelection"
-    @success="refreshUser" />
+    @success="refUsrTable?.refresh()" />
 </template>

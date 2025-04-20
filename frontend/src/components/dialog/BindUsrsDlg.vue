@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import type { CaInfoDTO, UserProfileDTO } from "@/api/types";
-import { useNotify, useReloadableAsyncGuard } from "@/utils/composable";
+import { useNotify } from "@/utils/composable";
 import { bindCaToUsrs, getAllCaNotBindedUsrs } from "@/api/admin/cert/binding";
-
-/* Async components */
-const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -17,47 +14,18 @@ const emits = defineEmits<{ success: [] }>();
 
 /* Services */
 const { toast, info, success, error } = useNotify();
-const { isActivate, getSignal, reload, cancel } = useReloadableAsyncGuard();
+
+const refUsrTable = useTemplateRef("usr-table");
 
 /* Reactives */
 const busyBind = ref(false);
 
-const userList = reactive({
-  first: 0,
-  total: 0,
-  limit: 10,
-  search: "",
-  data: [] as UserProfileDTO[],
-  selections: [] as UserProfileDTO[],
+const usrTable = reactive({
+  selection: [] as UserProfileDTO[],
   loading: false
 });
 
 /* Actions */
-const refresh = async () => {
-  userList.loading = true;
-  userList.selections = [];
-  try {
-    const page = await getAllCaNotBindedUsrs(
-      props.ca!.uuid,
-      Math.floor(userList.first / userList.limit) + 1,
-      userList.limit,
-      userList.search,
-      { signal: getSignal() }
-    );
-
-    if (isActivate.value) {
-      userList.total = page.total;
-      userList.data = (page.list ?? []).sort((a, b) =>
-        a.role !== b.role ? b.role - a.role : a.username < b.username ? -1 : 1
-      );
-    }
-  } catch (err: unknown) {
-    if (isActivate.value) {
-      error("Fail to Fetch User List", (err as Error).message);
-    }
-  }
-  userList.loading = false;
-};
 const tryBind = async () => {
   busyBind.value = true;
   const msg = info("Info", "Binding");
@@ -65,7 +33,7 @@ const tryBind = async () => {
   try {
     await bindCaToUsrs(
       props.ca!.uuid,
-      userList.selections.map(({ username }) => username)
+      usrTable.selection.map(({ username }) => username)
     );
 
     success("Success", "Successfully binded");
@@ -80,110 +48,31 @@ const tryBind = async () => {
 };
 
 /* Watches */
-watch(visible, (newValue) => {
+watch(visible, async (newValue) => {
   if (newValue) {
-    reload();
-    refresh();
+    await nextTick();
+    refUsrTable.value?.reload();
+    refUsrTable.value?.refresh();
   } else {
-    cancel();
+    refUsrTable.value?.cancel();
     busyBind.value = false;
-    userList.first = 0;
-    userList.total = 0;
-    userList.limit = 10;
-    userList.search = "";
-    userList.data = [];
-    userList.selections = [];
-    userList.loading = false;
+    refUsrTable.value?.resetStates();
   }
 });
-watch(
-  () => [userList.first, userList.limit],
-  () => refresh()
-);
-watchDebounced(
-  () => userList.search,
-  () => refresh(),
-  { debounce: 500, maxWait: 1000 }
-);
 </script>
 
 <template>
   <Dialog v-model:visible="visible" header="Bind Users" :closable="false" modal>
     <!-- User table -->
-    <AsyncDataTable
-      v-model:first="userList.first"
-      v-model:rows="userList.limit"
-      v-model:selection="userList.selections"
-      data-key="username"
-      size="small"
-      :loading="userList.loading"
-      :pt="{ pcPaginator: { root: { class: 'rounded-none' } } }"
-      :row-class="() => 'group'"
-      :row-hover="userList.data.length > 0"
-      :rows-per-page-options="[10, 20, 50]"
-      :total-records="userList.total"
-      :value="userList.data"
-      lazy
-      paginator>
-      <template #header>
-        <div class="flex items-end justify-between">
-          <p class="text-sm">Found {{ userList.total }} User(s) in total</p>
-          <IconField>
-            <InputIcon class="pi pi-search" />
-            <InputText
-              v-model.trim="userList.search"
-              placeholder="Search"
-              size="small"
-              :disabled="busyBind" />
-          </IconField>
-        </div>
-      </template>
-
-      <!-- Selector column -->
-      <Column class="w-4" selection-mode="multiple"></Column>
-
-      <!-- Info columns -->
-      <Column class="w-60" header="Username">
-        <template #body="{ data }">
-          <div class="flex w-60">
-            <p
-              v-tooltip.bottom="{ value: data.username, class: 'text-sm' }"
-              class="overflow-x-hidden text-ellipsis whitespace-nowrap"
-              :class="
-                data.role === 3
-                  ? 'font-bold text-red-500'
-                  : data.role === 2
-                    ? 'text-blue-500'
-                    : ''
-              ">
-              {{ data.username }}
-            </p>
-          </div>
-        </template>
-      </Column>
-      <Column class="w-60" header="Display Name">
-        <template #body="{ data }">
-          <div class="flex w-60">
-            <p
-              v-tooltip.bottom="{ value: data.displayName, class: 'text-sm' }"
-              class="overflow-x-hidden text-ellipsis whitespace-nowrap">
-              {{ data.displayName }}
-            </p>
-          </div>
-        </template>
-      </Column>
-      <Column header="Email">
-        <template #body="{ data }">
-          <div class="flex w-80">
-            <p
-              v-tooltip.bottom="{ value: data.email, class: 'text-sm' }"
-              class="overflow-x-hidden text-ellipsis whitespace-nowrap">
-              {{ data.email }}
-            </p>
-          </div>
-        </template>
-      </Column>
-    </AsyncDataTable>
+    <UsrTable
+      v-model:selection="usrTable.selection"
+      v-model:loading="usrTable.loading"
+      ref="usr-table"
+      :refresh-fn="
+        (page, limit, keyword, abort) =>
+          getAllCaNotBindedUsrs(ca!.uuid, page, limit, keyword, abort)
+      "
+      selectable />
 
     <!-- Buttons -->
     <div class="flex justify-between mt-4">
@@ -192,8 +81,8 @@ watchDebounced(
         severity="info"
         size="small"
         :disabled="busyBind"
-        :loading="userList.loading"
-        @click="refresh"></Button>
+        :loading="usrTable.loading"
+        @click="refUsrTable?.refresh()"></Button>
       <div class="flex gap-2">
         <Button
           label="Cancel"
@@ -204,7 +93,7 @@ watchDebounced(
         <Button
           label="Bind"
           size="small"
-          :disabled="userList.selections.length === 0"
+          :disabled="usrTable.selection.length === 0"
           :loading="busyBind"
           @click="tryBind"></Button>
       </div>

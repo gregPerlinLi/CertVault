@@ -58,10 +58,10 @@ async function trySignIn(ev: Event): Promise<void> {
       class="bg-neutral-50 border border-neutral-200 dark:bg-neutral-800 dark:border-neutral-500">
       <template #content>
         <form class="flex flex-col gap-4" @submit.prevent="trySignIn">
+          <!-- Form elements -->
           <InputText
             name="username"
             placeholder="Username"
-            type="text"
             :disabled="busy"
             :invalid="isInvalid('username')"
             @focus="clearInvalid('username')" />
@@ -75,6 +75,8 @@ async function trySignIn(ev: Event): Promise<void> {
             @focus="clearInvalid('password')"
             toggle-mask />
           <Button label="Sign in" type="submit" :loading="busy"></Button>
+
+          <!-- OIDC list -->
           <template v-if="oidcProviders !== null">
             <div class="flex items-center justify-center my-4">
               <div
