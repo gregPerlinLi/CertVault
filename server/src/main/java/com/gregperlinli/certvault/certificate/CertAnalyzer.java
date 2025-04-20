@@ -324,7 +324,12 @@ public class CertAnalyzer {
 
     private static boolean verifyKeyPair(PublicKey publicKey, PrivateKey privateKey) throws Exception {
         // 使用证书公钥和私钥进行签名验证
-        String algorithm = "SHA256with" + publicKey.getAlgorithm();
+        String algorithm = publicKey.getAlgorithm();
+        if ( "RSA".equals(algorithm) ) {
+            algorithm = "SHA256with" + algorithm;
+        } else if ( "EC".equals(algorithm)) {
+            algorithm = "ECDSA";
+        }
         Signature signature = Signature.getInstance(algorithm, "BC");
 
         byte[] data = "CertVaultVerification".getBytes(StandardCharsets.UTF_8);
