@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
             return new ResultVO<>(((BusinessException) e).getCode(), msg);
         }
         if ( e instanceof NoResourceFoundException) {
-            response.setStatus(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode());
+            // response.setStatus(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode());
             if ( !request.getRequestURI().startsWith("/api/") ) {
                 request.getRequestDispatcher("/index.html").forward(request, response);
             }
