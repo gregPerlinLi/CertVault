@@ -37,6 +37,30 @@ public class CaInfoDTO {
     private String uuid;
 
     /**
+     * Algorithm used for generating the CA certificate
+     */
+    @Schema(
+            name = "algorithm",
+            description = "Algorithm used for generating the CA certificate",
+            example = "RSA",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "String"
+    )
+    private String algorithm;
+
+    /**
+     * Size of the key in bits
+     */
+    @Schema(
+            name = "keySize",
+            description = "Size of the key in bits",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "Integer"
+    )
+    private Integer keySize;
+
+    /**
      * Username of the CA owner
      */
     @Schema(
