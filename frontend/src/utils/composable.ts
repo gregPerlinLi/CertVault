@@ -46,10 +46,12 @@ export const useNotify = () => {
   };
   const success = (summary: string, detail: string) =>
     toast.add({ severity: "success", summary, detail, life: 3000 });
+  const warn = (summary: string, detail: string) =>
+    toast.add({ severity: "warn", summary, detail, life: 5000 });
   const error = (summary: string, detail: string) =>
     toast.add({ severity: "error", summary, detail, life: 5000 });
 
-  return { toast, info, success, error };
+  return { toast, info, success, warn, error };
 };
 
 export const useAsyncGuard = () => {

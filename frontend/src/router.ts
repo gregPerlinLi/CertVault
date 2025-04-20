@@ -4,7 +4,7 @@ import { useNotify } from "@/utils/composable";
 import { createRouter, createWebHistory } from "vue-router";
 
 // Sync views
-import NotFound from "@/views/NotFound.vue";
+import NotFound from "@views/NotFound.vue";
 
 // Create router
 const router = createRouter({

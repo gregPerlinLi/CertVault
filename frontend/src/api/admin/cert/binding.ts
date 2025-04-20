@@ -17,6 +17,21 @@ export const getAllCaBindedUsrs = (
     abort
   });
 
+export const getAllCaNotBindedUsrs = (
+  uuid: string,
+  page: number,
+  limit: number,
+  keyword?: string,
+  abort?: AbortOption
+) =>
+  callRestfulApi<PaginationVO<UserProfileDTO>>({
+    method: "GET",
+    baseUrl: "/api/v1/admin/cert/ca/{uuid}/bind/not",
+    pathNames: { uuid },
+    searchParams: { page, limit, keyword },
+    abort
+  });
+
 export const bindCaToUsrs = (
   caUuid: string,
   usernames: string[],

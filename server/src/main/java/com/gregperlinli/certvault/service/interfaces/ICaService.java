@@ -49,6 +49,18 @@ public interface ICaService extends IService<Ca> {
     PageDTO<UserProfileDTO> getBoundUsers(String keyword, String uuid, String owner, Integer page, Integer limit);
 
     /**
+     * Get all users not bound to a CA
+     *
+     * @param keyword search keyword
+     * @param uuid ca certificate uuid
+     * @param owner owner of the ca certificate
+     * @param page page number
+     * @param limit page size
+     * @return user information
+     */
+    PageDTO<UserProfileDTO> getNotBoundUsers(String keyword, String uuid, String owner, Integer page, Integer limit);
+
+    /**
      * Get ca certificate
      *
      * @param uuid ca certificate uuid

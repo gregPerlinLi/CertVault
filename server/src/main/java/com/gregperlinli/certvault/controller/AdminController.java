@@ -147,6 +147,33 @@ public class AdminController {
         return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "No data", result);
     }
 
+    @Operation(
+            summary = "Get all user information not bound to a ca",
+            description = "Retrieve all user information not bound to a ca (paged)"
+    )
+    @NoDataListApiResponse
+    @SuccessApiResponse
+    @GetMapping(value = "/cert/ca/{uuid}/bind/not")
+    public ResultVO<PageDTO<UserProfileDTO>> getCaNotBoundUsers(@Parameter(name = "uuid", description = "CA UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
+                                                                    @PathVariable("uuid") String uuid,
+                                                                @Parameter(name = "keyword", description = "Search keywords (Can be username, display name, and email)", example = "user")
+                                                                    @RequestParam(value = "keyword", required = false) String keyword,
+                                                                @Parameter(name = "page", description = "Page number", example = "1")
+                                                                    @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                                @Parameter(name = "limit", description = "Page limit", example = "10")
+                                                                    @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                                HttpServletRequest request) {
+        PageDTO<UserProfileDTO> result = caService.getNotBoundUsers(keyword,
+                uuid,
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
+                page,
+                limit);
+        if ( result != null && result.getList() != null ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "No data", result);
+    }
+
     /**
      * Get a CA certificate
      *

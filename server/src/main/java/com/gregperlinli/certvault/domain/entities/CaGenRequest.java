@@ -32,6 +32,16 @@ public class CaGenRequest {
     private String parentCa;
 
     /**
+     * Algorithm
+     */
+    private String algorithm = "RSA";
+
+    /**
+     * Key Size
+     */
+    private Integer keySize = 2048;
+
+    /**
      * Allow Signing Sub CA
      */
     private Boolean allowSubCa = false;
@@ -82,6 +92,8 @@ public class CaGenRequest {
     private String comment;
 
     public CaGenRequest(RequestCertDTO requestCertDTO, String ownerEmail) {
+        this.algorithm = requestCertDTO.getAlgorithm();
+        this.keySize = requestCertDTO.getKeySize();
         this.country = requestCertDTO.getCountry();
         this.province = requestCertDTO.getProvince();
         this.city = requestCertDTO.getCity();
@@ -96,6 +108,8 @@ public class CaGenRequest {
     public CaGenRequest(RequestCertDTO requestCertDTO, String parentCaPrivkey, String parentCa, Boolean allowSubCa, String ownerEmail) {
         this.parentCaPrivkey = parentCaPrivkey;
         this.parentCa = parentCa;
+        this.algorithm = requestCertDTO.getAlgorithm();
+        this.keySize = requestCertDTO.getKeySize();
         this.allowSubCa = allowSubCa;
         this.country = requestCertDTO.getCountry();
         this.province = requestCertDTO.getProvince();

@@ -11,26 +11,23 @@ import { useUserStore } from "@/stores/user";
 import { useAsyncGuard, useNotify } from "@/utils/composable";
 import { useConfirm } from "primevue/useconfirm";
 
+import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
+import LoadingPlaceholder from "@comps/placeholder/LoadingPlaceholder.vue";
+
 /* Async components */
-const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
-const AsyncReqNewCertDlg = defineAsyncComponent(
-  () => import("@/components/dialog/cert/ReqNewCertDlg.vue")
-);
-const AsyncImCaDlg = defineAsyncComponent(
-  () => import("@/components/dialog/cert/ImCaDlg.vue")
-);
-const AsyncEditCertCmtDlg = defineAsyncComponent(
-  () => import("@/components/dialog/cert/EditCertCmtDlg.vue")
-);
-const AsyncDispCertInfoDlg = defineAsyncComponent(
-  () => import("@/components/dialog/cert/DispCertInfoDlg.vue")
-);
-const AsyncExCertDlg = defineAsyncComponent(
-  () => import("@/components/dialog/cert/ExCertDlg.vue")
-);
-const AsyncRenewCertDlg = defineAsyncComponent(
-  () => import("@/components/dialog/cert/RenewCertDlg.vue")
-);
+const AsyncDataTable = defineAsyncComponent({
+  loader: () => import("primevue/datatable"),
+  loadingComponent: LoadingPlaceholder,
+  errorComponent: ErrorPlaceholer,
+  onError: (err, retry, fail, attampts) => {
+    if (attampts < 5) {
+      retry();
+    } else {
+      error("Fail to Load Data Table Component", err.message);
+      fail();
+    }
+  }
+});
 
 // Properties
 const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
@@ -212,6 +209,7 @@ onBeforeMount(() => refresh());
     data-key="uuid"
     size="small"
     :loading="loading"
+    :pt="{ pcPaginator: { root: { class: 'rounded-none' } } }"
     :row-class="() => 'group'"
     :row-hover="pagination.data.length > 0"
     :rows-per-page-options="[10, 20, 50]"
@@ -399,25 +397,25 @@ onBeforeMount(() => refresh());
   </AsyncDataTable>
 
   <!-- Dialogs -->
-  <AsyncReqNewCertDlg
+  <ReqNewCertDlg
     v-model:visible="dialog.reqNewCert"
     :variant="variant"
     @success="refresh" />
-  <AsyncImCaDlg v-model:visible="dialog.uplNewCert" @success="refresh" />
-  <AsyncEditCertCmtDlg
+  <ImCaDlg v-model:visible="dialog.uplNewCert" @success="refresh" />
+  <EditCertCmtDlg
     v-model:visible="dialog.editComment"
     :data="targetCertData"
     :variant="variant"
     @success="refresh" />
-  <AsyncDispCertInfoDlg
+  <DispCertInfoDlg
     v-model:visible="dialog.showInfo"
     :data="targetCertData"
     :variant="variant" />
-  <AsyncExCertDlg
+  <ExCertDlg
     v-model:visible="dialog.exportCert"
     :data="targetCertData"
     :variant="variant" />
-  <AsyncRenewCertDlg
+  <RenewCertDlg
     v-model:visible="dialog.renewCert"
     :data="targetCertData"
     :variant="variant"

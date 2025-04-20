@@ -41,6 +41,18 @@ public class Certificate implements Serializable {
     private String uuid;
 
     /**
+     * 证书算法
+     */
+    @TableField("algorithm")
+    private String algorithm;
+
+    /**
+     * 证书密钥长度
+     */
+    @TableField("key_size")
+    private Integer keySize;
+
+    /**
      * 证书私钥
      */
     @TableField("privkey")

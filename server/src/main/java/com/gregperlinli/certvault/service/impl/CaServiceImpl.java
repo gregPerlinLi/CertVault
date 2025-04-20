@@ -17,6 +17,7 @@ import com.gregperlinli.certvault.service.interfaces.ICaService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import com.gregperlinli.certvault.utils.AuthUtils;
+import com.gregperlinli.certvault.utils.CertUtils;
 import com.gregperlinli.certvault.utils.EncryptAndDecryptUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -90,6 +91,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
                 resultPage.getRecords().stream().map(ca -> {
                     CaInfoDTO dto = new CaInfoDTO();
                     dto.setUuid(ca.getUuid());
+                    dto.setAlgorithm(ca.getAlgorithm());
+                    dto.setKeySize(ca.getKeySize());
                     dto.setParentCa(ca.getParentCa());
                     dto.setAllowSubCa(ca.getAllowSubCa());
                     dto.setComment(ca.getComment());
@@ -145,6 +148,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
                 resultPage.getRecords().stream().map(ca -> {
                     CaInfoDTO dto = new CaInfoDTO();
                     dto.setUuid(ca.getUuid());
+                    dto.setAlgorithm(ca.getAlgorithm());
+                    dto.setKeySize(ca.getKeySize());
                     dto.setParentCa(ca.getParentCa());
                     dto.setAllowSubCa(ca.getAllowSubCa());
                     dto.setComment(ca.getComment());
@@ -200,6 +205,56 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
                             .like("email", keyword)
                     )
                     .in("id", caBindings.stream().map(CaBinding::getUid).toList())
+                    .eq("deleted", false);
+        }
+        resultPage = userService.page(userPage, userQueryWrapper);
+        if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
+            return new PageDTO<>(resultPage.getTotal(), null);
+        }
+        return new PageDTO<>(resultPage.getTotal(),
+                resultPage.getRecords().stream().map(UserProfileDTO::new).toList());
+    }
+
+    @Override
+    public PageDTO<UserProfileDTO> getNotBoundUsers(String keyword, String uuid, String owner, Integer page, Integer limit) {
+        Page<User> userPage = new Page<>(page, limit);
+        Page<User> resultPage;
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("username", owner)
+                .eq("deleted", false);
+        User user = userService.getOne(userQueryWrapper);
+        if ( user == null ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
+        }
+        QueryWrapper<Ca> caQueryWrapper = new QueryWrapper<>();
+        caQueryWrapper.eq("uuid", uuid)
+                .eq("deleted", false);
+        Ca ca = this.getOne(caQueryWrapper);
+        if ( ca == null) {
+            throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The CA does not exist.");
+        }
+        if (
+                !Objects.equals( ca.getOwner(), user.getId() ) &&
+                        !(user.getRole() == AccountTypeConstant.SUPERADMIN.getAccountType())
+        ) {
+            throw new ParamValidateException(ResultStatusCodeConstant.FORBIDDEN.getResultCode(), "The CA is not yours.");
+        }
+        QueryWrapper<CaBinding> caBindingQueryWrapper = new QueryWrapper<>();
+        caBindingQueryWrapper.eq("ca_uuid", uuid);
+        List<CaBinding> caBindings = caBindingService.list(caBindingQueryWrapper);
+        Set<Integer> uids = caBindings.stream().map(CaBinding::getUid).collect(Collectors.toSet());
+        userQueryWrapper.clear();
+        if ( keyword == null || keyword.isEmpty() ) {
+            userQueryWrapper.notIn("id", uids)
+                    .eq("deleted", false);
+        } else {
+            userQueryWrapper.and(wrapper -> wrapper.like("username", keyword)
+                            .or()
+                            .like("display_name", keyword)
+                            .or()
+                            .like("email", keyword)
+                    )
+                    .notIn("id", uids)
                     .eq("deleted", false);
         }
         resultPage = userService.page(userPage, userQueryWrapper);
@@ -419,15 +474,37 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
         if ( !CertAnalyzer.certVerify(importCertDTO.getPrivkey(), importCertDTO.getCertificate()) ) {
-            throw new ParamValidateException(ResultStatusCodeConstant.FAILED.getResultCode(), "The certificate is invalid.");
+            throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The certificate is invalid.");
         }
         if ( !CertAnalyzer.verifyIsCa(importCertDTO.getCertificate()) ) {
-            throw new ParamValidateException(ResultStatusCodeConstant.FAILED.getResultCode(), "The certificate is not a CA.");
+            throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The certificate is not a CA.");
+        }
+        String privateKeyAlgorithm = CertUtils.getPrivateKeyAlgorithm(CertUtils.parsePrivateKey(importCertDTO.getPrivkey()));
+        String certificatePublicKeyAlgorithm = CertUtils.getCertificatePublicKeyAlgorithm(CertUtils.parseCertificate(importCertDTO.getCertificate()));
+        String algorithm = null;
+        if ( Objects.equals( privateKeyAlgorithm, certificatePublicKeyAlgorithm ) ) {
+            algorithm = certificatePublicKeyAlgorithm;
+        } else if ( "ECDSA".equals( privateKeyAlgorithm ) && "EC".equals( certificatePublicKeyAlgorithm )) {
+            algorithm = certificatePublicKeyAlgorithm;
+        } else if ( "EdDSA".equals( privateKeyAlgorithm ) && "Ed25519".equals( certificatePublicKeyAlgorithm) ) {
+            algorithm = certificatePublicKeyAlgorithm;
+        } else {
+            throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The algorithm of private key and certificate are not compatible.");
+        }
+        Integer privateKeySize = CertUtils.getPrivateKeySize(CertUtils.parsePrivateKey(importCertDTO.getPrivkey()));
+        Integer certificatePublicKeySize = CertUtils.getCertificatePublicKeySize(CertUtils.parseCertificate(importCertDTO.getCertificate()));
+        Integer keySize = null;
+        if ( Objects.equals( privateKeySize, certificatePublicKeySize ) ) {
+            keySize = privateKeySize;
+        } else {
+            throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The key size of private key and certificate are not compatible.");
         }
         CertificateDetails certificateDetails = CertAnalyzer.analyzeCertificate(importCertDTO.getCertificate());
         LocalDateTime now = LocalDateTime.now();
         Ca ca = new Ca();
         ca.setUuid(UUID.randomUUID().toString());
+        ca.setAlgorithm(algorithm);
+        ca.setKeySize(keySize);
         ca.setPrivkey(EncryptAndDecryptUtils.encrypt(importCertDTO.getPrivkey()));
         ca.setCert(importCertDTO.getCertificate());
         ca.setAllowSubCa(true);

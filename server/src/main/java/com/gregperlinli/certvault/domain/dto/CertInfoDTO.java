@@ -24,6 +24,9 @@ import java.time.LocalDateTime;
 @Data
 public class CertInfoDTO {
 
+    /**
+     * Certificate UUID
+     */
     @Schema(
             name = "uuid",
             description = "Unique identifier for the certificate",
@@ -33,6 +36,9 @@ public class CertInfoDTO {
     )
     private String uuid;
 
+    /**
+     * Certificate CA UUID
+     */
     @Schema(
             name = "caUuid",
             description = "Unique identifier for the Certificate Authority that issued the certificate",
@@ -42,6 +48,33 @@ public class CertInfoDTO {
     )
     private String caUuid;
 
+    /**
+     * Certificate algorithm
+     */
+    @Schema(
+            name = "algorithm",
+            description = "Algorithm used to generate the certificate",
+            example = "RSA",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "String"
+    )
+    private String algorithm;
+
+    /**
+     * Certificate key size
+     */
+    @Schema(
+            name = "keySize",
+            description = "Size of the key in bits",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "Integer"
+    )
+    private Integer keySize;
+
+    /**
+     * Certificate owner
+     */
     @Schema(
             name = "owner",
             description = "Username of the certificate owner",
@@ -51,6 +84,9 @@ public class CertInfoDTO {
     )
     private String owner;
 
+    /**
+     * Certificate comment
+     */
     @Schema(
             name = "comment",
             description = "Optional description or notes about the certificate",
@@ -60,6 +96,9 @@ public class CertInfoDTO {
     )
     private String comment;
 
+    /**
+     * Certificate validity period start date
+     */
     @Schema(
             name = "notBefore",
             description = "Start date of the certificate's validity period (ISO 8601 format)",
@@ -69,6 +108,9 @@ public class CertInfoDTO {
     )
     private LocalDateTime notBefore;
 
+    /**
+     * Certificate validity period end date
+     */
     @Schema(
             name = "notAfter",
             description = "End date of the certificate's validity period (ISO 8601 format)",
@@ -78,6 +120,9 @@ public class CertInfoDTO {
     )
     private LocalDateTime notAfter;
 
+    /**
+     * Certificate creation date
+     */
     @Schema(
             name = "createdAt",
             description = "Date when the certificate was created (ISO 8601 format)",
@@ -87,6 +132,9 @@ public class CertInfoDTO {
     )
     private LocalDateTime createdAt;
 
+    /**
+     * Certificate modification date
+     */
     @Schema(
             name = "modifiedAt",
             description = "Date when the certificate was last modified (ISO 8601 format)",

@@ -39,6 +39,30 @@ public class ResponseCaDTO {
     private String uuid;
 
     /**
+     * Algorithm
+     */
+    @Schema(
+            name = "algorithm",
+            description = "Algorithm used to generate the CA certificate",
+            example = "RSA",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "String"
+    )
+    private String algorithm;
+
+    /**
+     * Key Size
+     */
+    @Schema(
+            name = "keySize",
+            description = "Size of the key in bits",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "Integer"
+    )
+    private Integer keySize;
+
+    /**
      * Private key with BASE64 encoding
      */
     @Schema(
@@ -119,6 +143,8 @@ public class ResponseCaDTO {
 
     public ResponseCaDTO(GenResponse response) {
         this.uuid = response.getUuid();
+        this.algorithm = response.getAlgorithm();
+        this.keySize = response.getKeySize();
         this.privkey = response.getPrivkey();
         this.cert = response.getCert();
         this.notBefore = response.getNotBefore();
@@ -128,6 +154,8 @@ public class ResponseCaDTO {
 
     public ResponseCaDTO(GenResponse response, String parentCa, Boolean allowSubCa) {
         this.uuid = response.getUuid();
+        this.algorithm = response.getAlgorithm();
+        this.keySize = response.getKeySize();
         this.privkey = response.getPrivkey();
         this.cert = response.getCert();
         this.parentCa = parentCa;
@@ -139,6 +167,8 @@ public class ResponseCaDTO {
 
     public ResponseCaDTO(Ca ca) {
         this.uuid = ca.getUuid();
+        this.algorithm = ca.getAlgorithm();
+        this.keySize = ca.getKeySize();
         this.privkey = ca.getPrivkey();
         this.cert = ca.getCert();
         this.parentCa = ca.getParentCa();
