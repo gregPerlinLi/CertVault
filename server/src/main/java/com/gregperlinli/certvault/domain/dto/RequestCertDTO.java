@@ -47,6 +47,24 @@ public class RequestCertDTO {
     )
     private Boolean allowSubCa;
 
+    @Schema(
+            name = "algorithm",
+            description = "Algorithm (Can be RSA, EC, Ed25519)",
+            example = "RSA",
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            type = "String"
+    )
+    private String algorithm = "RSA";
+
+    @Schema(
+            name = "keySize",
+            description = "Key Size",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            type = "Integer"
+    )
+    private Integer keySize = 2048;
+
     /**
      * Country
      */
