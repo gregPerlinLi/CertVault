@@ -42,6 +42,18 @@ public class Ca implements Serializable {
     private String uuid;
 
     /**
+     * 签名算法
+     */
+    @TableField("algorithm")
+    private String algorithm;
+
+    /**
+     * 密钥长度
+     */
+    @TableField("key_size")
+    private Integer keySize;
+
+    /**
      * CA 私钥
      */
     @TableField("privkey")
