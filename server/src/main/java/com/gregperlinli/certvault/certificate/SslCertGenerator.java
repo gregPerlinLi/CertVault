@@ -14,12 +14,15 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jcajce.spec.EdDSAParameterSpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import java.math.BigInteger;
 import java.security.*;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -51,10 +54,32 @@ public class SslCertGenerator {
             // 2. 解析CA证书和私钥
             X509CertificateHolder caCert = CertUtils.parseCertificate(request.getCa());
             PrivateKey caPrivateKey = CertUtils.parsePrivateKey(request.getCaKey());
+            PublicKey caPublicKey = new JcaX509CertificateConverter()
+                    .setProvider("BC")
+                    .getCertificate(caCert)
+                    .getPublicKey();
 
-            // 3. 生成SSL密钥对（2048位）
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA", "BC");
-            keyGen.initialize(2048);
+            // 3. 生成SSL密钥对
+            String algorithm = caPublicKey.getAlgorithm();
+            Integer keySize = request.getKeySize();
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance(algorithm, "BC");
+            if ("Ed25519".equals(algorithm)) {
+                // 使用Ed25519专用参数初始化，固定密钥长度为256位
+                keySize = 256;
+                keyGen.initialize(new EdDSAParameterSpec("Ed25519"));
+            } else if ("EC".equals(algorithm)) {
+                // 使用ECC算法，初始化密钥长度只能为 256、384 或 521，不支持其他值
+                if ( keySize < 320 ) {
+                    keySize = 256;
+                } else if ( keySize <= 452 ) {
+                    keySize = 384;
+                } else {
+                    keySize = 521;
+                }
+                keyGen.initialize(keySize, new SecureRandom());
+            } else {
+                keyGen.initialize(keySize, new SecureRandom());
+            }
             KeyPair sslKeyPair = keyGen.generateKeyPair();
 
             // 4. 构建SSL证书主题
@@ -142,8 +167,16 @@ public class SslCertGenerator {
                     )
             );
 
+            // 签名算法选择
+            String signerAlg = switch (algorithm) {
+                case "RSA" -> "SHA256WithRSAEncryption";
+                case "EC" -> "SHA256withECDSA";
+                case "Ed25519" -> "Ed25519";
+                default -> throw new IllegalArgumentException("Unsupported algorithm");
+            };
+
             // 11. 创建签名器（使用CA私钥）
-            ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
+            ContentSigner signer = new JcaContentSignerBuilder(signerAlg)
                     .build(caPrivateKey);
 
             // 12. 生成最终证书
@@ -160,6 +193,8 @@ public class SslCertGenerator {
             // 15. 返回响应
             return new GenResponse()
                     .setUuid(UUID.randomUUID().toString())
+                    .setAlgorithm(algorithm)
+                    .setKeySize(keySize)
                     .setPrivkey(privKeyBase64)
                     .setCert(certBase64)
                     .setNotBefore(LocalDateTime.ofInstant(Instant.ofEpochMilli(notBefore.getTime()), ZoneId.systemDefault()))
@@ -247,8 +282,17 @@ public class SslCertGenerator {
                 );
             }
 
+            // 签名算法选择
+            String algorithm = publicKey.getAlgorithm();
+            String signerAlg = switch (algorithm) {
+                case "RSA" -> "SHA256WithRSAEncryption";
+                case "EC" -> "SHA256withECDSA";
+                case "Ed25519" -> "Ed25519";
+                default -> throw new IllegalArgumentException("Unsupported algorithm");
+            };
+
             // 9. 使用CA私钥签名新证书
-            ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
+            ContentSigner signer = new JcaContentSignerBuilder(signerAlg)
                     .build(caPrivateKey);
             X509CertificateHolder newCertHolder = certBuilder.build(signer);
 
@@ -260,9 +304,26 @@ public class SslCertGenerator {
             String certBase64 = CertUtils.encodeBase64(pemCert.getBytes());
             String privKeyBase64 = CertUtils.encodeBase64(pemPrivateKey.getBytes());
 
+            // 获取密钥长度
+            Integer keySize = null;
+            if (publicKey instanceof RSAPublicKey) {
+                // RSA 密钥长度（模数位数）
+                keySize = ((RSAPublicKey) publicKey).getModulus().bitLength();
+            } else if (publicKey instanceof ECPublicKey) {
+                // EC 密钥长度（椭圆曲线位数）
+                keySize = ((ECPublicKey) publicKey).getParams().getCurve().getField().getFieldSize();
+            } else if ("Ed25519".equals(publicKey.getAlgorithm())) {
+                // Ed25519 固定密钥长度
+                keySize = 256;
+            } else {
+                throw new UnsupportedOperationException("Unsupported key algorithm: " + publicKey.getAlgorithm());
+            }
+
             // 12. 返回响应
             return new GenResponse()
                     .setUuid(request.getUuid())
+                    .setAlgorithm(algorithm)
+                    .setKeySize(keySize)
                     .setPrivkey(privKeyBase64)
                     .setCert(certBase64)
                     .setNotBefore(LocalDateTime.ofInstant(Instant.ofEpochMilli(notBefore.getTime()), ZoneId.systemDefault()))
