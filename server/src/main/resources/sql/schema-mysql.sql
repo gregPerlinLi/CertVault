@@ -4,6 +4,8 @@ create table if not exists ca
     id           int auto_increment comment 'CA ID'
         primary key,
     uuid         varchar(100)                               not null comment 'CA UUID',
+    algorithm    varchar(10)default 'RSA'                   comment '签名算法',
+    key_size     int        default 2048                    comment '密钥长度',
     privkey      text                                       not null comment 'CA 私钥',
     cert         text                                       not null comment 'CA 证书',
     parent_ca    varchar(100)                               null comment '父 CA UUID（如果为根则应为空）',
@@ -40,6 +42,8 @@ create table if not exists certificate
     id          int auto_increment comment 'ID'
         primary key,
     uuid        varchar(100)                                not null comment '证书 UUID ',
+    algorithm   varchar(10) default 'RSA'                   comment '签名算法',
+    key_size    int         default 2048                    comment '密钥长度',
     privkey     text                                        null comment '证书私钥',
     cert        text                                        not null comment '证书',
     ca_uuid     varchar(100)                                null comment '证书机构 UUID',
@@ -50,7 +54,7 @@ create table if not exists certificate
     modified_at datetime    default '1970-01-01 00:00:00'   null comment '修改时间',
     comment     varchar(500)                                null comment '证书别名',
     deleted     tinyint(1)  default 0                       not null comment '是否被删除',
-    constraint certficate_pk_2
+    constraint certificate_pk_2
         unique (uuid)
 )
     comment 'SSL证书';
