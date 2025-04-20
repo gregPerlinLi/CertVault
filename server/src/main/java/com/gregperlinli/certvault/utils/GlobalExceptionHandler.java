@@ -19,6 +19,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import javax.naming.AuthenticationException;
 import java.nio.file.AccessDeniedException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * 全局异常处理器
@@ -59,6 +60,11 @@ public class GlobalExceptionHandler {
             // response.setStatus(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION);
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode()));
             return new ResultVO<>(((ParamValidateException) e).getCode(), msg);
+        }
+        if ( e instanceof NoSuchAlgorithmException) {
+            // response.setStatus(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION);
+            response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode()));
+            return new ResultVO<>(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), msg);
         }
         if ( e instanceof CertGenException ) {
             // response.setStatus(ResultStatusCodeConstant.BUSINESS_EXCEPTION);
