@@ -133,6 +133,8 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
                 resultPage.getRecords().stream().map(certificate -> {
                     CertInfoDTO dto = new CertInfoDTO();
                     dto.setUuid(certificate.getUuid());
+                    dto.setAlgorithm(certificate.getAlgorithm());
+                    dto.setKeySize(certificate.getKeySize());
                     dto.setCaUuid(certificate.getCaUuid());
                     dto.setComment(certificate.getComment());
                     dto.setNotBefore(certificate.getNotBefore());

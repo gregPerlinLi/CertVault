@@ -17,6 +17,7 @@ import com.gregperlinli.certvault.service.interfaces.ICaService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gregperlinli.certvault.service.interfaces.IUserService;
 import com.gregperlinli.certvault.utils.AuthUtils;
+import com.gregperlinli.certvault.utils.CertUtils;
 import com.gregperlinli.certvault.utils.EncryptAndDecryptUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -90,6 +91,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
                 resultPage.getRecords().stream().map(ca -> {
                     CaInfoDTO dto = new CaInfoDTO();
                     dto.setUuid(ca.getUuid());
+                    dto.setAlgorithm(ca.getAlgorithm());
+                    dto.setKeySize(ca.getKeySize());
                     dto.setParentCa(ca.getParentCa());
                     dto.setAllowSubCa(ca.getAllowSubCa());
                     dto.setComment(ca.getComment());
@@ -145,6 +148,8 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
                 resultPage.getRecords().stream().map(ca -> {
                     CaInfoDTO dto = new CaInfoDTO();
                     dto.setUuid(ca.getUuid());
+                    dto.setAlgorithm(ca.getAlgorithm());
+                    dto.setKeySize(ca.getKeySize());
                     dto.setParentCa(ca.getParentCa());
                     dto.setAllowSubCa(ca.getAllowSubCa());
                     dto.setComment(ca.getComment());
@@ -469,15 +474,37 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
             throw new ParamValidateException(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), "The user does not exist.");
         }
         if ( !CertAnalyzer.certVerify(importCertDTO.getPrivkey(), importCertDTO.getCertificate()) ) {
-            throw new ParamValidateException(ResultStatusCodeConstant.FAILED.getResultCode(), "The certificate is invalid.");
+            throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The certificate is invalid.");
         }
         if ( !CertAnalyzer.verifyIsCa(importCertDTO.getCertificate()) ) {
-            throw new ParamValidateException(ResultStatusCodeConstant.FAILED.getResultCode(), "The certificate is not a CA.");
+            throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The certificate is not a CA.");
+        }
+        String privateKeyAlgorithm = CertUtils.getPrivateKeyAlgorithm(CertUtils.parsePrivateKey(importCertDTO.getPrivkey()));
+        String certificatePublicKeyAlgorithm = CertUtils.getCertificatePublicKeyAlgorithm(CertUtils.parseCertificate(importCertDTO.getCertificate()));
+        String algorithm = null;
+        if ( Objects.equals( privateKeyAlgorithm, certificatePublicKeyAlgorithm ) ) {
+            algorithm = certificatePublicKeyAlgorithm;
+        } else if ( "ECDSA".equals( privateKeyAlgorithm ) && "EC".equals( certificatePublicKeyAlgorithm )) {
+            algorithm = certificatePublicKeyAlgorithm;
+        } else if ( "EdDSA".equals( privateKeyAlgorithm ) && "Ed25519".equals( certificatePublicKeyAlgorithm) ) {
+            algorithm = certificatePublicKeyAlgorithm;
+        } else {
+            throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The algorithm of private key and certificate are not compatible.");
+        }
+        Integer privateKeySize = CertUtils.getPrivateKeySize(CertUtils.parsePrivateKey(importCertDTO.getPrivkey()));
+        Integer certificatePublicKeySize = CertUtils.getCertificatePublicKeySize(CertUtils.parseCertificate(importCertDTO.getCertificate()));
+        Integer keySize = null;
+        if ( Objects.equals( privateKeySize, certificatePublicKeySize ) ) {
+            keySize = privateKeySize;
+        } else {
+            throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The key size of private key and certificate are not compatible.");
         }
         CertificateDetails certificateDetails = CertAnalyzer.analyzeCertificate(importCertDTO.getCertificate());
         LocalDateTime now = LocalDateTime.now();
         Ca ca = new Ca();
         ca.setUuid(UUID.randomUUID().toString());
+        ca.setAlgorithm(algorithm);
+        ca.setKeySize(keySize);
         ca.setPrivkey(EncryptAndDecryptUtils.encrypt(importCertDTO.getPrivkey()));
         ca.setCert(importCertDTO.getCertificate());
         ca.setAllowSubCa(true);
