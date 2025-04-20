@@ -29,6 +29,16 @@ public class GenResponse {
     private String uuid;
 
     /**
+     * Algorithm (Can be RSA, EC, Ed25519)
+     */
+    private String algorithm = "RSA";
+
+    /**
+     * Key Size
+     */
+    private Integer keySize = 2048;
+
+    /**
      * Private key with BASE64 encoding
      */
     private String privkey;
@@ -57,6 +67,8 @@ public class GenResponse {
         Ca ca = new Ca();
         ca.setId(null);
         ca.setUuid(this.getUuid());
+        ca.setAlgorithm(this.getAlgorithm());
+        ca.setKeySize(this.getKeySize());
         ca.setPrivkey(EncryptAndDecryptUtils.encrypt(this.getPrivkey()));
         ca.setCert(this.getCert());
         ca.setOwner(userId);
@@ -74,6 +86,8 @@ public class GenResponse {
         Ca ca = new Ca();
         ca.setId(null);
         ca.setUuid(this.getUuid());
+        ca.setAlgorithm(this.getAlgorithm());
+        ca.setKeySize(this.getKeySize());
         ca.setPrivkey(EncryptAndDecryptUtils.encrypt(this.getPrivkey()));
         ca.setCert(this.getCert());
         ca.setParentCa(parentCa);
@@ -93,6 +107,8 @@ public class GenResponse {
         Certificate certificate = new Certificate();
         certificate.setId(null);
         certificate.setUuid(this.getUuid());
+        certificate.setAlgorithm(this.getAlgorithm());
+        certificate.setKeySize(this.getKeySize());
         certificate.setPrivkey(EncryptAndDecryptUtils.encrypt(this.getPrivkey()));
         certificate.setCert(this.getCert());
         certificate.setCaUuid(caUuid);

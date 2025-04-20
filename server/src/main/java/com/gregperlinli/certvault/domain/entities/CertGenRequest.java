@@ -34,6 +34,11 @@ public class CertGenRequest {
     private String ca;
 
     /**
+     * Key Size
+     */
+    private Integer keySize = 2048;
+
+    /**
      * Country
      */
     private String country;
@@ -87,6 +92,7 @@ public class CertGenRequest {
     public CertGenRequest(RequestCertDTO requestCertDTO, String caKey, String ca, String emailAddress) {
         this.caKey = caKey;
         this.ca = ca;
+        this.keySize = requestCertDTO.getKeySize();
         this.country = requestCertDTO.getCountry();
         this.province = requestCertDTO.getProvince();
         this.city = requestCertDTO.getCity();
