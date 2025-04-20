@@ -4,6 +4,7 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
@@ -11,7 +12,12 @@ import org.bouncycastle.util.io.pem.PemWriter;
 
 import java.io.*;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.CertificateException;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 
 /**
  * Certificate Utils
@@ -114,6 +120,96 @@ public class CertUtils {
             return BasicConstraints.getInstance(ext.getParsedValue());
         }
         return null;
+    }
+
+    /**
+     * 辅助方法：获取证书的密钥算法
+     *
+     * @param cert 证书
+     * @return 密钥算法
+     */
+    public static String getCertificatePublicKeyAlgorithm(X509CertificateHolder cert) {
+        try {
+            PublicKey publicKey = new JcaX509CertificateConverter()
+                    .setProvider("BC")
+                    .getCertificate(cert)
+                    .getPublicKey();
+            return publicKey.getAlgorithm();
+        } catch (CertificateException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 辅助方法：获取私钥的密钥算法
+     *
+     * @param privkey 私钥
+     * @return 密钥算法
+     */
+    public static String getPrivateKeyAlgorithm(PrivateKey privkey) {
+        try {
+            return privkey.getAlgorithm();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 辅助方法：获取证书的密钥长度
+     *
+     * @param cert 证书
+     * @return 密钥长度
+     */
+    public static Integer getCertificatePublicKeySize(X509CertificateHolder cert) {
+        try {
+            PublicKey publicKey = new JcaX509CertificateConverter()
+                    .setProvider("BC")
+                    .getCertificate(cert)
+                    .getPublicKey();
+            Integer keySize = null;
+            if (publicKey instanceof RSAPublicKey) {
+                // RSA 密钥长度（模数位数）
+                keySize = ((RSAPublicKey) publicKey).getModulus().bitLength();
+            } else if (publicKey instanceof ECPublicKey) {
+                // EC 密钥长度（椭圆曲线位数）
+                keySize = ((ECPublicKey) publicKey).getParams().getCurve().getField().getFieldSize();
+            } else if ("Ed25519".equals(publicKey.getAlgorithm())) {
+                // Ed25519 固定密钥长度
+                keySize = 256;
+            } else {
+                throw new UnsupportedOperationException("Unsupported key algorithm: " + publicKey.getAlgorithm());
+            }
+            return keySize;
+        } catch (CertificateException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 辅助方法：获取私钥的密钥长度
+     *
+     * @param privkey 私钥
+     * @return 密钥长度
+     */
+    public static Integer getPrivateKeySize(PrivateKey privkey) {
+        try {
+            Integer keySize = null;
+            if (privkey instanceof RSAPrivateKey) {
+                // RSA 密钥长度（模数位数）
+                keySize = ((RSAPrivateKey) privkey).getModulus().bitLength();
+            } else if (privkey instanceof ECPrivateKey) {
+                // EC 密钥长度（椭圆曲线位数）
+                keySize = ((ECPrivateKey) privkey).getParams().getCurve().getField().getFieldSize();
+            } else if ("EdDSA".equals(privkey.getAlgorithm())) {
+                // Ed25519 固定密钥长度
+                keySize = 256;
+            } else {
+                throw new UnsupportedOperationException("Unsupported key algorithm: " + privkey.getAlgorithm());
+            }
+            return keySize;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
