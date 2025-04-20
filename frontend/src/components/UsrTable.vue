@@ -3,8 +3,9 @@ import type { AbortOption } from "@/api";
 import type { PaginationVO, UserProfileDTO } from "@/api/types";
 import type { DataTableCellEditCompleteEvent } from "primevue/datatable";
 import { useNotify, useReloadableAsyncGuard } from "@/utils/composable";
-import ErrorPlaceholer from "@/components/ErrorPlaceholer.vue";
-import LoadingPlaceholder from "@/components/LoadingPlaceholder.vue";
+
+import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
+import LoadingPlaceholder from "@comps/placeholder/LoadingPlaceholder.vue";
 
 /* Async components */
 const AsyncDataTable = defineAsyncComponent({

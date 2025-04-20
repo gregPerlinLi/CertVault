@@ -9,8 +9,23 @@ import { useUserStore } from "@/stores/user";
 import { useAsyncGuard, useNotify } from "@/utils/composable";
 import { useConfirm } from "primevue/useconfirm";
 
+import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
+import LoadingPlaceholder from "@comps/placeholder/LoadingPlaceholder.vue";
+
 /* Async components */
-const AsyncDataTable = defineAsyncComponent(() => import("primevue/datatable"));
+const AsyncDataTable = defineAsyncComponent({
+  loader: () => import("primevue/datatable"),
+  loadingComponent: LoadingPlaceholder,
+  errorComponent: ErrorPlaceholer,
+  onError: (err, retry, fail, attampts) => {
+    if (attampts < 5) {
+      retry();
+    } else {
+      error("Fail to Load Data Table Component", err.message);
+      fail();
+    }
+  }
+});
 
 /* Services */
 const router = useRouter();
