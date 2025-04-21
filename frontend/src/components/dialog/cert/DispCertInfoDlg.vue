@@ -35,7 +35,7 @@ const fetchDetails = async () => {
   canRetry.value = false;
 
   try {
-    const cert = await getCertFn.value(data!.uuid, undefined, {
+    const cert = await getCertFn.value(data!.uuid, undefined, undefined, {
       signal: getSignal()
     });
     if (!isActivate.value) {
@@ -57,10 +57,10 @@ const fetchDetails = async () => {
 };
 
 /* Watch */
-watch(visible, async () => {
-  if (visible.value) {
+watch(visible, (newValue) => {
+  if (newValue) {
     reload();
-    await fetchDetails();
+    fetchDetails();
   } else {
     cancel();
     details.value = undefined;
@@ -70,7 +70,14 @@ watch(visible, async () => {
 </script>
 
 <template>
-  <Dialog v-model:visible="visible" header="SSL Certificate Information" modal>
+  <Dialog
+    v-model:visible="visible"
+    :header="
+      variant === 'ca'
+        ? 'CA Certificate Information'
+        : 'SSL Certificate Information'
+    "
+    modal>
     <Tabs value="0">
       <TabList class="text-sm">
         <Tab value="0" class="py-2">Basic Info</Tab>
@@ -107,6 +114,18 @@ watch(visible, async () => {
               <AccordionHeader>UUID</AccordionHeader>
               <AccordionContent>
                 <pre>{{ data?.uuid }}</pre>
+              </AccordionContent>
+            </AccordionPanel>
+            <AccordionPanel value="algorithm">
+              <AccordionHeader>Algorithm</AccordionHeader>
+              <AccordionContent>
+                <pre>{{ data?.algorithm }}</pre>
+              </AccordionContent>
+            </AccordionPanel>
+            <AccordionPanel value="key-size">
+              <AccordionHeader>Key Size</AccordionHeader>
+              <AccordionContent>
+                <pre>{{ data?.keySize }}</pre>
               </AccordionContent>
             </AccordionPanel>
             <AccordionPanel value="not-before">
@@ -158,16 +177,46 @@ watch(visible, async () => {
                   <pre>{{ details?.serialNumber }}</pre>
                 </AccordionContent>
               </AccordionPanel>
-              <AccordionPanel value="modulus">
-                <AccordionHeader>Modulus</AccordionHeader>
+              <AccordionPanel v-if="details?.publicKey.modulus" value="modulus">
+                <AccordionHeader>RSA Modulus</AccordionHeader>
                 <AccordionContent>
                   <pre>{{ details?.publicKey.modulus }}</pre>
                 </AccordionContent>
               </AccordionPanel>
-              <AccordionPanel value="public-exponent">
-                <AccordionHeader>Public Exponent</AccordionHeader>
+              <AccordionPanel
+                v-if="details?.publicKey.publicExponent"
+                value="public-exponent">
+                <AccordionHeader>RSA Public Exponent</AccordionHeader>
                 <AccordionContent>
                   <pre>{{ details?.publicKey.publicExponent }}</pre>
+                </AccordionContent>
+              </AccordionPanel>
+              <AccordionPanel v-if="details?.publicKey.q" value="modulus">
+                <AccordionHeader>ECC Point Q</AccordionHeader>
+                <AccordionContent>
+                  <pre>
+X: {{ details.publicKey.q.x }}
+Y: {{ details.publicKey.q.x }}
+Coordinate System: {{ details.publicKey.q.coordinateSystem }}</pre
+                  >
+                </AccordionContent>
+              </AccordionPanel>
+              <AccordionPanel v-if="details?.publicKey.w" value="modulus">
+                <AccordionHeader>ECC Point W</AccordionHeader>
+                <AccordionContent>
+                  <pre>
+Affine X: {{ details.publicKey.w.affineX }}
+Affine Y: {{ details.publicKey.w.affineX }}</pre
+                  >
+                </AccordionContent>
+              </AccordionPanel>
+              <AccordionPanel v-if="details?.publicKey.point" value="modulus">
+                <AccordionHeader>Ed25519 Point</AccordionHeader>
+                <AccordionContent>
+                  <pre>
+Y: {{ details.publicKey.point.y }}
+X Odd: {{ details.publicKey.point.xodd }}</pre
+                  >
                 </AccordionContent>
               </AccordionPanel>
               <AccordionPanel value="encoded">
@@ -180,12 +229,6 @@ watch(visible, async () => {
                 <AccordionHeader>Format</AccordionHeader>
                 <AccordionContent>
                   <pre>{{ details?.publicKey.format }}</pre>
-                </AccordionContent>
-              </AccordionPanel>
-              <AccordionPanel value="algorithm">
-                <AccordionHeader>Algorithm</AccordionHeader>
-                <AccordionContent>
-                  <pre>{{ details?.publicKey.algorithm }}</pre>
                 </AccordionContent>
               </AccordionPanel>
               <AccordionPanel value="parameters">

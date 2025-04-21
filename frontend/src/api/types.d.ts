@@ -25,6 +25,8 @@ export interface UserProfileDTO {
 
 export interface CertInfoDTO {
   uuid: string;
+  algorithm: string;
+  keySize: number;
   caUuid: string;
   owner: string;
   comment: string;
@@ -41,8 +43,21 @@ export interface CertDetailDTO {
   notAfter: string;
   serialNumber: string;
   publicKey: {
-    modulus: string;
-    publicExponent: string;
+    modulus?: string;
+    publicExponent?: string;
+    q?: {
+      x: string | null;
+      y: string | null;
+      coordinateSystem: string | null;
+    };
+    w?: {
+      affineX: string | null;
+      affineY: string | null;
+    };
+    point?: {
+      y: string;
+      xodd: boolean;
+    };
     encoded: string;
     format: string;
     algorithm: string;
@@ -53,6 +68,8 @@ export interface CertDetailDTO {
 
 export interface CaInfoDTO {
   uuid: string;
+  algorithm: string;
+  keySize: number;
   owner: string;
   parentCa: string | null;
   allowSubCa: boolean | null;
@@ -66,6 +83,8 @@ export interface CaInfoDTO {
 
 export interface ResponseCertDTO {
   uuid: string;
+  algorithm: string;
+  keySize: number;
   privkey: string | null;
   cert: string;
   caUuid: string;
