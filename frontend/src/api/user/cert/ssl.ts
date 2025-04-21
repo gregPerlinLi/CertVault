@@ -18,13 +18,14 @@ export const getAllSslCertInfo = (
 export const getSslCert = (
   uuid: string,
   isChain?: boolean,
+  needRootCa?: boolean,
   abort?: AbortOption
 ) =>
   callRestfulApi<string>({
     method: "GET",
     baseUrl: "/api/v1/user/cert/ssl/{uuid}/cer",
     pathNames: { uuid },
-    searchParams: { isChain },
+    searchParams: { isChain, needRootCa },
     abort
   });
 

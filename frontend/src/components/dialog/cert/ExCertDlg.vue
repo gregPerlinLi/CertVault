@@ -26,12 +26,17 @@ const { isAdmin, isSuperadmin } = useUserStore();
 const busy = reactive({
   exportCert: false,
   exportChain: false,
+  exportChainRoot: false,
   exportPrivKey: false
 });
 
 /* Computed */
 const canClose = computed(
-  () => !busy.exportCert && !busy.exportChain && !busy.exportPrivKey
+  () =>
+    !busy.exportCert &&
+    !busy.exportChain &&
+    !busy.exportChainRoot &&
+    !busy.exportPrivKey
 );
 const getCertFn = computed(() => (variant === "ca" ? getCaCert : getSslCert));
 const getPrivKeyFn = computed(() =>
@@ -39,9 +44,15 @@ const getPrivKeyFn = computed(() =>
 );
 
 /* Actions */
-const exportCert = async (fullchain: boolean = false) => {
+const exportCert = async (
+  fullchain: boolean = false,
+  needRootCa: boolean = false
+) => {
   const msg = (() => {
-    if (fullchain) {
+    if (needRootCa) {
+      busy.exportChainRoot = true;
+      return info("Info", "Exporting fullchain with root CA");
+    } else if (fullchain) {
       busy.exportChain = true;
       return info("Info", "Exporting fullchain");
     } else {
@@ -51,7 +62,7 @@ const exportCert = async (fullchain: boolean = false) => {
   })();
 
   try {
-    const cert = await getCertFn.value(data!.uuid, fullchain);
+    const cert = await getCertFn.value(data!.uuid, fullchain, needRootCa);
     const pem = new TextDecoder().decode(b64ToU8Arr(cert));
     const file = new Blob([pem], { type: "application/x-pem-file" });
     saveFile(`${data!.uuid}.pem`, file);
@@ -65,7 +76,9 @@ const exportCert = async (fullchain: boolean = false) => {
   }
 
   toast.remove(msg);
-  if (fullchain) {
+  if (needRootCa) {
+    busy.exportChainRoot = false;
+  } else if (fullchain) {
     busy.exportChain = false;
   } else {
     busy.exportCert = false;
@@ -125,6 +138,12 @@ watch(visible, () => {
           :disabled="busy.exportChain"
           :loading="busy.exportChain"
           @click="exportCert(true)"></Button>
+        <Button
+          label="Export Fullchain with Root CA"
+          size="small"
+          :disabled="busy.exportChainRoot"
+          :loading="busy.exportChainRoot"
+          @click="exportCert(true, true)"></Button>
       </div>
     </section>
     <section v-if="variant === 'ssl' || isAdmin || isSuperadmin" class="mt-8">
