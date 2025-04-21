@@ -43,6 +43,7 @@ export const getSslPrivKey = (
 
 export interface RequestSslCertPayload {
   caUuid?: string;
+  keySize?: number;
   country: string;
   province: string;
   city: string;

@@ -31,6 +31,8 @@ export const getCaPrivKey = (
 export interface RequestCaCertPayload {
   caUuid?: string;
   allowSubCa?: boolean;
+  algorithm?: string;
+  keySize?: number;
   country: string;
   province: string;
   city: string;
