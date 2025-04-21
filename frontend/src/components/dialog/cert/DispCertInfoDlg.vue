@@ -191,7 +191,7 @@ watch(visible, (newValue) => {
                   <pre>{{ details?.publicKey.publicExponent }}</pre>
                 </AccordionContent>
               </AccordionPanel>
-              <AccordionPanel v-if="details?.publicKey.q" value="modulus">
+              <AccordionPanel v-if="details?.publicKey.q" value="q">
                 <AccordionHeader>ECC Point Q</AccordionHeader>
                 <AccordionContent>
                   <pre>
@@ -201,7 +201,7 @@ Coordinate System: {{ details.publicKey.q.coordinateSystem }}</pre
                   >
                 </AccordionContent>
               </AccordionPanel>
-              <AccordionPanel v-if="details?.publicKey.w" value="modulus">
+              <AccordionPanel v-if="details?.publicKey.w" value="w">
                 <AccordionHeader>ECC Point W</AccordionHeader>
                 <AccordionContent>
                   <pre>
@@ -210,7 +210,7 @@ Affine Y: {{ details.publicKey.w.affineX }}</pre
                   >
                 </AccordionContent>
               </AccordionPanel>
-              <AccordionPanel v-if="details?.publicKey.point" value="modulus">
+              <AccordionPanel v-if="details?.publicKey.point" value="point">
                 <AccordionHeader>Ed25519 Point</AccordionHeader>
                 <AccordionContent>
                   <pre>
