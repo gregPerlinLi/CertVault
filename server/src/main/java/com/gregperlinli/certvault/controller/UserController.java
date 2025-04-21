@@ -19,6 +19,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.PrivateKey;
+
 /**
  * User Controller
  *
@@ -572,7 +574,7 @@ public class UserController {
     )
     @SuccessApiResponse
     @PostMapping(value = "/cert/analyze")
-    public ResultVO<CertificateDetailsDTO> getCertificateDetails(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+    public ResultVO<CertificateDetailsDTO> analyzeCertificate(@io.swagger.v3.oas.annotations.parameters.RequestBody(
                                                                          description = "Certificate Base64",
                                                                          content = @Content(
                                                                                  examples = {@ExampleObject(value =
@@ -588,6 +590,30 @@ public class UserController {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "success",
                 new CertificateDetailsDTO(CertAnalyzer.analyzeCertificate(certBase64.get("cert").asText())));
+    }
+
+    @Operation(
+            summary = "Analyze Private Key",
+            description = "Private key parser, used for parsing private key information"
+    )
+    @SuccessApiResponse
+    @PostMapping(value = "/cert/privkey/analyze")
+    public ResultVO<PrivkeyDetailsDTO> analyzePrivateKey(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                                 description = "Private key Base64",
+                                                                 content = @Content(
+                                                                         examples = {@ExampleObject(value =
+                                                                                 """
+                                                                                 {
+                                                                                     "privkey": "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC1GAQWvotGCPu1QAB14hzKF5C2bc9WRecF..."
+                                                                                 }
+                                                                                 """
+                                                                         )}
+                                                                 )
+                                                           )
+                                                             @RequestBody JsonNode privkeyBase64) throws Exception {
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                "success",
+                new PrivkeyDetailsDTO(CertAnalyzer.analyzePrivkey(privkeyBase64.get("privkey").asText())));
     }
 
     /**
