@@ -16,12 +16,14 @@ public interface ICertificateService extends IService<Certificate> {
      * Get own SSL Certificates
      *
      * @param keyword Search keyword
-     * @param owner  Owner of the Certificate
-     * @param page   Page number
-     * @param limit  Number of certificates per page
+     * @param owner   Owner of the Certificate
+     * @param page    Page number
+     * @param limit   Number of certificates per page
+     * @param isAsc   Ascending or descending
+     * @param orderBy Order by field
      * @return {@link PageDTO<CertificateDetailsDTO>}
      */
-    PageDTO<CertInfoDTO> getCertificates(String keyword, String owner, Integer page, Integer limit);
+    PageDTO<CertInfoDTO> getCertificates(String keyword, String owner, Integer page, Integer limit, Boolean isAsc, String orderBy);
 
     /**
      * Get SSL Certificate
