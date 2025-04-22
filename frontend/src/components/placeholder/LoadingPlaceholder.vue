@@ -1,3 +1,5 @@
 <template>
-  <Skeleton height="12rem" width="100%" />
+  <div>
+    <Skeleton height="12rem" width="100%" />
+  </div>
 </template>
