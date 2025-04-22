@@ -16,6 +16,7 @@ import LoadingPlaceholder from "@comps/placeholder/LoadingPlaceholder.vue";
 
 /* Async components */
 const AsyncDataTable = defineAsyncComponent({
+  suspensible: false,
   loader: () => import("primevue/datatable"),
   loadingComponent: LoadingPlaceholder,
   errorComponent: ErrorPlaceholer,
