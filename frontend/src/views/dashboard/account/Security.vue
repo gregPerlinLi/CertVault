@@ -52,9 +52,9 @@ const loading = reactive({
 
 /* Actions */
 const parseIpRegion = (dto: LoginRecordDTO) => {
-  const arr = [dto.region, dto.province, dto.city].filter(
-    (s) => s !== "Unknown"
-  );
+  const arr = [dto.region, dto.province, dto.city]
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0 && s !== "Unknown");
   return arr.length === 0 ? "Unknown" : arr.join(", ");
 };
 const refreshOnline = async () => {
