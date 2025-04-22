@@ -44,7 +44,7 @@ onMounted(() => refUsrTable.value?.refresh());
   </Breadcrumb>
 
   <!-- Main -->
-  <UsrTable
+  <UsrTbl
     ref="user-table"
     :editable="isSuperadmin"
     :refresh-fn="
@@ -78,5 +78,5 @@ onMounted(() => refUsrTable.value?.refresh());
         </template>
       </Column>
     </template>
-  </UsrTable>
+  </UsrTbl>
 </template>

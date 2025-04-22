@@ -122,7 +122,7 @@ watch(caSelection, async () => {
   <div v-if="caSelection === null" class="font-bold py-24 text-2xl text-center">
     Please Select a CA
   </div>
-  <UsrTable
+  <UsrTbl
     v-else
     v-model:search="usrTable.search"
     v-model:selection="usrTable.selection"

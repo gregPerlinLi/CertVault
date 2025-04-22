@@ -63,7 +63,7 @@ watch(visible, async (newValue) => {
 <template>
   <Dialog v-model:visible="visible" header="Bind Users" :closable="false" modal>
     <!-- User table -->
-    <UsrTable
+    <UsrTbl
       v-model:selection="usrTable.selection"
       v-model:loading="usrTable.loading"
       ref="usr-table"
