@@ -2,7 +2,7 @@
 import type { CaInfoDTO } from "@api/types";
 import { requestCaCert } from "@api/admin/cert/ca";
 import { requestSslCert } from "@api/user/cert/ssl";
-import { useFormValidator, useNotify } from "@utils/composable";
+import { useFormValidator } from "@utils/composable";
 import { reqNewCertSchema } from "@utils/schema";
 
 /* Models */
@@ -15,7 +15,7 @@ const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 const emits = defineEmits<{ success: [] }>();
 
 /* Services */
-const { toast, info, success, warn, error } = useNotify();
+const { success, info, warn, error, remove } = useNotify();
 const { isInvalid, setInvalid, clearInvalid, validate } =
   useFormValidator(reqNewCertSchema);
 
@@ -52,18 +52,18 @@ const onSubmit = async (ev: Event) => {
   // Validate form
   const result = validate(ev.target as HTMLFormElement);
   if (!result.success) {
-    error("Validation Error", result.issues![0].message);
+    error(result.issues![0].message, "Validation Error");
     return;
   }
   if (variant === "ssl" && caSelection.value === null) {
     setInvalid("ca-uuid");
-    error("Validation Error", "CA is required");
+    error("CA is required", "Validation Error");
     return;
   }
 
   // Try to require
   busy.value = true;
-  const msg = info("Info", "Requesting");
+  const msg = info("Requesting");
 
   try {
     await reqNewCertFn.value({
@@ -75,14 +75,14 @@ const onSubmit = async (ev: Event) => {
       abort: { timeout: -1 }
     });
 
-    success("Success", "Successfully requested");
+    success("Successfully requested");
     emits("success");
     visible.value = false;
   } catch (err: unknown) {
-    error("Fail to Request", (err as Error).message);
+    error((err as Error).message, "Fail to Request");
   }
 
-  toast.remove(msg);
+  remove(msg);
   busy.value = false;
 };
 
@@ -99,7 +99,7 @@ watch(caSelection, (newValue) => {
   if (newValue !== null && !newValue.allowSubCa) {
     queueMicrotask(() => {
       caSelection.value = null;
-      warn("Warning", `"${newValue.comment}" is not allowed to have sub-CA`);
+      warn(`"${newValue.comment}" is not allowed to have sub-CA`);
     });
     return;
   }

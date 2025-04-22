@@ -3,7 +3,7 @@ import type { CaInfoDTO, CertDetailDTO, CertInfoDTO } from "@api/types";
 import { analyzeCert } from "@api/user/cert";
 import { getCaCert } from "@api/user/cert/ca";
 import { getSslCert } from "@api/user/cert/ssl";
-import { useNotify, useReloadableAsyncGuard } from "@utils/composable";
+import { useReloadableAsyncGuard } from "@utils/composable";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -55,7 +55,7 @@ const fetchDetails = async () => {
   } catch (err: unknown) {
     if (isActivate.value) {
       canRetry.value = true;
-      error("Fail to Get Detailed Info", (err as Error).message);
+      error((err as Error).message, "Fail to Get Detailed Info");
     }
   }
 };

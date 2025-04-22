@@ -6,7 +6,7 @@ import {
   getUsrLoginRecs
 } from "@api/user/user";
 import { useUserStore } from "@stores/user";
-import { useAsyncGuard, useNotify } from "@utils/composable";
+import { useAsyncGuard } from "@utils/composable";
 import { useConfirm } from "primevue/useconfirm";
 
 import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
@@ -31,7 +31,7 @@ const AsyncDataTable = defineAsyncComponent({
 const router = useRouter();
 const confirm = useConfirm();
 const { isActivate, signal } = useAsyncGuard();
-const { toast, info, success, error } = useNotify();
+const { success, info, error, remove } = useNotify();
 
 /* Stores */
 const user = useUserStore();
@@ -76,7 +76,7 @@ const refreshOnline = async () => {
     }
   } catch (err: unknown) {
     if (isActivate.value) {
-      error("Fail to Fetch Online Sessions", (err as Error).message);
+      error((err as Error).message, "Fail to Fetch Online Sessions");
     }
   }
   loading.online = false;
@@ -99,7 +99,7 @@ const refreshOffline = async () => {
     }
   } catch (err: unknown) {
     if (isActivate.value) {
-      error("Fail to Fetch Offline Sessions", (err as Error).message);
+      error((err as Error).message, "Fail to Fetch Offline Sessions");
     }
   }
   loading.offline = false;
@@ -109,7 +109,7 @@ const trySignOutSelected = () => {
     .slice(0, -1)
     .reduce((prev, cur) => (cur ? prev + 1 : prev), 0);
   if (cnt === 0) {
-    error("Fail to Sign out Selected Session", "No session selected");
+    error("No session selected", "Fail to Sign out Selected Session");
     return;
   }
 
@@ -127,7 +127,7 @@ const trySignOutSelected = () => {
     },
     accept: async () => {
       busy.signOutSelected = true;
-      const msg = info("Info", "Signing out");
+      const msg = info("Signing out");
 
       try {
         await Promise.allSettled(
@@ -140,13 +140,13 @@ const trySignOutSelected = () => {
             })
             .filter((v) => v !== null)
         );
-        success("Success", "Successfully signed out");
+        success("Successfully signed out");
       } catch (err: unknown) {
-        error("Fail to Sign out", (err as Error).message);
+        error((err as Error).message, "Fail to Sign out");
       }
 
       refreshOnline();
-      toast.remove(msg);
+      remove(msg);
       busy.signOutSelected = false;
     }
   });
@@ -166,18 +166,18 @@ const trySignOutAll = () =>
     },
     accept: async () => {
       busy.signOutAll = true;
-      const msg = info("Info", "Signing out");
+      const msg = info("Signing out");
 
       try {
         await forceLogoutUsr();
-        success("Success", "Successfully signed out, please re-sign in");
+        success("Successfully signed out, please re-sign in");
         user.clear();
         router.push("/");
       } catch (err: unknown) {
-        error("Fail to Sign out", (err as Error).message);
+        error((err as Error).message, "Fail to Sign out");
       }
 
-      toast.remove(msg);
+      remove(msg);
       busy.signOutAll = false;
     }
   });

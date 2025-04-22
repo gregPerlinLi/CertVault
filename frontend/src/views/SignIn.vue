@@ -3,12 +3,12 @@ import { login } from "@api/authentication";
 import { oidcLogin } from "@api/authentication/oauth";
 import { useCommonStore } from "@stores/common";
 import { useUserStore } from "@stores/user";
-import { useFormValidator, useNotify } from "@utils/composable";
+import { useFormValidator } from "@utils/composable";
 import { signInSchema } from "@utils/schema";
 
 /* Services */
 const router = useRouter();
-const { toast, info, success, error } = useNotify();
+const { success, info, error, remove } = useNotify();
 const { isInvalid, clearInvalid, validate } = useFormValidator(signInSchema);
 
 /* Stores */
@@ -23,13 +23,13 @@ async function trySignIn(ev: Event): Promise<void> {
   // Validate form
   const result = validate(ev.target as HTMLFormElement);
   if (!result.success) {
-    error("Validation Error", result.issues![0].message);
+    error(result.issues![0].message, "Validation Error");
     return;
   }
 
   // Try to sign in
   busy.value = true;
-  const msg = info("Info", "Signing in");
+  const msg = info("Signing in");
 
   try {
     const profile = await login({
@@ -39,13 +39,13 @@ async function trySignIn(ev: Event): Promise<void> {
     });
 
     user.update(profile);
-    success("Success", "Successfully signed in");
+    success("Successfully signed in");
     router.push("/dashboard");
   } catch (err: unknown) {
-    error("Fail to Sign in", (err as Error).message);
+    error((err as Error).message, "Fail to Sign in");
   }
 
-  toast.remove(msg);
+  remove(msg);
   busy.value = false;
 }
 </script>

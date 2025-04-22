@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
       tsconfigPaths({ loose: true, projects: ["tsconfig.app.json"] }),
       vue(),
       autoImport.vite({
+        dirs: ["./src/composables/**"],
         dts: true,
         imports: ["vue", "vue-router", "@vueuse/core"]
       }),

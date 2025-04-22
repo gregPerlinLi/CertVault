@@ -2,7 +2,6 @@
 import type { DataTableCellEditCompleteEvent } from "primevue/datatable";
 import { getAllUsrInfo } from "@api/admin/user";
 import { useUserStore } from "@stores/user";
-import { useNotify } from "@utils/composable";
 
 /* Services */
 const { success } = useNotify();
@@ -18,7 +17,7 @@ const onEdit = ({ newValue, value }: DataTableCellEditCompleteEvent) => {
   if (newValue === value) {
     return;
   }
-  success("Edited", `"${value}" -> "${newValue}"`);
+  success(`"${value}" -> "${newValue}"`);
 };
 
 /* Hooks */

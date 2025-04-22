@@ -2,7 +2,7 @@
 import type { CaInfoDTO } from "@api/types";
 import { getAllCaInfo } from "@api/admin/cert/ca";
 import { getAllBindedCaInfo } from "@api/user/cert/ca";
-import { useNotify, useReloadableAsyncGuard } from "@utils/composable";
+import { useReloadableAsyncGuard } from "@utils/composable";
 
 /* Models */
 const selection = defineModel<CaInfoDTO | null>("selection");
@@ -56,7 +56,7 @@ const refresh = async () => {
     }
   } catch (err: unknown) {
     if (isActivate.value) {
-      error("Fail to Fetch CA List", (err as Error).message);
+      error((err as Error).message, "Fail to Fetch CA List");
     }
   }
   caList.loading = false;

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useUserStore } from "@stores/user";
-import { useNotify } from "@utils/composable";
 
 /* Services */
 const { error } = useNotify();
@@ -22,7 +21,7 @@ const dialog = reactive({
 const onSubmitNewPassword = () => {
   if (newPassword.value.length === 0) {
     newPasswordInvalid.value = true;
-    error("Validation Error", "New password is required");
+    error("New password is required", "Validation Error");
     return;
   }
   dialog.editPasswd = true;

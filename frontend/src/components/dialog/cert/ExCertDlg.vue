@@ -4,7 +4,6 @@ import { getCaPrivKey } from "@api/admin/cert/ca";
 import { getCaCert } from "@api/user/cert/ca";
 import { getSslCert, getSslPrivKey } from "@api/user/cert/ssl";
 import { useUserStore } from "@stores/user";
-import { useNotify } from "@utils/composable";
 import { b64ToU8Arr, saveFile } from "@utils/index";
 
 /* Models */
@@ -17,7 +16,7 @@ const { variant, data } = defineProps<{
 }>();
 
 /* Services */
-const { toast, info, success, error } = useNotify();
+const { success, info, error, remove } = useNotify();
 
 /* Stores */
 const { isAdmin, isSuperadmin } = useUserStore();
@@ -51,13 +50,13 @@ const exportCert = async (
   const msg = (() => {
     if (needRootCa) {
       busy.exportChainRoot = true;
-      return info("Info", "Exporting fullchain with root CA");
+      return info("Exporting fullchain with root CA");
     } else if (isChain) {
       busy.exportChain = true;
-      return info("Info", "Exporting fullchain");
+      return info("Exporting fullchain");
     } else {
       busy.exportCert = true;
-      return info("Info", "Exporting");
+      return info("Exporting");
     }
   })();
 
@@ -72,14 +71,13 @@ const exportCert = async (
     saveFile(`${data!.uuid}.pem`, file);
 
     success(
-      "Success",
       isChain ? "Successfully exported fullchain" : "Successfully exported"
     );
   } catch (err: unknown) {
-    error("Fail to Export SSL Certificate", (err as Error).message);
+    error((err as Error).message, "Fail to Export SSL Certificate");
   }
 
-  toast.remove(msg);
+  remove(msg);
   if (needRootCa) {
     busy.exportChainRoot = false;
   } else if (isChain) {
@@ -90,7 +88,7 @@ const exportCert = async (
 };
 const onSumbit = async (ev: Event) => {
   busy.exportPrivKey = true;
-  const msg = info("Info", "Exporting private key");
+  const msg = info("Exporting private key");
 
   try {
     const formData = new FormData(ev.target as HTMLFormElement);
@@ -102,12 +100,12 @@ const onSumbit = async (ev: Event) => {
     saveFile(`${data!.uuid}.pem`, file);
 
     (ev.target as HTMLFormElement).querySelector("input")!.value = "";
-    success("Success", "Successfully exported private key");
+    success("Successfully exported private key");
   } catch (err: unknown) {
-    error("Fail to Export SSL Private Key", (err as Error).message);
+    error((err as Error).message, "Fail to Export SSL Private Key");
   }
 
-  toast.remove(msg);
+  remove(msg);
   busy.exportPrivKey = false;
 };
 

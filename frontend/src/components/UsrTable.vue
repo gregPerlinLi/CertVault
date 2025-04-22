@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AbortOption, PageVO, UserProfileDTO } from "@api/types";
 import type { DataTableCellEditCompleteEvent } from "primevue/datatable";
-import { useNotify, useReloadableAsyncGuard } from "@utils/composable";
+import { useReloadableAsyncGuard } from "@utils/composable";
 
 import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
 import LoadingPlaceholder from "@comps/placeholder/LoadingPlaceholder.vue";
@@ -15,7 +15,7 @@ const AsyncDataTable = defineAsyncComponent({
     if (attampts < 5) {
       retry();
     } else {
-      error("Fail to Load Data Table Component", err.message);
+      error(err.message, "Fail to Load Data Table Component");
       fail();
     }
   }
@@ -84,7 +84,7 @@ const refresh = async () => {
     }
   } catch (err: unknown) {
     if (isActivate.value) {
-      error("Fail to Fetch User List", (err as Error).message);
+      error((err as Error).message, "Fail to Fetch User List");
     }
   }
   loading.value = false;

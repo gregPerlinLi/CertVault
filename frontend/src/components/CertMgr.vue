@@ -8,7 +8,7 @@ import {
 import { getAllBindedCaInfo } from "@api/user/cert/ca";
 import { deleteSslCert, getAllSslCertInfo } from "@api/user/cert/ssl";
 import { useUserStore } from "@stores/user";
-import { useAsyncGuard, useNotify } from "@utils/composable";
+import { useAsyncGuard } from "@utils/composable";
 import { useConfirm } from "primevue/useconfirm";
 
 import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
@@ -34,7 +34,7 @@ const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 
 /* Services */
 const confirm = useConfirm();
-const { toast, info, success, error } = useNotify();
+const { success, info, error, remove } = useNotify();
 const { isActivate, signal } = useAsyncGuard();
 
 /* Stores */
@@ -96,10 +96,10 @@ const refresh = async () => {
   } catch (err: unknown) {
     if (isActivate.value) {
       error(
+        (err as Error).message,
         variant === "ca"
           ? "Fail to Fetch CA Certificates List"
-          : "Fail to Fetch SSL Certificates List",
-        (err as Error).message
+          : "Fail to Fetch SSL Certificates List"
       );
     }
   }
@@ -125,17 +125,17 @@ const tryToggleCertAvailable = (data: CaInfoDTO) =>
     acceptProps: { severity: "danger" },
     rejectProps: { severity: "secondary" },
     accept: async () => {
-      const msg = info("Info", "Toggling");
+      const msg = info("Toggling");
 
       try {
         await toggleCaAvailability({ uuid: data.uuid });
-        success("Success", "Successfully toggled");
+        success("Successfully toggled");
         refresh();
       } catch (err: unknown) {
-        error("Fail to Delete", (err as Error).message);
+        error((err as Error).message, "Fail to Delete");
       }
 
-      toast.remove(msg);
+      remove(msg);
     }
   });
 
@@ -149,17 +149,17 @@ const tryDelCert = (data: CertInfoDTO) =>
     acceptProps: { severity: "danger" },
     rejectProps: { severity: "secondary" },
     accept: async () => {
-      const msg = info("Info", "Deleting");
+      const msg = info("Deleting");
 
       try {
         await delCertFn.value({ uuid: data.uuid });
-        success("Success", "Successfully deleted");
+        success("Successfully deleted");
         refresh();
       } catch (err: unknown) {
-        error("Fail to Delete", (err as Error).message);
+        error((err as Error).message, "Fail to Delete");
       }
 
-      toast.remove(msg);
+      remove(msg);
     }
   });
 

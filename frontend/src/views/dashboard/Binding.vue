@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { CaInfoDTO, UserProfileDTO } from "@api/types";
 import { getAllCaBindedUsrs, unbindCaFromUsrs } from "@api/admin/cert/binding";
-import { useNotify } from "@utils/composable";
 import { useConfirm } from "primevue/useconfirm";
 
 /* Services */
 const confirm = useConfirm();
-const { toast, info, success, error } = useNotify();
+const { success, info, error, remove } = useNotify();
 
 const refUsrTable = useTemplateRef("usr-table");
 
@@ -32,7 +31,7 @@ const tryUnbind = () =>
     rejectProps: { severity: "secondary", variant: "outlined" },
     accept: async () => {
       busyUnbind.value = true;
-      const msg = info("Info", "Unbinding");
+      const msg = info("Unbinding");
 
       try {
         await unbindCaFromUsrs({
@@ -40,14 +39,14 @@ const tryUnbind = () =>
           usernames: usrTable.selection.map(({ username }) => username)
         });
 
-        success("Success", "Successfully unbinded");
+        success("Successfully unbinded");
         usrTable.selection = [];
         refUsrTable.value?.refresh();
       } catch (err: unknown) {
-        error("Fail to Unbind", (err as Error).message);
+        error((err as Error).message, "Fail to Unbind");
       }
 
-      toast.remove(msg);
+      remove(msg);
       busyUnbind.value = false;
     }
   });

@@ -1,4 +1,3 @@
-import { useToast } from "primevue/usetoast";
 import * as v from "valibot";
 
 export const useFormValidator = (
@@ -34,24 +33,6 @@ export const useFormValidator = (
   };
 
   return { isInvalid, setInvalid, clearInvalid, validate };
-};
-
-export const useNotify = () => {
-  const toast = useToast();
-
-  const info = (summary: string, detail: string, life?: number) => {
-    const msg = { severity: "info", summary, detail, life };
-    toast.add(msg);
-    return msg;
-  };
-  const success = (summary: string, detail: string) =>
-    toast.add({ severity: "success", summary, detail, life: 3000 });
-  const warn = (summary: string, detail: string) =>
-    toast.add({ severity: "warn", summary, detail, life: 5000 });
-  const error = (summary: string, detail: string) =>
-    toast.add({ severity: "error", summary, detail, life: 5000 });
-
-  return { toast, info, success, warn, error };
 };
 
 export const useAsyncGuard = () => {

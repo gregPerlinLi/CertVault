@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { getProfile, updateProfile } from "@api/user/user";
 import { useUserStore } from "@stores/user";
-import { useNotify } from "@utils/composable";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -10,7 +9,7 @@ const visible = defineModel<boolean>("visible");
 const props = defineProps<{ value: string }>();
 
 /* Services */
-const { toast, info, success, error } = useNotify();
+const { success, info, error, remove } = useNotify();
 
 /* Stores */
 const user = useUserStore();
@@ -29,30 +28,30 @@ const submit = async () => {
   // Validate
   if (newEmail.value.length === 0) {
     invalid.value = true;
-    error("Validation Error", "New email is required");
+    error("New email is required", "Validation Error");
     return;
   }
   if (newEmail.value === props.value) {
     invalid.value = true;
-    error("Validation Error", "No changes found");
+    error("No changes found", "Validation Error");
     return;
   }
 
   // Try to update
   busy.value = true;
-  const msg = info("Info", "Updating");
+  const msg = info("Updating");
 
   try {
     await updateProfile({ email: newEmail.value });
     const profile = await getProfile({ abort: { timeout: -1 } });
     user.update(profile);
-    success("Success", "Successfully updated profile");
+    success("Successfully updated profile");
     visible.value = false;
   } catch (err: unknown) {
-    error("Fail to Update Profile", (err as Error).message);
+    error((err as Error).message, "Fail to Update Profile");
   }
 
-  toast.remove(msg);
+  remove(msg);
   busy.value = false;
 };
 

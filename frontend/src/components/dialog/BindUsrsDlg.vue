@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { CaInfoDTO, UserProfileDTO } from "@api/types";
 import { bindCaToUsrs, getAllCaNotBindedUsrs } from "@api/admin/cert/binding";
-import { useNotify } from "@utils/composable";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -13,7 +12,7 @@ const props = defineProps<{ ca: CaInfoDTO | null }>();
 const emits = defineEmits<{ success: [] }>();
 
 /* Services */
-const { toast, info, success, error } = useNotify();
+const { success, info, error, remove } = useNotify();
 
 const refUsrTable = useTemplateRef("usr-table");
 
@@ -28,7 +27,7 @@ const usrTable = reactive({
 /* Actions */
 const tryBind = async () => {
   busyBind.value = true;
-  const msg = info("Info", "Binding");
+  const msg = info("Binding");
 
   try {
     await bindCaToUsrs({
@@ -36,14 +35,14 @@ const tryBind = async () => {
       usernames: usrTable.selection.map(({ username }) => username)
     });
 
-    success("Success", "Successfully binded");
+    success("Successfully binded");
     emits("success");
     visible.value = false;
   } catch (err: unknown) {
-    error("Fail to Bind", (err as Error).message);
+    error((err as Error).message, "Fail to Bind");
   }
 
-  toast.remove(msg);
+  remove(msg);
   busyBind.value = false;
 };
 
