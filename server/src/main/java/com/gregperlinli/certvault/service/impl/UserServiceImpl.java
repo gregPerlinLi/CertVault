@@ -209,7 +209,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
 
     @Override
-    public PageDTO<UserProfileDTO> getUsers(String keyword, Integer page, Integer limit) {
+    public PageDTO<UserProfileDTO> getUsers(String keyword, Integer page, Integer limit, Boolean isAsc, String orderBy) {
         Page<User> userPage = new Page<>(page, limit);
         Page<User> resultPage = null;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
@@ -223,6 +223,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                             .like("email", keyword)
                     )
                     .eq("deleted", false);
+        }
+        if ( orderBy != null && !orderBy.isEmpty() ) {
+            if ( isAsc == null ) {
+                isAsc = true;
+            }
+            switch (orderBy) {
+                case "username" -> userQueryWrapper.orderBy(true, isAsc,"username");
+                case "displayName" -> userQueryWrapper.orderBy(true, isAsc,"display_name");
+                case "email" -> userQueryWrapper.orderBy(true, isAsc,"email");
+            }
         }
         resultPage = this.page(userPage, userQueryWrapper);
         return new PageDTO<>(resultPage.getTotal(),
