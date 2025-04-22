@@ -1,12 +1,11 @@
-import type { AbortOption } from "@/api";
-import type { OidcProviderDTO } from "@/api/types";
-import { callRestfulApi } from "@/api";
+import type { BaseParams, OidcProviderDTO } from "@api/types";
+import { callRestfulApi } from "@api/index";
 
-export const getOidcProvider = (abort?: AbortOption) =>
+export const getOidcProviders = (params: BaseParams = {}) =>
   callRestfulApi<OidcProviderDTO[] | null>({
     method: "GET",
     baseUrl: "/api/v1/auth/oauth/provider",
-    abort
+    abort: params.abort
   });
 
 export const oidcLogin = (provider: string) => {

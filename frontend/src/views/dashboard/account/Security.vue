@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { LoginRecordDTO } from "@/api/types";
+import type { LoginRecordDTO } from "@api/types";
 import {
   forceLogoutSession,
   forceLogoutUsr,
   getUsrLoginRecs
-} from "@/api/user/user";
-import { useUserStore } from "@/stores/user";
-import { useAsyncGuard, useNotify } from "@/utils/composable";
+} from "@api/user/user";
+import { useUserStore } from "@stores/user";
+import { useAsyncGuard, useNotify } from "@utils/composable";
 import { useConfirm } from "primevue/useconfirm";
 
 import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
@@ -61,7 +61,12 @@ const refreshOnline = async () => {
   loading.online = true;
   online.value = [];
   try {
-    const page = await getUsrLoginRecs(0, 5, 1, { signal });
+    const page = await getUsrLoginRecs({
+      page: 1,
+      limit: 5,
+      status: 1,
+      abort: { signal }
+    });
 
     if (isActivate.value) {
       online.value = (page.list ?? []).sort((a, b) =>
@@ -80,7 +85,12 @@ const refreshOffline = async () => {
   loading.offline = true;
   offline.value = [];
   try {
-    const page = await getUsrLoginRecs(0, 20, 0, { signal });
+    const page = await getUsrLoginRecs({
+      page: 1,
+      limit: 20,
+      status: 0,
+      abort: { signal }
+    });
 
     if (isActivate.value) {
       offline.value = (page.list ?? []).sort((a, b) =>
@@ -124,7 +134,9 @@ const trySignOutSelected = () => {
           selectedOnline.value
             .slice(0, -1)
             .map((v, i) => {
-              return v ? forceLogoutSession(online.value![i].uuid) : null;
+              return v
+                ? forceLogoutSession({ uuid: online.value![i].uuid })
+                : null;
             })
             .filter((v) => v !== null)
         );

@@ -1,8 +1,8 @@
-import type { OidcProviderDTO } from "@/api/types";
+import type { OidcProviderDTO } from "@api/types";
 import type { ToastServiceMethods } from "primevue/toastservice";
-import { getOidcProvider } from "@/api/authentication/oauth";
-import { getProfile } from "@/api/user/user";
-import { useUserStore } from "@/stores/user";
+import { getOidcProviders } from "@api/authentication/oauth";
+import { getProfile } from "@api/user/user";
+import { useUserStore } from "@stores/user";
 
 // Export store
 export const useCommonStore = createGlobalState(() => {
@@ -21,7 +21,7 @@ export const useCommonStore = createGlobalState(() => {
 
     // Try to get OIDC providers
     try {
-      const provider = await getOidcProvider({ timeout: -1 });
+      const provider = await getOidcProviders({ abort: { timeout: -1 } });
       if (provider !== null) {
         oidcProviders.value = provider;
       }
@@ -37,7 +37,7 @@ export const useCommonStore = createGlobalState(() => {
     // Try to get user profile
     try {
       const user = useUserStore();
-      const profile = await getProfile({ timeout: -1 });
+      const profile = await getProfile({ abort: { timeout: -1 } });
       user.update(profile);
     } catch (err: unknown) {
       toast?.add({

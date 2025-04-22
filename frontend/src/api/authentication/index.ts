@@ -1,22 +1,21 @@
-import type { AbortOption } from "@/api";
-import type { UserProfileDTO } from "@/api/types";
-import { callRestfulApi } from "@/api";
+import type { BaseParams, UserProfileDTO } from "@api/types";
+import { callRestfulApi } from "@api/index";
 
-export const login = (
-  username: string,
-  password: string,
-  abort?: AbortOption
-) =>
+export interface LoginParams extends BaseParams {
+  username: string;
+  password: string;
+}
+export const login = (params: LoginParams) =>
   callRestfulApi<UserProfileDTO>({
     method: "POST",
     baseUrl: "/api/v1/auth/login",
-    payload: { username, password },
-    abort
+    payload: { ...params, abort: undefined },
+    abort: params.abort
   });
 
-export const logout = (abort?: AbortOption) =>
+export const logout = (params: BaseParams = {}) =>
   callRestfulApi({
     method: "DELETE",
     baseUrl: "/api/v1/auth/logout",
-    abort
+    abort: params.abort
   });

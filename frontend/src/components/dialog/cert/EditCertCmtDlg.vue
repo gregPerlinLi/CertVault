@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
-import { updateCaComment } from "@/api/admin/cert/ca";
-import { updateSslCertComment } from "@/api/user/cert/ssl";
-import { useNotify } from "@/utils/composable";
+import type { CaInfoDTO, CertInfoDTO } from "@api/types";
+import { updateCaComment } from "@api/admin/cert/ca";
+import { updateSslCertComment } from "@api/user/cert/ssl";
+import { useNotify } from "@utils/composable";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -51,7 +51,7 @@ const onSubmit = async (ev: Event) => {
   const msg = info("Info", "Updating");
 
   try {
-    await updCertCmtFn.value(data!.uuid, comment);
+    await updCertCmtFn.value({ uuid: data!.uuid, comment });
 
     success("Success", "Successfully updated comment");
     emits("success");

@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { AbortOption } from "@/api";
-import type { PaginationVO, UserProfileDTO } from "@/api/types";
+import type { AbortOption, PageVO, UserProfileDTO } from "@api/types";
 import type { DataTableCellEditCompleteEvent } from "primevue/datatable";
-import { useNotify, useReloadableAsyncGuard } from "@/utils/composable";
+import { useNotify, useReloadableAsyncGuard } from "@utils/composable";
 
 import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
 import LoadingPlaceholder from "@comps/placeholder/LoadingPlaceholder.vue";
@@ -39,7 +38,7 @@ const props = defineProps<{
     limit: number,
     keyword?: string,
     abort?: AbortOption
-  ) => PaginationVO<UserProfileDTO> | Promise<PaginationVO<UserProfileDTO>>;
+  ) => PageVO<UserProfileDTO> | Promise<PageVO<UserProfileDTO>>;
   selectable?: boolean;
 }>();
 

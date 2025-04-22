@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { CaInfoDTO, UserProfileDTO } from "@/api/types";
-import { useNotify } from "@/utils/composable";
-import { getAllCaBindedUsrs, unbindCaFromUsrs } from "@/api/admin/cert/binding";
+import type { CaInfoDTO, UserProfileDTO } from "@api/types";
+import { getAllCaBindedUsrs, unbindCaFromUsrs } from "@api/admin/cert/binding";
+import { useNotify } from "@utils/composable";
 import { useConfirm } from "primevue/useconfirm";
 
 /* Services */
@@ -35,10 +35,10 @@ const tryUnbind = () =>
       const msg = info("Info", "Unbinding");
 
       try {
-        await unbindCaFromUsrs(
-          caSelection.value!.uuid,
-          usrTable.selection.map(({ username }) => username)
-        );
+        await unbindCaFromUsrs({
+          caUuid: caSelection.value!.uuid,
+          usernames: usrTable.selection.map(({ username }) => username)
+        });
 
         success("Success", "Successfully unbinded");
         usrTable.selection = [];
@@ -131,7 +131,13 @@ watch(caSelection, async () => {
     ref="usr-table"
     :refresh-fn="
       (page, limit, keyword, abort) =>
-        getAllCaBindedUsrs(caSelection!.uuid, page, limit, keyword, abort)
+        getAllCaBindedUsrs({
+          uuid: caSelection!.uuid,
+          page,
+          limit,
+          keyword,
+          abort
+        })
     "
     selectable />
 

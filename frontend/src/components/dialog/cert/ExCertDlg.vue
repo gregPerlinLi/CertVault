@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
-import { getCaPrivKey } from "@/api/admin/cert/ca";
-import { getCaCert } from "@/api/user/cert/ca";
-import { getSslCert, getSslPrivKey } from "@/api/user/cert/ssl";
-import { useUserStore } from "@/stores/user";
-import { b64ToU8Arr, saveFile } from "@/utils";
-import { useNotify } from "@/utils/composable";
+import type { CaInfoDTO, CertInfoDTO } from "@api/types";
+import { getCaPrivKey } from "@api/admin/cert/ca";
+import { getCaCert } from "@api/user/cert/ca";
+import { getSslCert, getSslPrivKey } from "@api/user/cert/ssl";
+import { useUserStore } from "@stores/user";
+import { useNotify } from "@utils/composable";
+import { b64ToU8Arr, saveFile } from "@utils/index";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -45,14 +45,14 @@ const getPrivKeyFn = computed(() =>
 
 /* Actions */
 const exportCert = async (
-  fullchain: boolean = false,
+  isChain: boolean = false,
   needRootCa: boolean = false
 ) => {
   const msg = (() => {
     if (needRootCa) {
       busy.exportChainRoot = true;
       return info("Info", "Exporting fullchain with root CA");
-    } else if (fullchain) {
+    } else if (isChain) {
       busy.exportChain = true;
       return info("Info", "Exporting fullchain");
     } else {
@@ -62,14 +62,18 @@ const exportCert = async (
   })();
 
   try {
-    const cert = await getCertFn.value(data!.uuid, fullchain, needRootCa);
+    const cert = await getCertFn.value({
+      uuid: data!.uuid,
+      isChain,
+      needRootCa
+    });
     const pem = new TextDecoder().decode(b64ToU8Arr(cert));
     const file = new Blob([pem], { type: "application/x-pem-file" });
     saveFile(`${data!.uuid}.pem`, file);
 
     success(
       "Success",
-      fullchain ? "Successfully exported fullchain" : "Successfully exported"
+      isChain ? "Successfully exported fullchain" : "Successfully exported"
     );
   } catch (err: unknown) {
     error("Fail to Export SSL Certificate", (err as Error).message);
@@ -78,7 +82,7 @@ const exportCert = async (
   toast.remove(msg);
   if (needRootCa) {
     busy.exportChainRoot = false;
-  } else if (fullchain) {
+  } else if (isChain) {
     busy.exportChain = false;
   } else {
     busy.exportCert = false;
@@ -92,7 +96,7 @@ const onSumbit = async (ev: Event) => {
     const formData = new FormData(ev.target as HTMLFormElement);
     const password = formData.get("password")!.toString();
 
-    const cert = await getPrivKeyFn.value(data!.uuid, password);
+    const cert = await getPrivKeyFn.value({ uuid: data!.uuid, password });
     const pem = new TextDecoder().decode(b64ToU8Arr(cert));
     const file = new Blob([pem], { type: "application/x-pem-file" });
     saveFile(`${data!.uuid}.pem`, file);

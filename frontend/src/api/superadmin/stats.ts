@@ -1,20 +1,20 @@
-import type { AbortOption } from "@/api";
-import { callRestfulApi } from "@/api";
+import type { BaseParams } from "@api/types";
+import { callRestfulApi } from "@api/index";
 
-export const countAllCaCerts = (
-  condition: "available" | "unavailable" | "none" = "none",
-  abort?: AbortOption
-) =>
+export interface CountAllCaCertsParams extends BaseParams {
+  condition?: "available" | "unavailable" | "none";
+}
+export const countAllCaCerts = (params: CountAllCaCertsParams = {}) =>
   callRestfulApi<number>({
     method: "GET",
     baseUrl: "/api/v1/superadmin/cert/ca/count",
-    searchParams: { condition },
-    abort
+    searchParams: { ...params, abort: undefined },
+    abort: params.abort
   });
 
-export const countAllSslCerts = (abort?: AbortOption) =>
+export const countAllSslCerts = (params: BaseParams = {}) =>
   callRestfulApi<number>({
     method: "GET",
     baseUrl: "/api/v1/superadmin/cert/ssl/count",
-    abort
+    abort: params.abort
   });

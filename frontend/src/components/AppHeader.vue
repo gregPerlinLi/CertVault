@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { logout } from "@/api/authentication";
-import { useUserStore } from "@/stores/user";
-import { useNotify } from "@/utils/composable";
+import { logout } from "@api/authentication";
+import { useUserStore } from "@stores/user";
+import { useNotify } from "@utils/composable";
 import { useConfirm } from "primevue/useconfirm";
 
 /* Services */
@@ -29,7 +29,7 @@ const trySignOut = () =>
       const msg = info("Info", "Signing out");
 
       try {
-        await logout({ timeout: -1 });
+        await logout({ abort: { timeout: -1 } });
 
         success("Success", "Successfully signed out");
         user.clear();

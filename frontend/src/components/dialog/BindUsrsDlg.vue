@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { CaInfoDTO, UserProfileDTO } from "@/api/types";
-import { useNotify } from "@/utils/composable";
-import { bindCaToUsrs, getAllCaNotBindedUsrs } from "@/api/admin/cert/binding";
+import type { CaInfoDTO, UserProfileDTO } from "@api/types";
+import { bindCaToUsrs, getAllCaNotBindedUsrs } from "@api/admin/cert/binding";
+import { useNotify } from "@utils/composable";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -31,10 +31,10 @@ const tryBind = async () => {
   const msg = info("Info", "Binding");
 
   try {
-    await bindCaToUsrs(
-      props.ca!.uuid,
-      usrTable.selection.map(({ username }) => username)
-    );
+    await bindCaToUsrs({
+      caUuid: props.ca!.uuid,
+      usernames: usrTable.selection.map(({ username }) => username)
+    });
 
     success("Success", "Successfully binded");
     emits("success");
@@ -70,7 +70,13 @@ watch(visible, async (newValue) => {
       ref="usr-table"
       :refresh-fn="
         (page, limit, keyword, abort) =>
-          getAllCaNotBindedUsrs(ca!.uuid, page, limit, keyword, abort)
+          getAllCaNotBindedUsrs({
+            uuid: ca!.uuid,
+            page,
+            limit,
+            keyword,
+            abort
+          })
       "
       selectable />
 

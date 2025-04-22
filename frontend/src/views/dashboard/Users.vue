@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { DataTableCellEditCompleteEvent } from "primevue/datatable";
-import { getAllUsrInfo } from "@/api/admin/user";
-import { useUserStore } from "@/stores/user";
-import { useNotify } from "@/utils/composable";
+import { getAllUsrInfo } from "@api/admin/user";
+import { useUserStore } from "@stores/user";
+import { useNotify } from "@utils/composable";
 
 /* Services */
 const { success } = useNotify();
@@ -48,7 +48,10 @@ onMounted(() => refUsrTable.value?.refresh());
   <UsrTable
     ref="user-table"
     :editable="isSuperadmin"
-    :refresh-fn="getAllUsrInfo"
+    :refresh-fn="
+      (page, limit, keyword, abort) =>
+        getAllUsrInfo({ page, limit, keyword, abort })
+    "
     @cell-edit-complete="onEdit">
     <template #operations>
       <Column v-if="isSuperadmin">

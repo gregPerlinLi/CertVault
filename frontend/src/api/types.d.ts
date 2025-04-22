@@ -1,3 +1,35 @@
+/* Wrapper */
+export interface AbortOption {
+  timeout?: number;
+  signal?: AbortSignal;
+}
+
+export interface RestfulApiOption {
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  baseUrl: string;
+  pathNames?: Record<string, any>;
+  searchParams?: Record<string, any>;
+  payload?: any;
+  abort?: AbortOption;
+}
+
+/* Parameters */
+export interface BaseParams {
+  abort?: AbortOption;
+}
+
+export interface PageParams {
+  page?: number;
+  limit?: number;
+  keyword?: string;
+}
+
+/* Auxlilliary */
+export interface PageVO<T> {
+  total: number;
+  list: T[] | null;
+}
+
 export interface ResultVO<T = null> {
   code: number;
   msg: string;
@@ -5,34 +37,19 @@ export interface ResultVO<T = null> {
   data: T | null;
 }
 
-export interface PaginationVO<T> {
-  total: number;
-  list: T[] | null;
-}
-
-export interface OidcProviderDTO {
-  provider: string;
-  displayName: string;
-  logo: string;
-}
-
-export interface UserProfileDTO {
-  username: string;
-  displayName: string;
-  email: string;
-  role: 1 | 2 | 3;
-}
-
-export interface CertInfoDTO {
+/* Data */
+export interface CaInfoDTO {
   uuid: string;
   algorithm: string;
   keySize: number;
-  caUuid: string;
   owner: string;
+  parentCa: string | null;
+  allowSubCa: boolean | null;
   comment: string;
+  available: boolean;
   notBefore: string;
   notAfter: string;
-  createAt: string;
+  createdAt: string;
   modifiedAt: string;
 }
 
@@ -66,40 +83,17 @@ export interface CertDetailDTO {
   extensions: any;
 }
 
-export interface CaInfoDTO {
+export interface CertInfoDTO {
   uuid: string;
   algorithm: string;
   keySize: number;
-  owner: string;
-  parentCa: string | null;
-  allowSubCa: boolean | null;
-  comment: string;
-  available: boolean;
-  notBefore: string;
-  notAfter: string;
-  createdAt: string;
-  modifiedAt: string;
-}
-
-export interface ResponseCertDTO {
-  uuid: string;
-  algorithm: string;
-  keySize: number;
-  privkey: string | null;
-  cert: string;
   caUuid: string;
+  owner: string;
+  comment: string;
   notBefore: string;
   notAfter: string;
-  comment: string;
-}
-
-export interface ResponseCaDTO {
-  uuid: string;
-  privkey: string | null;
-  cert: string;
-  notBefore: string;
-  notAfter: string;
-  comment: string;
+  createAt: string;
+  modifiedAt: string;
 }
 
 export interface LoginRecordDTO {
@@ -115,4 +109,40 @@ export interface LoginRecordDTO {
   loginTime: string;
   isOnline: boolean;
   isCurrentSession: boolean;
+}
+
+export interface OidcProviderDTO {
+  provider: string;
+  displayName: string;
+  logo: string;
+}
+
+export interface UserProfileDTO {
+  username: string;
+  displayName: string;
+  email: string;
+  role: 1 | 2 | 3;
+}
+
+export interface ResponseCaDTO {
+  uuid: string;
+  algorithm: string;
+  keySize: number;
+  privkey: string | null;
+  cert: string;
+  notBefore: string;
+  notAfter: string;
+  comment: string;
+}
+
+export interface ResponseCertDTO {
+  uuid: string;
+  algorithm: string;
+  keySize: number;
+  privkey: string | null;
+  cert: string;
+  caUuid: string;
+  notBefore: string;
+  notAfter: string;
+  comment: string;
 }

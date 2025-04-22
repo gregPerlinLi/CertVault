@@ -1,4 +1,4 @@
-import type { UserProfileDTO } from "@/api/types";
+import type { UserProfileDTO } from "@api/types";
 
 // Types
 export enum UserRole {

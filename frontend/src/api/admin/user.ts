@@ -1,16 +1,15 @@
-import type { AbortOption } from "@/api";
-import type { PaginationVO, UserProfileDTO } from "@/api/types";
-import { callRestfulApi } from "@/api";
+import type {
+  BaseParams,
+  PageParams,
+  PageVO,
+  UserProfileDTO
+} from "@api/types";
+import { callRestfulApi } from "@api/index";
 
-export const getAllUsrInfo = (
-  page: number,
-  limit: number,
-  keyword?: string,
-  abort?: AbortOption
-) =>
-  callRestfulApi<PaginationVO<UserProfileDTO>>({
+export const getAllUsrInfo = (params: BaseParams & PageParams = {}) =>
+  callRestfulApi<PageVO<UserProfileDTO>>({
     method: "GET",
     baseUrl: "/api/v1/admin/users",
-    searchParams: { page, limit, keyword },
-    abort
+    searchParams: { ...params, abort: undefined },
+    abort: params.abort
   });

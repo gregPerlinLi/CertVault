@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { CaInfoDTO } from "@/api/types";
-import { requestCaCert } from "@/api/admin/cert/ca";
-import { requestSslCert } from "@/api/user/cert/ssl";
-import { useFormValidator, useNotify } from "@/utils/composable";
-import { reqNewCertSchema } from "@/utils/schema";
+import type { CaInfoDTO } from "@api/types";
+import { requestCaCert } from "@api/admin/cert/ca";
+import { requestSslCert } from "@api/user/cert/ssl";
+import { useFormValidator, useNotify } from "@utils/composable";
+import { reqNewCertSchema } from "@utils/schema";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -66,16 +66,14 @@ const onSubmit = async (ev: Event) => {
   const msg = info("Info", "Requesting");
 
   try {
-    await reqNewCertFn.value(
-      {
-        ...result.output,
-        caUuid: caSelection.value?.uuid,
-        allowSubCa: allowSubCa.value,
-        algorithm: algorithm.value,
-        keySize: keySize.value
-      },
-      { timeout: -1 }
-    );
+    await reqNewCertFn.value({
+      ...result.output,
+      caUuid: caSelection.value?.uuid,
+      allowSubCa: allowSubCa.value,
+      algorithm: algorithm.value,
+      keySize: keySize.value,
+      abort: { timeout: -1 }
+    });
 
     success("Success", "Successfully requested");
     emits("success");

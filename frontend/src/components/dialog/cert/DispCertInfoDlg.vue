@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { CaInfoDTO, CertDetailDTO, CertInfoDTO } from "@/api/types";
-import { analyzeCert } from "@/api/user/cert";
-import { getCaCert } from "@/api/user/cert/ca";
-import { getSslCert } from "@/api/user/cert/ssl";
-import { useNotify, useReloadableAsyncGuard } from "@/utils/composable";
+import type { CaInfoDTO, CertDetailDTO, CertInfoDTO } from "@api/types";
+import { analyzeCert } from "@api/user/cert";
+import { getCaCert } from "@api/user/cert/ca";
+import { getSslCert } from "@api/user/cert/ssl";
+import { useNotify, useReloadableAsyncGuard } from "@utils/composable";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -35,14 +35,18 @@ const fetchDetails = async () => {
   canRetry.value = false;
 
   try {
-    const cert = await getCertFn.value(data!.uuid, undefined, undefined, {
-      signal: getSignal()
+    const cert = await getCertFn.value({
+      uuid: data!.uuid,
+      abort: { signal: getSignal() }
     });
     if (!isActivate.value) {
       return;
     }
 
-    const result = await analyzeCert(cert, { signal: getSignal() });
+    const result = await analyzeCert({
+      cert: cert,
+      abort: { signal: getSignal() }
+    });
     if (!isActivate.value) {
       return;
     }

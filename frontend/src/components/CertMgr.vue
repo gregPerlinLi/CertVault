@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
+import type { CaInfoDTO, CertInfoDTO } from "@api/types";
 import {
   deleteCaCert,
   getAllCaInfo,
   toggleCaAvailability
-} from "@/api/admin/cert/ca";
-import { getAllBindedCaInfo } from "@/api/user/cert/ca";
-import { deleteSslCert, getAllSslCertInfo } from "@/api/user/cert/ssl";
-import { useUserStore } from "@/stores/user";
-import { useAsyncGuard, useNotify } from "@/utils/composable";
+} from "@api/admin/cert/ca";
+import { getAllBindedCaInfo } from "@api/user/cert/ca";
+import { deleteSslCert, getAllSslCertInfo } from "@api/user/cert/ssl";
+import { useUserStore } from "@stores/user";
+import { useAsyncGuard, useNotify } from "@utils/composable";
 import { useConfirm } from "primevue/useconfirm";
 
 import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
@@ -81,12 +81,13 @@ const refresh = async () => {
   loading.value = true;
 
   try {
-    const page = await getCertInfo.value(
-      pagination.first / pagination.limit + 1,
-      pagination.limit,
-      searchKeyword.value.length === 0 ? undefined : searchKeyword.value,
-      { signal }
-    );
+    const page = await getCertInfo.value({
+      page: pagination.first / pagination.limit + 1,
+      limit: pagination.limit,
+      keyword:
+        searchKeyword.value.length === 0 ? undefined : searchKeyword.value,
+      abort: { signal }
+    });
 
     if (isActivate.value) {
       pagination.total = page.total;
@@ -127,7 +128,7 @@ const tryToggleCertAvailable = (data: CaInfoDTO) =>
       const msg = info("Info", "Toggling");
 
       try {
-        await toggleCaAvailability(data.uuid);
+        await toggleCaAvailability({ uuid: data.uuid });
         success("Success", "Successfully toggled");
         refresh();
       } catch (err: unknown) {
@@ -151,7 +152,7 @@ const tryDelCert = (data: CertInfoDTO) =>
       const msg = info("Info", "Deleting");
 
       try {
-        await delCertFn.value(data.uuid);
+        await delCertFn.value({ uuid: data.uuid });
         success("Success", "Successfully deleted");
         refresh();
       } catch (err: unknown) {

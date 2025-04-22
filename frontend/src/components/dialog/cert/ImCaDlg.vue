@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FileUploadSelectEvent } from "primevue";
-import { importCa } from "@/api/admin/cert/ca";
-import { useNotify } from "@/utils/composable";
+import { importCa } from "@api/admin/cert/ca";
+import { useNotify } from "@utils/composable";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -64,7 +64,11 @@ const onSubmit = async (ev: Event) => {
   const msg = info("Info", "Importing");
 
   try {
-    await importCa(certData.value, keyData.value, comment);
+    await importCa({
+      certificate: certData.value,
+      privkey: keyData.value,
+      comment
+    });
     success("Success", "Successfully imported");
     emits("success");
     visible.value = false;

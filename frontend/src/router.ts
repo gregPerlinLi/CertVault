@@ -1,6 +1,6 @@
-import { useCommonStore } from "@/stores/common";
+import { useCommonStore } from "@stores/common";
 import { useUserStore } from "@stores/user";
-import { useNotify } from "@/utils/composable";
+import { useNotify } from "@utils/composable";
 import { createRouter, createWebHistory } from "vue-router";
 
 // Sync views

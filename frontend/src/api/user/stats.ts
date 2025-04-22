@@ -1,16 +1,16 @@
-import type { AbortOption } from "@/api";
-import { callRestfulApi } from "@/api";
+import type { BaseParams } from "@api/types";
+import { callRestfulApi } from "@api/index";
 
-export const countBindedCa = (abort?: AbortOption) =>
+export const countBindedCa = (params: BaseParams = {}) =>
   callRestfulApi<number>({
     method: "GET",
     baseUrl: "/api/v1/user/cert/ca/count",
-    abort
+    abort: params.abort
   });
 
-export const countRequestedSslCert = (abort?: AbortOption) =>
+export const countRequestedSslCert = (params: BaseParams = {}) =>
   callRestfulApi<number>({
     method: "GET",
     baseUrl: "/api/v1/user/cert/ssl/count",
-    abort
+    abort: params.abort
   });

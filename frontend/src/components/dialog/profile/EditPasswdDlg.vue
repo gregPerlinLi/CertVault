@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { updateProfile } from "@/api/user/user";
-import { useNotify } from "@/utils/composable";
+import { updateProfile } from "@api/user/user";
+import { useNotify } from "@utils/composable";
 
 /* Models */
 const visible = defineModel<boolean>("visible");

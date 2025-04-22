@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { CaInfoDTO } from "@/api/types";
-import { getAllCaInfo } from "@/api/admin/cert/ca";
-import { getAllBindedCaInfo } from "@/api/user/cert/ca";
-import { useNotify, useReloadableAsyncGuard } from "@/utils/composable";
+import type { CaInfoDTO } from "@api/types";
+import { getAllCaInfo } from "@api/admin/cert/ca";
+import { getAllBindedCaInfo } from "@api/user/cert/ca";
+import { useNotify, useReloadableAsyncGuard } from "@utils/composable";
 
 /* Models */
 const selection = defineModel<CaInfoDTO | null>("selection");
@@ -43,12 +43,12 @@ const refresh = async () => {
   try {
     selection.value = null;
 
-    const data = await fetchFn.value(
-      Math.floor(caList.first / 10) + 1,
-      10,
-      caList.search,
-      { signal: getSignal() }
-    );
+    const data = await fetchFn.value({
+      page: Math.floor(caList.first / 10) + 1,
+      limit: 10,
+      keyword: caList.search,
+      abort: { signal: getSignal() }
+    });
 
     if (isActivate.value) {
       caList.total = data.total;

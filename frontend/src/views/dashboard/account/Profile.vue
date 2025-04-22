@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useUserStore } from "@/stores/user";
-import { useNotify } from "@/utils/composable";
+import { useUserStore } from "@stores/user";
+import { useNotify } from "@utils/composable";
 
 /* Services */
 const { error } = useNotify();

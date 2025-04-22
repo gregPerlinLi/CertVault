@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { login } from "@/api/authentication";
-import { oidcLogin } from "@/api/authentication/oauth";
-import { useCommonStore } from "@/stores/common";
-import { useUserStore } from "@/stores/user";
-import { useFormValidator, useNotify } from "@/utils/composable";
-import { signInSchema } from "@/utils/schema";
+import { login } from "@api/authentication";
+import { oidcLogin } from "@api/authentication/oauth";
+import { useCommonStore } from "@stores/common";
+import { useUserStore } from "@stores/user";
+import { useFormValidator, useNotify } from "@utils/composable";
+import { signInSchema } from "@utils/schema";
 
 /* Services */
 const router = useRouter();
@@ -32,11 +32,11 @@ async function trySignIn(ev: Event): Promise<void> {
   const msg = info("Info", "Signing in");
 
   try {
-    const profile = await login(
-      result.output.username,
-      result.output.password,
-      { timeout: 20000 }
-    );
+    const profile = await login({
+      username: result.output.username,
+      password: result.output.password,
+      abort: { timeout: 20000 }
+    });
 
     user.update(profile);
     success("Success", "Successfully signed in");

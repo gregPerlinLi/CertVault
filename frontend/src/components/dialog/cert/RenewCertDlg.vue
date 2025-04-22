@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
-import { renewCaCert } from "@/api/admin/cert/ca";
-import { renewSslCert } from "@/api/user/cert/ssl";
-import { useNotify } from "@/utils/composable";
+import type { CaInfoDTO, CertInfoDTO } from "@api/types";
+import { renewCaCert } from "@api/admin/cert/ca";
+import { renewSslCert } from "@api/user/cert/ssl";
+import { useNotify } from "@utils/composable";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -37,7 +37,7 @@ const onSubmit = async (ev: Event) => {
   busy.value = true;
   const msg = info("Info", "Requesting");
   try {
-    await renewCertFn.value(data!.uuid, expiry);
+    await renewCertFn.value({ uuid: data!.uuid, expiry });
 
     success("Success", "Successfully renewed");
     emits("success");

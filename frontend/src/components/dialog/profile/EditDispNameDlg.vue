@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { getProfile, updateProfile } from "@/api/user/user";
-import { useUserStore } from "@/stores/user";
-import { useNotify } from "@/utils/composable";
+import { getProfile, updateProfile } from "@api/user/user";
+import { useUserStore } from "@stores/user";
+import { useNotify } from "@utils/composable";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -44,7 +44,7 @@ const submit = async () => {
 
   try {
     await updateProfile({ displayName: newDisplayName.value });
-    const profile = await getProfile({ timeout: -1 });
+    const profile = await getProfile({ abort: { timeout: -1 } });
     user.update(profile);
     success("Success", "Successfully updated profile");
     visible.value = false;
