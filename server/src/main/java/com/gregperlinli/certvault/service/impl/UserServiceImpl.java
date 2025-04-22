@@ -230,8 +230,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             }
             switch (orderBy) {
                 case "username" -> userQueryWrapper.orderBy(true, isAsc,"username");
-                case "displayName" -> userQueryWrapper.orderBy(true, isAsc,"display_name");
-                case "email" -> userQueryWrapper.orderBy(true, isAsc,"email");
+                case "displayName" -> userQueryWrapper.orderBy(true, isAsc,"display_name", "username");
+                case "email" -> userQueryWrapper.orderBy(true, isAsc,"email", "username");
+                case "role" -> userQueryWrapper.orderBy(true, isAsc,"role", "username");
             }
         }
         resultPage = this.page(userPage, userQueryWrapper);
