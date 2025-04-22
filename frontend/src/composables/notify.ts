@@ -18,11 +18,7 @@ export const useNotify = () => {
     toast.add(msg);
     return msg;
   };
-  const info = (
-    detail: string,
-    summary: string = "Info",
-    life: number = -1
-  ) => {
+  const info = (detail: string, summary: string = "Info", life?: number) => {
     const msg = {
       severity: "info",
       summary,
