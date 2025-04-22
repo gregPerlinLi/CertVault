@@ -1,7 +1,9 @@
 import type { BaseParams, CaInfoDTO, PageParams, PageVO } from "@api/types";
 import { callRestfulApi } from "@api/index";
 
-export const getAllBindedCaInfo = (params: BaseParams & PageParams = {}) =>
+export const getAllBindedCaInfo = (
+  params: BaseParams & PageParams<"uuid" | "comment" | "owner" | "status"> = {}
+) =>
   callRestfulApi<PageVO<CaInfoDTO>>({
     method: "GET",
     baseUrl: "/api/v1/user/cert/ca",

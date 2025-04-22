@@ -18,10 +18,12 @@ export interface BaseParams {
   abort?: AbortOption;
 }
 
-export interface PageParams {
+export interface PageParams<T extends string | undefined = undefined> {
   page?: number;
   limit?: number;
   keyword?: string;
+  isAsc?: boolean;
+  orderBy?: T;
 }
 
 /* Auxlilliary */

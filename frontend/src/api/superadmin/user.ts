@@ -6,7 +6,19 @@ import type {
 } from "@api/types";
 import { callRestfulApi } from "@api/index";
 
-export interface GetAllLoginRecsParams extends BaseParams, PageParams {
+export interface GetAllLoginRecsParams
+  extends BaseParams,
+    PageParams<
+      | "user"
+      | "loginTime"
+      | "ip"
+      | "region"
+      | "province"
+      | "city"
+      | "platform"
+      | "os"
+      | "browser"
+    > {
   status?: -1 | 0 | 1;
 }
 export const getAllLoginRecs = (params: GetAllLoginRecsParams = {}) =>

@@ -7,7 +7,9 @@ import type {
 } from "@api/types";
 import { callRestfulApi } from "@api/index";
 
-export const getAllSslCertInfo = (params: BaseParams & PageParams = {}) =>
+export const getAllSslCertInfo = (
+  params: BaseParams & PageParams<"uuid" | "comment" | "owner" | "status"> = {}
+) =>
   callRestfulApi<PageVO<CertInfoDTO>>({
     method: "GET",
     baseUrl: "/api/v1/user/cert/ssl",

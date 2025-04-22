@@ -6,7 +6,9 @@ import type {
 } from "@api/types";
 import { callRestfulApi } from "@api/index";
 
-export interface GetAllCaBindedUsrsParams extends BaseParams, PageParams {
+export interface GetAllCaBindedUsrsParams
+  extends BaseParams,
+    PageParams<"username" | "displayName" | "email"> {
   uuid: string;
 }
 export const getAllCaBindedUsrs = (params: GetAllCaBindedUsrsParams) =>
@@ -18,7 +20,9 @@ export const getAllCaBindedUsrs = (params: GetAllCaBindedUsrsParams) =>
     abort: params.abort
   });
 
-export interface GetAllCaNotBindedUsrsParams extends BaseParams, PageParams {
+export interface GetAllCaNotBindedUsrsParams
+  extends BaseParams,
+    PageParams<"username" | "displayName" | "email"> {
   uuid: string;
 }
 export const getAllCaNotBindedUsrs = (params: GetAllCaNotBindedUsrsParams) =>

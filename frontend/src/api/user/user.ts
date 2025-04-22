@@ -16,7 +16,19 @@ export const getProfile = (params: BaseParams = {}) =>
 
 export interface GetUsrLoginRecsParams
   extends BaseParams,
-    Omit<PageParams, "keyword"> {
+    Omit<
+      PageParams<
+        | "loginTime"
+        | "ip"
+        | "region"
+        | "province"
+        | "city"
+        | "platform"
+        | "os"
+        | "browser"
+      >,
+      "keyword"
+    > {
   status?: -1 | 0 | 1;
 }
 export const getUsrLoginRecs = (params: GetUsrLoginRecsParams = {}) =>

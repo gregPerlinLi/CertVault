@@ -6,7 +6,9 @@ import type {
 } from "@api/types";
 import { callRestfulApi } from "@api/index";
 
-export const getAllUsrInfo = (params: BaseParams & PageParams = {}) =>
+export const getAllUsrInfo = (
+  params: BaseParams & PageParams<"username" | "displayName" | "email"> = {}
+) =>
   callRestfulApi<PageVO<UserProfileDTO>>({
     method: "GET",
     baseUrl: "/api/v1/admin/users",

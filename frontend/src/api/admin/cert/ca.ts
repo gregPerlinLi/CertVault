@@ -7,7 +7,9 @@ import type {
 } from "@api/types";
 import { callRestfulApi } from "@api/index";
 
-export const getAllCaInfo = (params: BaseParams & PageParams = {}) =>
+export const getAllCaInfo = (
+  params: BaseParams & PageParams<"uuid" | "comment" | "owner" | "status"> = {}
+) =>
   callRestfulApi<PageVO<CaInfoDTO>>({
     method: "GET",
     baseUrl: "/api/v1/admin/cert/ca",
