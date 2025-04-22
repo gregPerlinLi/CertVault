@@ -19,8 +19,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.PrivateKey;
-
 /**
  * User Controller
  *
@@ -78,6 +76,8 @@ public class UserController {
      * @param status Login status (-1: all, 0: offline, 1:online)
      * @param page Page number
      * @param limit Page limit
+     * @param orderBy the order by field
+     * @param isAsc the ascending or descending
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
@@ -95,13 +95,19 @@ public class UserController {
                                                                  @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                              @Parameter(name = "limit", description = "Page limit", example = "10")
                                                                  @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                             @Parameter(name = "orderBy", description = "Order by field", example = "username")
+                                                                 @RequestParam(value = "orderBy", required = false) String orderBy,
+                                                             @Parameter(name = "isAsc", description = "Ascending or descending", example = "true")
+                                                                 @RequestParam(value = "isAsc", required = false, defaultValue = "true") Boolean isAsc,
                                                              HttpServletRequest request) {
         PageDTO<LoginRecordDTO> result = loginRecordService.getUserLoginRecords(
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
                 status,
                 request.getSession().getId(),
                 page,
-                limit);
+                limit,
+                isAsc,
+                orderBy);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -200,8 +206,11 @@ public class UserController {
     /**
      * Get user's CA list
      *
+     * @param keyword Search keywords
      * @param page Page number
      * @param limit Page limit
+     * @param orderBy the order by field
+     * @param isAsc the ascending or descending
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
@@ -219,11 +228,17 @@ public class UserController {
                                                    @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                @Parameter(name = "limit", description = "Page limit", example = "10")
                                                    @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                               @Parameter(name = "orderBy", description = "Order by field", example = "username")
+                                                   @RequestParam(value = "orderBy", required = false) String orderBy,
+                                               @Parameter(name = "isAsc", description = "Ascending or descending", example = "true")
+                                                   @RequestParam(value = "isAsc", required = false, defaultValue = "true") Boolean isAsc,
                                                HttpServletRequest request) {
         PageDTO<CaInfoDTO> result = caService.getBoundCas(keyword,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
                 page,
-                limit);
+                limit,
+                isAsc,
+                orderBy);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -271,8 +286,11 @@ public class UserController {
     /**
      * Get user's certificate list
      *
+     * @param keyword Search keywords
      * @param page Page number
      * @param limit Page limit
+     * @param orderBy the order by field
+     * @param isAsc the ascending or descending
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
@@ -308,11 +326,17 @@ public class UserController {
                                                        @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                    @Parameter(name = "limit", description = "Page limit", example = "10")
                                                        @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                   @Parameter(name = "orderBy", description = "Order by field", example = "username")
+                                                       @RequestParam(value = "orderBy", required = false) String orderBy,
+                                                   @Parameter(name = "isAsc", description = "Ascending or descending", example = "true")
+                                                       @RequestParam(value = "isAsc", required = false, defaultValue = "true") Boolean isAsc,
                                                    HttpServletRequest request) {
         PageDTO<CertInfoDTO> result = certificateService.getCertificates(keyword,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
                 page,
-                limit);
+                limit,
+                isAsc,
+                orderBy);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }

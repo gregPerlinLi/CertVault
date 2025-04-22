@@ -75,8 +75,12 @@ public class SuperadminController {
                                                                  @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                              @Parameter(name = "limit", description = "Number of records per page", example = "10")
                                                                  @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                             @Parameter(name = "orderBy", description = "Order by field", example = "username")
+                                                                 @RequestParam(value = "orderBy", required = false) String orderBy,
+                                                             @Parameter(name = "isAsc", description = "Ascending or descending", example = "true")
+                                                                 @RequestParam(value = "isAsc", required = false, defaultValue = "true") Boolean isAsc,
                                                              HttpServletRequest request) {
-        PageDTO<LoginRecordDTO> result = loginRecordService.getLoginRecords(keyword, status, request.getSession().getId(), page, limit);
+        PageDTO<LoginRecordDTO> result = loginRecordService.getLoginRecords(keyword, status, request.getSession().getId(), page, limit, isAsc, orderBy);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
