@@ -18,47 +18,55 @@ public interface ICaService extends IService<Ca> {
      * Get ca certificates
      *
      * @param keyword search keyword
-     * @param owner owner of the ca certificates
-     * @param page page number
-     * @param limit page size
+     * @param owner   owner of the ca certificates
+     * @param page    page number
+     * @param limit   page size
+     * @param isAsc   ascending or descending
+     * @param orderBy order by
      * @return ca certificates info
      */
-    PageDTO<CaInfoDTO> getCas(String keyword, String owner, Integer page, Integer limit);
+    PageDTO<CaInfoDTO> getCas(String keyword, String owner, Integer page, Integer limit, Boolean isAsc, String orderBy);
 
     /**
      * Get all CA bindings of a user
      *
-     * @param keyword search keyword
+     * @param keyword  search keyword
      * @param username username
      * @param page     page number
      * @param limit    page size
+     * @param isAsc    ascending or descending
+     * @param orderBy  order by
      * @return CA binding information
      */
-    PageDTO<CaInfoDTO> getBoundCas(String keyword, String username, Integer page, Integer limit);
+    PageDTO<CaInfoDTO> getBoundCas(String keyword, String username, Integer page, Integer limit, Boolean isAsc, String orderBy);
 
     /**
      * Get all users bound to a CA
      *
      * @param keyword search keyword
-     * @param uuid ca certificate uuid
-     * @param owner owner of the ca certificate
-     * @param page page number
-     * @param limit page size
+     * @param uuid    ca certificate uuid
+     * @param owner   owner of the ca certificate
+     * @param page    page number
+     * @param limit   page size
+     * @param isAsc   ascending or descending
+     * @param orderBy order by
      * @return user information
      */
-    PageDTO<UserProfileDTO> getBoundUsers(String keyword, String uuid, String owner, Integer page, Integer limit);
+    PageDTO<UserProfileDTO> getBoundUsers(String keyword, String uuid, String owner, Integer page, Integer limit, Boolean isAsc, String orderBy);
 
     /**
      * Get all users not bound to a CA
      *
      * @param keyword search keyword
-     * @param uuid ca certificate uuid
-     * @param owner owner of the ca certificate
-     * @param page page number
-     * @param limit page size
+     * @param uuid    ca certificate uuid
+     * @param owner   owner of the ca certificate
+     * @param page    page number
+     * @param limit   page size
+     * @param isAsc   ascending or descending
+     * @param orderBy order by
      * @return user information
      */
-    PageDTO<UserProfileDTO> getNotBoundUsers(String keyword, String uuid, String owner, Integer page, Integer limit);
+    PageDTO<UserProfileDTO> getNotBoundUsers(String keyword, String uuid, String owner, Integer page, Integer limit, Boolean isAsc, String orderBy);
 
     /**
      * Get ca certificate
