@@ -1,24 +1,113 @@
 <script setup lang="ts">
+import type { UserProfileDTO } from "@api/types";
 import type { DataTableCellEditCompleteEvent } from "primevue/datatable";
 import { getAllUsrInfo } from "@api/admin/user";
+import { deleteMultiUsrs, updateUsrInfo } from "@api/superadmin/user";
 import { useUserStore } from "@stores/user";
+import { useConfirm } from "primevue/useconfirm";
 
 /* Services */
-const { success } = useNotify();
+const confirm = useConfirm();
+const { success, info, warn, error, remove } = useNotify();
 
 const refUsrTable = useTemplateRef("user-table");
 
 /* Stores */
 const { isSuperadmin } = useUserStore();
 
+/* Reactive */
+const usrTbl = reactive({
+  selection: [] as UserProfileDTO[],
+  loading: false
+});
+const busy = reactive({
+  delSelUsrs: false,
+  updSelUsrRoles: false
+});
+
 /* Actions */
-const onEdit = ({ newValue, value }: DataTableCellEditCompleteEvent) => {
-  console.log(newValue, value);
+const onEdit = async ({
+  data,
+  field,
+  newValue,
+  value
+}: DataTableCellEditCompleteEvent) => {
+  newValue = newValue.trim();
+  value = value.trim();
+
   if (newValue === value) {
     return;
   }
-  success(`"${value}" -> "${newValue}"`);
+
+  if (field === "displayName") {
+    if (newValue.length === 0) {
+      warn("Display name cannot be empty");
+      return;
+    }
+
+    const msg = info("Updating display name");
+    try {
+      await updateUsrInfo({
+        username: data.username,
+        displayName: newValue
+      });
+      success("Successfully updated display name");
+      refUsrTable.value?.refresh();
+    } catch (err: unknown) {
+      error((err as Error).message, "Fail to Update Display Name");
+    }
+    remove(msg);
+  }
+
+  if (field === "email") {
+    if (newValue.length === 0) {
+      warn("Email cannot be empty");
+      return;
+    }
+
+    const msg = info("Updating email");
+    try {
+      await updateUsrInfo({
+        username: data.username,
+        email: newValue
+      });
+      success("Successfully updated email");
+      refUsrTable.value?.refresh();
+    } catch (err: unknown) {
+      error((err as Error).message, "Fail to Update Email");
+    }
+    remove(msg);
+  }
 };
+
+const tryDelSelUsrs = () =>
+  confirm.require({
+    header: "Delete Selected Users",
+    message: "Are you sure to delete selected users?",
+    icon: "pi pi-exclamation-triangle",
+    modal: true,
+    acceptProps: { severity: "danger" },
+    rejectProps: { severity: "secondary", variant: "outlined" },
+    accept: async () => {
+      busy.delSelUsrs = true;
+      const msg = info("Deleting");
+
+      try {
+        await deleteMultiUsrs({
+          usernames: usrTbl.selection.map(({ username }) => username)
+        });
+
+        success("Deleted");
+        usrTbl.selection = [];
+        refUsrTable.value?.refresh();
+      } catch (err: unknown) {
+        error((err as Error).message, "Fail to Delete");
+      }
+
+      remove(msg);
+      busy.delSelUsrs = false;
+    }
+  });
 
 /* Hooks */
 onMounted(() => refUsrTable.value?.refresh());
@@ -43,15 +132,54 @@ onMounted(() => refUsrTable.value?.refresh());
     </template>
   </Breadcrumb>
 
-  <!-- Main -->
+  <!-- Tools -->
+  <Toolbar class="border-none">
+    <template #start>
+      <div class="flex gap-4">
+        <Button
+          icon="pi pi-plus"
+          label="Create New"
+          severity="success"
+          size="small"
+          :disabled="usrTbl.loading"></Button>
+        <Button
+          icon="pi pi-trash"
+          label="Delete Selected"
+          severity="danger"
+          size="small"
+          :disabled="usrTbl.selection.length === 0"
+          :loading="busy.delSelUsrs"
+          @click="tryDelSelUsrs()"></Button>
+        <Button
+          icon="pi pi-user"
+          label="Update Selected Roles"
+          severity="help"
+          size="small"
+          :disabled="usrTbl.selection.length === 0"
+          :loading="busy.updSelUsrRoles"></Button>
+        <Button
+          icon="pi pi-refresh"
+          label="Refresh"
+          severity="info"
+          size="small"
+          :loading="usrTbl.loading"
+          @click="refUsrTable?.refresh()"></Button>
+      </div>
+    </template>
+  </Toolbar>
+
+  <!-- User table -->
   <UsrTbl
+    v-model:selection="usrTbl.selection"
+    v-model:loading="usrTbl.loading"
     ref="user-table"
     :editable="isSuperadmin"
     :refresh-fn="
       (page, limit, keyword, abort) =>
         getAllUsrInfo({ page, limit, keyword, abort })
     "
-    @cell-edit-complete="onEdit">
+    @cell-edit-complete="onEdit"
+    selectable>
     <template #operations>
       <Column v-if="isSuperadmin">
         <template #body>
@@ -62,15 +190,6 @@ onMounted(() => refUsrTable.value?.refresh());
               class="h-6 w-6"
               icon="pi pi-key"
               severity="success"
-              size="small"
-              variant="text"
-              rounded></Button>
-            <Button
-              v-tooltip.top="{ value: 'Update Role', class: 'text-sm' }"
-              aria-label="Update Role"
-              class="h-6 w-6"
-              icon="pi pi-user"
-              severity="help"
               size="small"
               variant="text"
               rounded></Button>

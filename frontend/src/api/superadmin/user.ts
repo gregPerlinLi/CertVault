@@ -41,7 +41,7 @@ export interface CreateMultiUsrsParams extends BaseParams {
 export const createMultiUsrs = (params: CreateMultiUsrsParams) =>
   callRestfulApi({
     method: "POST",
-    baseUrl: "/api/v1/superadmin/users",
+    baseUrl: "/api/v1/superadmin/users/create",
     payload: params.list,
     abort: params.abort
   });
@@ -81,8 +81,8 @@ export interface DeleteMultiUsrsParams extends BaseParams {
 }
 export const deleteMultiUsrs = (params: DeleteMultiUsrsParams) =>
   callRestfulApi({
-    method: "DELETE",
-    baseUrl: "/api/v1/superadmin/users",
+    method: "POST",
+    baseUrl: "/api/v1/superadmin/users/delete",
     payload: params.usernames,
     abort: params.abort
   });

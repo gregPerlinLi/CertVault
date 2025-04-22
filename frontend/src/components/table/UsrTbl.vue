@@ -175,7 +175,7 @@ defineExpose({
         <InputText v-model="data.displayName" size="small" autofocus />
       </template>
     </Column>
-    <Column field="email" header="Email">
+    <Column class="w-0" field="email" header="Email">
       <template #body="{ data }: { data: UserProfileDTO }">
         <div class="flex items-baseline w-80">
           <p

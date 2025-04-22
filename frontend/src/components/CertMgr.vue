@@ -87,6 +87,8 @@ const refresh = async () => {
       limit: pagination.limit,
       keyword:
         searchKeyword.value.length === 0 ? undefined : searchKeyword.value,
+      orderBy: "status",
+      isAsc: false,
       abort: { signal }
     });
 

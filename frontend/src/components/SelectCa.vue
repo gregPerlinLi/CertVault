@@ -47,6 +47,8 @@ const refresh = async () => {
       page: Math.floor(caList.first / 10) + 1,
       limit: 10,
       keyword: caList.search,
+      orderBy: "status",
+      isAsc: false,
       abort: { signal: getSignal() }
     });
 
