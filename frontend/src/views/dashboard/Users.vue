@@ -21,8 +21,13 @@ const usrTbl = reactive({
   loading: false
 });
 const busy = reactive({
-  delSelUsrs: false,
-  updSelUsrRoles: false
+  delSelUsrs: false
+});
+const dialog = reactive({
+  target: null as UserProfileDTO | null,
+  createNewUsrs: false,
+  updRols: false,
+  updPasswd: false
 });
 
 /* Actions */
@@ -141,7 +146,8 @@ onMounted(() => refUsrTable.value?.refresh());
           label="Create New"
           severity="success"
           size="small"
-          :disabled="usrTbl.loading"></Button>
+          :disabled="usrTbl.loading"
+          @click="dialog.createNewUsrs = true"></Button>
         <Button
           icon="pi pi-trash"
           label="Delete Selected"
@@ -156,7 +162,7 @@ onMounted(() => refUsrTable.value?.refresh());
           severity="help"
           size="small"
           :disabled="usrTbl.selection.length === 0"
-          :loading="busy.updSelUsrRoles"></Button>
+          @click="dialog.updRols = true"></Button>
         <Button
           icon="pi pi-refresh"
           label="Refresh"
@@ -189,20 +195,35 @@ onMounted(() => refUsrTable.value?.refresh());
     selectable>
     <template #operations>
       <Column v-if="isSuperadmin">
-        <template #body>
+        <template #body="{ data }">
           <div class="gap-2 hidden justify-end group-hover:flex">
-            <Button
-              v-tooltip.top="{ value: 'Update Password', class: 'text-sm' }"
-              aria-label="Update Password"
-              class="h-6 w-6"
-              icon="pi pi-key"
+            <OperationButton
+              icon="pi-history"
+              label="Manage Sessions"
+              severity="help" />
+            <OperationButton
+              icon="pi-key"
+              label="Update Password"
               severity="success"
-              size="small"
-              variant="text"
-              rounded></Button>
+              @click="
+                () => {
+                  dialog.target = data;
+                  dialog.updPasswd = true;
+                }
+              " />
           </div>
         </template>
       </Column>
     </template>
   </UsrTbl>
+
+  <!-- Dialogs -->
+  <CreateNewUsrsDlg
+    v-model:visible="dialog.createNewUsrs"
+    @success="refUsrTable?.refresh()" />
+  <UpdUsrRolesDlg
+    v-model:visible="dialog.updRols"
+    :users="usrTbl.selection"
+    @success="refUsrTable?.refresh()" />
+  <UpdUsrPasswdDlg v-model:visible="dialog.updPasswd" :user="dialog.target" />
 </template>

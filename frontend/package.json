@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@vueuse/core": "^13.1.0",
-    "nanoid": "^5.1.5",
+    "csv-parse": "^5.6.0",
+    "lodash": "^4.17.21",
     "primeicons": "^7.0.0",
     "primevue": "^4.3.3",
     "tailwindcss": "^4.1.4",
@@ -25,6 +26,7 @@
     "@primeuix/themes": "^1.0.3",
     "@primevue/auto-import-resolver": "^4.3.3",
     "@tailwindcss/vite": "^4.1.4",
+    "@types/lodash": "^4.17.16",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/tsconfig": "^0.7.0",
     "prettier": "^3.5.3",
