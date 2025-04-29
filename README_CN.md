@@ -106,9 +106,12 @@ cd docker-compose
 docker compose -f docker-compose-with-postgres-redis.yml up -d
 ```
 ## 📚 使用指南
-- 如何安装
+- [如何部署](docs/Deployment_CN.md)
 - 如何使用
-- 环境配置
+
+## 📊 统计
+
+<img alt="Alt" src="https://repobeats.axiom.co/api/embed/cf9bca15eb390e1b9ee9cb5564672e8bf7760618.svg" title="Repobeats analytics image"/>
 
 ## 🤝 贡献
 贡献使开源社区成为学习、启发和创造的绝佳场所。您所做的任何贡献都**非常宝贵**。

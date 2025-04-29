@@ -110,9 +110,12 @@ docker compose -f docker-compose-with-postgres-redis.yml up -d
 
 ## 📚 Guidance
 
-- How to install
+- [How to deployment](docs/Deployment.md)
 - How to use
-- Configure the environment
+
+## 📊 Statistics
+
+<img alt="Alt" src="https://repobeats.axiom.co/api/embed/cf9bca15eb390e1b9ee9cb5564672e8bf7760618.svg" title="Repobeats analytics image"/>
 
 ## 🤝 Contributing
 
