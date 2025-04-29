@@ -265,7 +265,7 @@ watch(algorithm, (newValue) => {
             suffix=" day(s)"
             :default-value="30"
             :invalid="isInvalid('expiry')"
-            :max="365"
+            :max="variant === 'ca' ? 7300 : 365"
             :min="1"
             @focus="clearInvalid('expiry')"
             required
