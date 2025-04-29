@@ -50,7 +50,7 @@ const tryBind = async () => {
 watch(visible, async (newValue) => {
   if (newValue) {
     await nextTick();
-    refUsrTable.value?.reload();
+    refUsrTable.value?.reset();
     refUsrTable.value?.refresh();
   } else {
     refUsrTable.value?.cancel();

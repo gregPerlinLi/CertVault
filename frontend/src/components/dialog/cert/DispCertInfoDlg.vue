@@ -3,7 +3,6 @@ import type { CaInfoDTO, CertDetailDTO, CertInfoDTO } from "@api/types";
 import { analyzeCert } from "@api/user/cert";
 import { getCaCert } from "@api/user/cert/ca";
 import { getSslCert } from "@api/user/cert/ssl";
-import { useReloadableAsyncGuard } from "@utils/composable";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -16,7 +15,7 @@ const { variant, data } = defineProps<{
 
 /* Services */
 const { error } = useNotify();
-const { isActivate, getSignal, reload, cancel } = useReloadableAsyncGuard();
+const { isActive, getSignal, reset, cancel } = useAsyncGuard();
 
 /* Reactive */
 const details = ref<CertDetailDTO>();
@@ -39,7 +38,7 @@ const fetchDetails = async () => {
       uuid: data!.uuid,
       abort: { signal: getSignal() }
     });
-    if (!isActivate.value) {
+    if (!isActive.value) {
       return;
     }
 
@@ -47,13 +46,13 @@ const fetchDetails = async () => {
       cert: cert,
       abort: { signal: getSignal() }
     });
-    if (!isActivate.value) {
+    if (!isActive.value) {
       return;
     }
 
     details.value = result;
   } catch (err: unknown) {
-    if (isActivate.value) {
+    if (isActive.value) {
       canRetry.value = true;
       error((err as Error).message, "Fail to Get Detailed Info");
     }
@@ -63,7 +62,7 @@ const fetchDetails = async () => {
 /* Watch */
 watch(visible, (newValue) => {
   if (newValue) {
-    reload();
+    reset();
     fetchDetails();
   } else {
     cancel();

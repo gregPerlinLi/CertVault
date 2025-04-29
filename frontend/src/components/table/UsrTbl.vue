@@ -1,26 +1,9 @@
 <script setup lang="ts">
 import type { AbortOption, PageVO, UserProfileDTO } from "@api/types";
 import type { DataTableCellEditCompleteEvent } from "primevue/datatable";
-import { useReloadableAsyncGuard } from "@utils/composable";
-
-import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
-import LoadingPlaceholder from "@comps/placeholder/LoadingPlaceholder.vue";
 
 /* Async components */
-const AsyncDataTable = defineAsyncComponent({
-  suspensible: false,
-  loader: () => import("primevue/datatable"),
-  loadingComponent: LoadingPlaceholder,
-  errorComponent: ErrorPlaceholer,
-  onError: (err, retry, fail, attampts) => {
-    if (attampts < 5) {
-      retry();
-    } else {
-      error(err.message, "Fail to Load Data Table Component");
-      fail();
-    }
-  }
-});
+const AsyncDataTable = useAsyncDataTable();
 
 /* Models */
 const first = defineModel<number>("first", { default: 0 });
@@ -50,7 +33,7 @@ defineEmits<{
 
 /* Services */
 const { error } = useNotify();
-const { isActivate, getSignal, reload, cancel } = useReloadableAsyncGuard();
+const { isActive, getSignal, reset, cancel } = useAsyncGuard();
 
 /* Actions */
 const resetStates = () => {
@@ -63,7 +46,7 @@ const resetStates = () => {
   loading.value = false;
 };
 const refresh = async () => {
-  if (!isActivate.value) {
+  if (!isActive.value) {
     return;
   }
 
@@ -77,12 +60,12 @@ const refresh = async () => {
       { signal: getSignal() }
     );
 
-    if (isActivate.value) {
+    if (isActive.value) {
       totalRecords.value = page.total;
       data.value = page.list ?? [];
     }
   } catch (err: unknown) {
-    if (isActivate.value) {
+    if (isActive.value) {
       error((err as Error).message, "Fail to Fetch User List");
     }
   }
@@ -97,7 +80,7 @@ watchDebounced(search, () => refresh(), { debounce: 500 });
 defineExpose({
   refresh,
   resetStates,
-  reload,
+  reset,
   cancel
 });
 </script>

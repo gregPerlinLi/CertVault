@@ -2,7 +2,6 @@
 import type { CaInfoDTO } from "@api/types";
 import { getAllCaInfo } from "@api/admin/cert/ca";
 import { getAllBindedCaInfo } from "@api/user/cert/ca";
-import { useReloadableAsyncGuard } from "@utils/composable";
 
 /* Models */
 const selection = defineModel<CaInfoDTO | null>("selection");
@@ -21,7 +20,7 @@ defineEmits<{ focus: [] }>();
 
 /* Services */
 const { error } = useNotify();
-const { isActivate, reload, cancel, getSignal } = useReloadableAsyncGuard();
+const { isActive, getSignal, reset, cancel } = useAsyncGuard();
 
 /* Reactives */
 const caList = reactive({
@@ -52,12 +51,12 @@ const refresh = async () => {
       abort: { signal: getSignal() }
     });
 
-    if (isActivate.value) {
+    if (isActive.value) {
       caList.total = data.total;
       caList.data = data.list ?? [];
     }
   } catch (err: unknown) {
-    if (isActivate.value) {
+    if (isActive.value) {
       error((err as Error).message, "Fail to Fetch CA List");
     }
   }
@@ -69,7 +68,7 @@ watch(
   () => props.visible,
   (newValue) => {
     if (newValue) {
-      reload();
+      reset();
       refresh();
     } else {
       cancel();

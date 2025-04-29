@@ -8,27 +8,10 @@ import {
 import { getAllBindedCaInfo } from "@api/user/cert/ca";
 import { deleteSslCert, getAllSslCertInfo } from "@api/user/cert/ssl";
 import { useUserStore } from "@stores/user";
-import { useAsyncGuard } from "@utils/composable";
 import { useConfirm } from "primevue/useconfirm";
 
-import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
-import LoadingPlaceholder from "@comps/placeholder/LoadingPlaceholder.vue";
-
 /* Async components */
-const AsyncDataTable = defineAsyncComponent({
-  suspensible: false,
-  loader: () => import("primevue/datatable"),
-  loadingComponent: LoadingPlaceholder,
-  errorComponent: ErrorPlaceholer,
-  onError: (err, retry, fail, attampts) => {
-    if (attampts < 5) {
-      retry();
-    } else {
-      error("Fail to Load Data Table Component", err.message);
-      fail();
-    }
-  }
-});
+const AsyncDataTable = useAsyncDataTable();
 
 // Properties
 const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
@@ -36,7 +19,7 @@ const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 /* Services */
 const confirm = useConfirm();
 const { success, info, error, remove } = useNotify();
-const { isActivate, signal } = useAsyncGuard();
+const { isActive, getSignal } = useAsyncGuard();
 
 /* Stores */
 const { isUser, isAdmin, isSuperadmin } = useUserStore();
@@ -89,15 +72,15 @@ const refresh = async () => {
         searchKeyword.value.length === 0 ? undefined : searchKeyword.value,
       orderBy: "status",
       isAsc: false,
-      abort: { signal }
+      abort: { signal: getSignal() }
     });
 
-    if (isActivate.value) {
+    if (isActive.value) {
       pagination.total = page.total;
       pagination.data = page.list ?? [];
     }
   } catch (err: unknown) {
-    if (isActivate.value) {
+    if (isActive.value) {
       error(
         (err as Error).message,
         variant === "ca"
