@@ -78,7 +78,7 @@ const menuModel = computed(() =>
         {{ displayRole }} View
       </p>
       <p class="leading-none select-none text-center text-neutral-400 text-sm">
-        <a class="hover:text-blue-500" href="/swagger-ui" rel="noopener noreferer" target="_blank"
+        <a class="hover:text-blue-500" href="/swagger-ui/index.html" rel="noopener noreferer" target="_blank"
           >API Doc</a
         >
       </p>
