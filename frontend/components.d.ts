@@ -58,6 +58,7 @@ declare module 'vue' {
     Toast: typeof import('primevue/toast')['default']
     ToggleButton: typeof import('primevue/togglebutton')['default']
     Toolbar: typeof import('primevue/toolbar')['default']
+    UsrTable: typeof import('./src/components/UsrTable.vue')['default']
     UsrTbl: typeof import('./src/components/table/UsrTbl.vue')['default']
   }
   export interface ComponentCustomProperties {
