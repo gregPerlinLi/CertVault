@@ -38,6 +38,8 @@ declare module 'vue' {
     InputNumber: typeof import('primevue/inputnumber')['default']
     InputText: typeof import('primevue/inputtext')['default']
     LoadingPlaceholder: typeof import('./src/components/placeholder/LoadingPlaceholder.vue')['default']
+    NewUsrsDlg: typeof import('./src/components/dialog/user/NewUsrsDlg.vue')['default']
+    OperationButton: typeof import('./src/components/button/OperationButton.vue')['default']
     Paginator: typeof import('primevue/paginator')['default']
     Panel: typeof import('primevue/panel')['default']
     PanelMenu: typeof import('primevue/panelmenu')['default']
@@ -59,6 +61,8 @@ declare module 'vue' {
     Toast: typeof import('primevue/toast')['default']
     ToggleButton: typeof import('primevue/togglebutton')['default']
     Toolbar: typeof import('primevue/toolbar')['default']
+    UpdUsrPasswdDlg: typeof import('./src/components/dialog/user/UpdUsrPasswdDlg.vue')['default']
+    UpdUsrRolesDlg: typeof import('./src/components/dialog/user/UpdUsrRolesDlg.vue')['default']
     UsrTable: typeof import('./src/components/UsrTable.vue')['default']
     UsrTbl: typeof import('./src/components/table/UsrTbl.vue')['default']
   }

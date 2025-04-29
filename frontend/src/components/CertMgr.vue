@@ -324,77 +324,49 @@ onBeforeMount(() => refresh());
     <Column>
       <template #body="{ data }">
         <div class="gap-2 hidden justify-end group-hover:flex">
-          <Button
-            v-tooltip.top="{ value: 'Info', class: 'text-sm' }"
-            aria-label="Certificate information"
-            class="h-6 w-6"
-            icon="pi pi-info-circle"
+          <OperationButton
+            icon="pi-info-circle"
+            label="Show Details"
             severity="info"
-            size="small"
-            variant="text"
-            rounded
             @click="
               () => {
                 targetCertData = data;
                 dialog.showInfo = true;
               }
-            "></Button>
-          <Button
-            v-tooltip.top="{ value: 'Export', class: 'text-sm' }"
-            aria-label="Export certificate"
-            class="h-6 w-6"
-            icon="pi pi-file-export"
+            " />
+          <OperationButton
+            icon="pi-file-export"
+            label="Export"
             severity="success"
-            size="small"
-            variant="text"
-            rounded
             @click="
               () => {
                 targetCertData = data;
                 dialog.exportCert = true;
               }
-            "></Button>
-          <Button
+            " />
+          <OperationButton
             v-if="variant === 'ssl' || isAdmin || isSuperadmin"
-            v-tooltip.top="{ value: 'Renew', class: 'text-sm' }"
-            aria-label="Renew certificate"
-            class="h-6 w-6"
-            icon="pi pi-sync"
-            severity="secondary"
-            size="small"
-            variant="text"
-            rounded
+            icon="pi-sync"
+            label="Renew"
+            severity="help"
             @click="
               () => {
                 targetCertData = data;
                 dialog.renewCert = true;
               }
-            "></Button>
-          <Button
+            " />
+          <OperationButton
             v-if="variant === 'ca' && (isAdmin || isSuperadmin)"
-            v-tooltip.top="{
-              value: data.available ? 'Disable' : 'Enable',
-              class: 'text-sm'
-            }"
-            class="h-6 w-6"
-            size="small"
-            variant="text"
-            :aria-label="data.available ? 'Disable' : 'Enable'"
-            :icon="data.available ? 'pi pi-ban' : 'pi pi-check-circle'"
+            :icon="data.available ? 'pi-ban' : 'pi-check-circle'"
+            :label="data.available ? 'Disable' : 'Enable'"
             :severity="data.available ? 'danger' : 'success'"
-            rounded
-            @click="tryToggleCertAvailable(data)"></Button>
-          <Button
+            @click="tryToggleCertAvailable(data)" />
+          <OperationButton
             v-if="variant === 'ssl' || isAdmin || isSuperadmin"
-            v-tooltip.top="{ value: 'Delete', class: 'text-sm' }"
-            aria-label="Delete certificate"
-            class="h-6 w-6"
-            icon="pi pi-trash"
+            icon="pi-trash"
+            label="Delete"
             severity="danger"
-            size="small"
-            variant="text"
-            rounded
-            @click="tryDelCert(data)"></Button>
+            @click="tryDelCert(data)" />
         </div>
       </template>
     </Column>
