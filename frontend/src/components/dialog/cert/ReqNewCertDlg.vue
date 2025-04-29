@@ -2,7 +2,6 @@
 import type { CaInfoDTO } from "@api/types";
 import { requestCaCert } from "@api/admin/cert/ca";
 import { requestSslCert } from "@api/user/cert/ssl";
-import { useFormValidator } from "@utils/composable";
 import { reqNewCertSchema } from "@utils/schema";
 
 /* Models */

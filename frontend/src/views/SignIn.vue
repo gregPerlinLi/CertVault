@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { login } from "@api/authentication";
 import { oidcLogin } from "@api/authentication/oauth";
-import { useCommonStore } from "@stores/common";
-import { useUserStore } from "@stores/user";
-import { useFormValidator } from "@utils/composable";
 import { signInSchema } from "@utils/schema";
 
 /* Services */
