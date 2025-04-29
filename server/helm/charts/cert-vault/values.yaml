@@ -130,8 +130,14 @@ init:
     password: "changeme"
 
 ## Encryption configuration
-## @param encrypt.rsa.key.publicKey The public key used for RSA encryption
-## @param encrypt.rsa.key.privateKey The private key used for RSA decryption
+## @param encrypt.rsa.key.publicKey The BASE64 encoded pem format public key used for RSA encryption
+## @param encrypt.rsa.key.privateKey The BASE64 encoded pem format private key used for RSA decryption
+##
+## How to Generate:
+## openssl genpkey -algorithm RSA -out private.key -pkeyopt rsa_keygen_bits:2048
+## openssl rsa -in private.key -pubout -out public.key
+## Public key: cat public.key | base64
+## Private key: cat private.key | base64
 ##
 encrypt:
   rsa:
