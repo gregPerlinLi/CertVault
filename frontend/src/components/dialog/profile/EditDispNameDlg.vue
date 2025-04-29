@@ -55,11 +55,12 @@ const submit = async () => {
 };
 
 /* Watches */
-watch(visible, () => {
-  if (!visible.value) {
+watch(visible, (newValue) => {
+  if (newValue) {
+    newDisplayName.value = props.value;
+  } else {
     invalid.value = false;
     busy.value = false;
-    newDisplayName.value = props.value;
   }
 });
 </script>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { MenuItem } from "primevue/menuitem";
-import { useUserStore } from "@stores/user";
 
 /* Services */
 const router = useRouter();

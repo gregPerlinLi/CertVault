@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { logout } from "@api/authentication";
-import { useUserStore } from "@stores/user";
 import { useConfirm } from "primevue/useconfirm";
 
 /* Services */
@@ -30,9 +29,9 @@ const trySignOut = () =>
       try {
         await logout({ abort: { timeout: -1 } });
 
-        success("Successfully signed out");
         user.clear();
         router.push("/");
+        success("Successfully signed out");
       } catch (err: unknown) {
         error((err as Error).message, "Fail to Sign out");
       }

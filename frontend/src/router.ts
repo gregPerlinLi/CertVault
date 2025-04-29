@@ -1,5 +1,3 @@
-import { useCommonStore } from "@stores/common";
-import { useUserStore } from "@stores/user";
 import { useToast } from "primevue/usetoast";
 import { createRouter, createWebHistory } from "vue-router";
 

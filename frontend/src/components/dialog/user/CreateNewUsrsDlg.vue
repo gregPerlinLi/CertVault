@@ -65,9 +65,9 @@ const submit = async () => {
 
   try {
     await createMultiUsrs({ list: users.value });
-    success("Successfully updated");
     visible.value = false;
     emits("success");
+    success("Successfully updated");
   } catch (err: unknown) {
     error((err as Error).message, "Fail to Update");
   }

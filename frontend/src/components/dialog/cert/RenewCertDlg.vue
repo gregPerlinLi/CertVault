@@ -38,9 +38,9 @@ const onSubmit = async (ev: Event) => {
   try {
     await renewCertFn.value({ uuid: data!.uuid, expiry });
 
-    success("Successfully renewed");
     emits("success");
     visible.value = false;
+    success("Successfully renewed");
   } catch (err: unknown) {
     error((err as Error).message, "Fail to Renew");
   }
@@ -74,7 +74,7 @@ watch(visible, () => {
           size="small"
           suffix=" day(s)"
           :default-value="30"
-          :max="365"
+          :max="variant === 'ca' ? 7300 : 365"
           :min="1"
           required
           show-buttons />

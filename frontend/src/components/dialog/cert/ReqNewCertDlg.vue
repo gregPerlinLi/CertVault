@@ -51,12 +51,12 @@ const onSubmit = async (ev: Event) => {
   // Validate form
   const result = validate(ev.target as HTMLFormElement);
   if (!result.success) {
-    error(result.issues![0].message, "Validation Error");
+    warn(result.issues![0].message, "Validation Error");
     return;
   }
   if (variant === "ssl" && caSelection.value === null) {
     setInvalid("ca-uuid");
-    error("CA is required", "Validation Error");
+    warn("CA is required", "Validation Error");
     return;
   }
 
@@ -74,9 +74,9 @@ const onSubmit = async (ev: Event) => {
       abort: { timeout: -1 }
     });
 
-    success("Successfully requested");
     emits("success");
     visible.value = false;
+    success("Successfully requested");
   } catch (err: unknown) {
     error((err as Error).message, "Fail to Request");
   }

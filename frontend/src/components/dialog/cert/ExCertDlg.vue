@@ -3,7 +3,6 @@ import type { CaInfoDTO, CertInfoDTO } from "@api/types";
 import { getCaPrivKey } from "@api/admin/cert/ca";
 import { getCaCert } from "@api/user/cert/ca";
 import { getSslCert, getSslPrivKey } from "@api/user/cert/ssl";
-import { useUserStore } from "@stores/user";
 import { b64ToU8Arr, saveFile } from "@utils/index";
 
 /* Models */

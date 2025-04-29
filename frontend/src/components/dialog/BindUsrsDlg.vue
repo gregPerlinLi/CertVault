@@ -35,9 +35,9 @@ const tryBind = async () => {
       usernames: usrTable.selection.map(({ username }) => username)
     });
 
-    success("Successfully binded");
     emits("success");
     visible.value = false;
+    success("Successfully binded");
   } catch (err: unknown) {
     error((err as Error).message, "Fail to Bind");
   }

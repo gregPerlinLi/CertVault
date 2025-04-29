@@ -7,7 +7,6 @@ import {
 } from "@api/admin/cert/ca";
 import { getAllBindedCaInfo } from "@api/user/cert/ca";
 import { deleteSslCert, getAllSslCertInfo } from "@api/user/cert/ssl";
-import { useUserStore } from "@stores/user";
 import { useConfirm } from "primevue/useconfirm";
 
 /* Async components */

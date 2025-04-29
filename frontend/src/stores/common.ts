@@ -2,7 +2,6 @@ import type { OidcProviderDTO } from "@api/types";
 import type { ToastServiceMethods } from "primevue/toastservice";
 import { getOidcProviders } from "@api/authentication/oauth";
 import { getProfile } from "@api/user/user";
-import { useUserStore } from "@stores/user";
 
 // Export store
 export const useCommonStore = createGlobalState(() => {

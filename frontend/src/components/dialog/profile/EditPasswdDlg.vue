@@ -46,8 +46,8 @@ const submit = async () => {
 };
 
 /* Watches */
-watch(visible, () => {
-  if (!visible.value) {
+watch(visible, (newValue) => {
+  if (!newValue) {
     invalid.value = false;
     busy.value = false;
     oldPassword.value = "";

@@ -16,7 +16,7 @@ const { variant, data } = defineProps<{
 }>();
 
 /* Services */
-const { success, info, error, remove } = useNotify();
+const { success, info, warn, error, remove } = useNotify();
 
 /* Reactive */
 const busy = ref(false);
@@ -36,12 +36,12 @@ const onSubmit = async (ev: Event) => {
   const comment = formData.get("comment")?.toString().trim() ?? "";
   if (comment === data!.comment) {
     invalid.value = true;
-    error("No changes found", "Validation Error");
+    warn("No changes found");
     return;
   }
   if (comment.length === 0) {
     invalid.value = true;
-    error("Comment is required", "Validation Error");
+    warn("Comment is required");
     return;
   }
 
@@ -51,10 +51,9 @@ const onSubmit = async (ev: Event) => {
 
   try {
     await updCertCmtFn.value({ uuid: data!.uuid, comment });
-
-    success("Successfully updated comment");
     emits("success");
     visible.value = false;
+    success("Successfully updated comment");
   } catch (err: unknown) {
     error((err as Error).message, "Fail to Update Comment");
   }

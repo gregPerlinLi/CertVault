@@ -55,11 +55,12 @@ const submit = async () => {
 };
 
 /* Watches */
-watch(visible, () => {
-  if (!visible.value) {
+watch(visible, (newValue) => {
+  if (newValue) {
+    newEmail.value = props.value;
+  } else {
     invalid.value = false;
     busy.value = false;
-    newEmail.value = props.value;
   }
 });
 </script>

@@ -26,13 +26,6 @@ const submit = async () => {
   // Clear error flag
   invalid.value = false;
 
-  // Validate
-  if (newPassword.value.length === 0) {
-    invalid.value = true;
-    error("New password is required", "Validation Error");
-    return;
-  }
-
   // Try to update
   busy.value = true;
   const msg = info("Updating");
@@ -42,8 +35,8 @@ const submit = async () => {
       username: props.user.username,
       newPassword: newPassword.value
     });
-    success("Successfully updated");
     visible.value = false;
+    success("Successfully updated");
   } catch (err: unknown) {
     error((err as Error).message, "Fail to Update");
   }
@@ -76,6 +69,7 @@ watch(visible, () => {
         placeholder="New Password"
         :disabled="busy"
         :invalid="invalid"
+        required
         toggle-mask />
       <div class="flex justify-end gap-2">
         <Button

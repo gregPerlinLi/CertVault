@@ -7,9 +7,8 @@ import { useConfirm } from "primevue/useconfirm";
 const confirm = useConfirm();
 const { success, info, error, remove } = useNotify();
 
-const refUsrTable = useTemplateRef("usr-table");
-
 /* Reactives */
+const refUsrTable = useTemplateRef("usr-table");
 const busyUnbind = ref(false);
 const caSelection = ref<CaInfoDTO | null>(null);
 
@@ -42,9 +41,9 @@ const tryUnbind = () =>
           usernames: usrTable.selection.map(({ username }) => username)
         });
 
-        success("Successfully unbinded");
         usrTable.selection = [];
         refUsrTable.value?.refresh();
+        success("Successfully unbinded");
       } catch (err: unknown) {
         error((err as Error).message, "Fail to Unbind");
       }

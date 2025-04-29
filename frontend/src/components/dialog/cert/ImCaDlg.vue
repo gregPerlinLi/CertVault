@@ -9,7 +9,7 @@ const visible = defineModel<boolean>("visible");
 const emits = defineEmits<{ success: [] }>();
 
 /* Services */
-const { success, info, error, remove } = useNotify();
+const { success, info, warn, error, remove } = useNotify();
 
 /* Reactive */
 const busy = ref(false);
@@ -42,19 +42,19 @@ const onSubmit = async (ev: Event) => {
 
   // Validate data
   if (certData.value === undefined) {
-    error("Certificate not selected", "Validation Error");
+    warn("Certificate not selected");
     return;
   }
 
   if (keyData.value === undefined) {
-    error("Private key not selected", "Validation Error");
+    warn("Private key not selected");
     return;
   }
 
   const comment = formData.get("comment")?.toString().trim() ?? "";
   if (comment.length === 0) {
     invalid.value = true;
-    error("Comment is required", "Validation Error");
+    warn("Comment is required");
     return;
   }
 
@@ -68,9 +68,9 @@ const onSubmit = async (ev: Event) => {
       privkey: keyData.value,
       comment
     });
-    success("Successfully imported");
     emits("success");
     visible.value = false;
+    success("Successfully imported");
   } catch (err: unknown) {
     error((err as Error).message, "Fail to Import");
   }

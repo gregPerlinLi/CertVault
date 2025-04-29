@@ -3,19 +3,17 @@ import type { UserProfileDTO } from "@api/types";
 import type { DataTableCellEditCompleteEvent } from "primevue/datatable";
 import { getAllUsrInfo } from "@api/admin/user";
 import { deleteMultiUsrs, updateUsrInfo } from "@api/superadmin/user";
-import { useUserStore } from "@stores/user";
 import { useConfirm } from "primevue/useconfirm";
 
 /* Services */
 const confirm = useConfirm();
 const { success, info, warn, error, remove } = useNotify();
 
-const refUsrTable = useTemplateRef("user-table");
-
 /* Stores */
 const { isSuperadmin } = useUserStore();
 
 /* Reactive */
+const refUsrTable = useTemplateRef("user-table");
 const usrTbl = reactive({
   selection: [] as UserProfileDTO[],
   loading: false

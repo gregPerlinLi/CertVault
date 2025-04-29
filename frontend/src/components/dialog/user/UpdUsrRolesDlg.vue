@@ -35,9 +35,9 @@ const submit = async () => {
       usernames: props.users.map(({ username }) => username),
       role: role.value
     });
-    success("Successfully updated");
     emits("success");
     visible.value = false;
+    success("Successfully updated");
   } catch (err: unknown) {
     error((err as Error).message, "Fail to Update");
   }
