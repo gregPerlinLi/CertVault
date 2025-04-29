@@ -8,24 +8,29 @@ import { callRestfulApi } from "@api/index";
 
 export interface GetAllLoginRecsParams
   extends BaseParams,
-    PageParams<
-      | "user"
-      | "loginTime"
-      | "ip"
-      | "region"
-      | "province"
-      | "city"
-      | "platform"
-      | "os"
-      | "browser"
+    Omit<
+      PageParams<
+        | "user"
+        | "loginTime"
+        | "ip"
+        | "region"
+        | "province"
+        | "city"
+        | "platform"
+        | "os"
+        | "browser"
+      >,
+      "keyword"
     > {
+  username: string;
   status?: -1 | 0 | 1;
 }
-export const getAllLoginRecs = (params: GetAllLoginRecsParams = {}) =>
+export const getUsrAllLoginRecs = (params: GetAllLoginRecsParams) =>
   callRestfulApi<PageVO<LoginRecordDTO>>({
     method: "GET",
-    baseUrl: "/api/v1/superadmin/user/session",
-    searchParams: { ...params, abort: undefined },
+    baseUrl: "/api/v1/superadmin/user/session/{username}",
+    pathNames: params,
+    searchParams: { ...params, username: undefined, abort: undefined },
     abort: params.abort
   });
 

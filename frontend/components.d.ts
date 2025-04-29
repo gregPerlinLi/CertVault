@@ -39,6 +39,7 @@ declare module 'vue' {
     InputNumber: typeof import('primevue/inputnumber')['default']
     InputText: typeof import('primevue/inputtext')['default']
     LoadingPlaceholder: typeof import('./src/components/placeholder/LoadingPlaceholder.vue')['default']
+    MngUsrSessDlg: typeof import('./src/components/dialog/user/MngUsrSessDlg.vue')['default']
     OfflineSessTbl: typeof import('./src/components/table/OfflineSessTbl.vue')['default']
     OnlineSessTbl: typeof import('./src/components/table/OnlineSessTbl.vue')['default']
     OperationButton: typeof import('./src/components/button/OperationButton.vue')['default']

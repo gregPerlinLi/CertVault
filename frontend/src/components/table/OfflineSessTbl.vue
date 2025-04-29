@@ -58,8 +58,8 @@ defineExpose({
     data-key="uuid"
     size="small"
     :loading="loading"
-    :value="data"
-    row-hover>
+    :row-hover="data.length > 0"
+    :value="data">
     <template #header>
       <Button
         icon="pi pi-refresh"

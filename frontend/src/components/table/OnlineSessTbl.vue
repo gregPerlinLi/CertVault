@@ -33,6 +33,9 @@ const busy = reactive({
 });
 
 /* Computed */
+const hasCurrent = computed(
+  () => !data.value.every(({ isCurrentSession }) => !isCurrentSession)
+);
 const canSignOutSel = computed(
   () =>
     selectionFlags.value
@@ -147,8 +150,8 @@ defineExpose({
     size="small"
     :loading="loading"
     :pt="{ header: { class: 'flex gap-4' } }"
-    :value="data"
-    row-hover>
+    :row-hover="data.length > 0"
+    :value="data">
     <template #header>
       <Button
         icon="pi pi-refresh"
@@ -169,6 +172,7 @@ defineExpose({
         label="Sign out all"
         severity="danger"
         size="small"
+        :disabled="data.length === 0"
         :loading="busy.signOutAll"
         @click="trySignOutAll()"></Button>
     </template>
@@ -204,8 +208,7 @@ defineExpose({
               const cnt = selectionFlags
                 .slice(0, -1)
                 .reduce((cnt, cur) => (cur ? cnt + 1 : cnt), 0);
-              console.log(cnt, selectionFlags, selectionFlags.length);
-              if (cnt === selectionFlags.length - 2) {
+              if (cnt === selectionFlags.length - (hasCurrent ? 2 : 1)) {
                 selectionFlags[selectionFlags.length - 1] = true;
               } else {
                 selectionFlags[selectionFlags.length - 1] = false;

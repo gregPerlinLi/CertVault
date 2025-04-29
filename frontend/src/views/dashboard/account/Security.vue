@@ -3,7 +3,6 @@ import { forceLogoutUsr, getUsrLoginRecs } from "@api/user/user";
 
 /* Services */
 const router = useRouter();
-const { getSignal } = useAsyncGuard();
 
 /* Stores */
 const user = useUserStore();
@@ -46,12 +45,14 @@ onMounted(() => {
   <OnlineSessTbl
     ref="online-sess-tbl"
     :fetch-fn="
-      () =>
+      (abort) =>
         getUsrLoginRecs({
           page: 1,
           limit: 5,
           status: 1,
-          abort: { signal: getSignal() }
+          orderBy: 'loginTime',
+          isAsc: false,
+          abort
         })
     "
     :sign-out-all-fn="
@@ -66,14 +67,14 @@ onMounted(() => {
   <OfflineSessTbl
     ref="offline-sess-tbl"
     :fetch-fn="
-      () =>
+      (abort) =>
         getUsrLoginRecs({
           page: 1,
           limit: 20,
           status: 0,
           orderBy: 'loginTime',
           isAsc: false,
-          abort: { signal: getSignal() }
+          abort
         })
     " />
 </template>

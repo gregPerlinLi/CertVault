@@ -5,7 +5,7 @@
 - [x] Refactor certificate management
 - [x] Bind/Unbind CA/SSL to user
 - [x] Dashboard
-- [ ] User management
+- [x] User management
 
 # Tasks
 
@@ -13,7 +13,7 @@
 - [x] Create dialog for update users' roles
 - [x] Create dialog for update user's password
 - [x] Split login record tables
-- [ ] User session control
+- [x] User session control
 
 # Issues
 

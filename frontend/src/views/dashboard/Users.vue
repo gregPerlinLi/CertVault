@@ -25,6 +25,7 @@ const dialog = reactive({
   target: null as UserProfileDTO | null,
   createNewUsrs: false,
   updRols: false,
+  mngSess: false,
   updPasswd: false
 });
 
@@ -198,7 +199,13 @@ onMounted(() => refUsrTable.value?.refresh());
             <OperationButton
               icon="pi-history"
               label="Manage Sessions"
-              severity="help" />
+              severity="help"
+              @click="
+                () => {
+                  dialog.target = data;
+                  dialog.mngSess = true;
+                }
+              " />
             <OperationButton
               icon="pi-key"
               label="Update Password"
@@ -223,5 +230,6 @@ onMounted(() => refUsrTable.value?.refresh());
     v-model:visible="dialog.updRols"
     :users="usrTbl.selection"
     @success="refUsrTable?.refresh()" />
+  <MngUsrSessDlg v-model:visible="dialog.mngSess" :user="dialog.target" />
   <UpdUsrPasswdDlg v-model:visible="dialog.updPasswd" :user="dialog.target" />
 </template>
