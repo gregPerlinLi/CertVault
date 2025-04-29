@@ -38,10 +38,6 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           target: env.VITE_TEST_SERVER_TARGET
         },
-        "/devcenter-api": {
-          changeOrigin: true,
-          target: env.VITE_TEST_SERVER_TARGET
-        },
         "/swagger-ui": {
           changeOrigin: true,
           target: env.VITE_TEST_SERVER_TARGET
