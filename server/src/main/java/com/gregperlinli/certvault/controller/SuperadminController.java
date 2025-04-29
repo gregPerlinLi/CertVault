@@ -88,6 +88,43 @@ public class SuperadminController {
     }
 
     /**
+     * Get user's login records
+     *
+     * @param username the username
+     * @param status the status of the login record (-1: all, 0: offline, 1: online)
+     * @param page the page number
+     * @param limit the number of records per page
+     * @param request the request
+     * @return user's login records
+     */
+    @Operation(
+            summary = "Get user's login records",
+            description = "Get a user's login records"
+    )
+    @NoDataListApiResponse
+    @SuccessApiResponse
+    @GetMapping(value = "/user/session/{username}")
+    public ResultVO<PageDTO<LoginRecordDTO>> getUserLoginRecords(@Parameter(name = "username", description = "Username", example = "gregPerlinLi")
+                                                                     @PathVariable("username") String username,
+                                                                 @Parameter(name = "status", description = "Status of the login record (-1: all, 0: offline, 1: online)", example = "-1")
+                                                                    @RequestParam(value = "status", defaultValue = "-1") Integer status,
+                                                                 @Parameter(name = "page", description = "Page number", example = "1")
+                                                                    @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                                 @Parameter(name = "limit", description = "Number of records per page", example = "10")
+                                                                    @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                                 @Parameter(name = "orderBy", description = "Order by field", example = "username")
+                                                                    @RequestParam(value = "orderBy", required = false) String orderBy,
+                                                                 @Parameter(name = "isAsc", description = "Ascending or descending", example = "true")
+                                                                    @RequestParam(value = "isAsc", required = false, defaultValue = "true") Boolean isAsc,
+                                                                 HttpServletRequest request) {
+        PageDTO<LoginRecordDTO> result = loginRecordService.getUserLoginRecords(username, status, request.getSession().getId(), page, limit, isAsc, orderBy);
+        if ( result != null && result.getList() != null ) {
+            return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
+        }
+        return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "No data", result);
+    }
+
+    /**
      * Force logout a user
      *
      * @param username the username of the user to be logged out
