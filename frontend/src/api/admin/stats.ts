@@ -7,7 +7,7 @@ export interface CountAllUsrsParams extends BaseParams {
 export const countAllUsrs = (params: CountAllUsrsParams = {}) =>
   callRestfulApi<number>({
     method: "GET",
-    baseUrl: "/api/v1/superadmin/user/count",
+    baseUrl: "/api/v1/admin/users/count",
     searchParams: { ...params, abort: undefined },
     abort: params.abort
   });

@@ -8,7 +8,7 @@ export const countBindedCa = (params: BaseParams = {}) =>
     abort: params.abort
   });
 
-export const countRequestedSslCert = (params: BaseParams = {}) =>
+export const countRequestedSslCerts = (params: BaseParams = {}) =>
   callRestfulApi<number>({
     method: "GET",
     baseUrl: "/api/v1/user/cert/ssl/count",

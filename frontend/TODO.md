@@ -4,8 +4,8 @@
 - [x] Support OAuth
 - [x] Refactor certificate management
 - [x] Bind/Unbind CA/SSL to user
+- [x] Dashboard
 - [ ] User management
-- [ ] Dashboard
 
 # Tasks
 
