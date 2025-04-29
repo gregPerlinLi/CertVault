@@ -61,6 +61,7 @@ CertVault 的设计目标是：
 ## 🚀 功能
 
 ### 核心功能
+
 - 🔐 **证书管理**  
   支持自签署 CA 创建、SSL 证书签发、证书详情查看、评论编辑、导出和续期
 - 🛠 **用户权限**  
@@ -75,12 +76,14 @@ CertVault 的设计目标是：
 ## 技术栈
 
 ### 🌐 前端
+
 - **Vue.js 3** + **Vite**
 - **PrimeVue** UI 组件
 - **TailwindCSS** 响应式样式
 - **TypeScript** 类型化开发
 
 ### 🖥️ 后端
+
 - **Java 17** + **Spring Boot 3**
 - **MyBatis-Plus** ORM 框架
 - **Druid** 数据库连接池
@@ -88,6 +91,7 @@ CertVault 的设计目标是：
 - **Helm Chart** Kubernetes 部署
 
 ### 📦 其他
+
 - **Kubernetes** 容器编排
 - **Prometheus** 监控指标
 - **传统/OIDC** 认证
@@ -106,8 +110,14 @@ cd docker-compose
 docker compose -f docker-compose-with-postgres-redis.yml up -d
 ```
 ## 📚 使用指南
+
 - [如何部署](docs/Deployment_CN.md)
 - 如何使用
+
+## 🧰 相关项目
+
+- [CertVault CLI](https://github.com/gregPerlinLi/CertVaultCLI): CertVault 的命令行工具
+- [CertVault Charts](https://github.com/gregPerlinLi/certvault-charts): CertVault 的 Helm Chart
 
 ## 📊 统计
 
