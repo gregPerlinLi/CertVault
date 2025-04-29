@@ -43,7 +43,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     StringRedisTemplate stringRedisTemplate;
 
     @Resource
-    RedisTemplate redisTemplate;
+    RedisTemplate<String, UserProfileDTO> redisTemplate;
 
     private static final int BATCH_SIZE = 500;
 
