@@ -12,7 +12,7 @@
 - [x] Create dialog for create new users
 - [x] Create dialog for update users' roles
 - [x] Create dialog for update user's password
-- [ ] Split login record tables
+- [x] Split login record tables
 - [ ] User session control
 
 # Issues
@@ -20,4 +20,4 @@
 - [x] Get all users with filter of binded CA
 - [x] Extract user table component
 - [x] Waiting for pagination order by update
-- [ ] Buttons disable logic
+- [x] Buttons disable logic
