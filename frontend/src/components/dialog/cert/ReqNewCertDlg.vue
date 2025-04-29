@@ -96,7 +96,7 @@ watch(visible, (newValue) => {
   }
 });
 watch(caSelection, (newValue) => {
-  if (newValue !== null && !newValue.allowSubCa) {
+  if (variant === "ca" && newValue !== null && !newValue.allowSubCa) {
     queueMicrotask(() => {
       caSelection.value = null;
       warn(`"${newValue.comment}" is not allowed to have sub-CA`);
