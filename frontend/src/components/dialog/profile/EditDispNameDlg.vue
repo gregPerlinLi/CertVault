@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { getProfile, updateProfile } from "@api/user/user";
-import { useUserStore } from "@stores/user";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -9,7 +8,7 @@ const visible = defineModel<boolean>("visible");
 const props = defineProps<{ value: string }>();
 
 /* Services */
-const { success, info, error, remove } = useNotify();
+const { success, info, warn, error, remove } = useNotify();
 
 /* Stores */
 const user = useUserStore();
@@ -28,12 +27,12 @@ const submit = async () => {
   // Validate
   if (newDisplayName.value.length === 0) {
     invalid.value = true;
-    error("New display name is required", "Validation Error");
+    warn("New display name is required");
     return;
   }
   if (newDisplayName.value === props.value) {
     invalid.value = true;
-    error("No changes found", "Validation Error");
+    warn("No changes found");
     return;
   }
 
@@ -45,8 +44,8 @@ const submit = async () => {
     await updateProfile({ displayName: newDisplayName.value });
     const profile = await getProfile({ abort: { timeout: -1 } });
     user.update(profile);
-    success("Successfully updated profile");
     visible.value = false;
+    success("Successfully updated profile");
   } catch (err: unknown) {
     error((err as Error).message, "Fail to Update Profile");
   }

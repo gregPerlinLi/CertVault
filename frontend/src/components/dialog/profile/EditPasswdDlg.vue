@@ -6,7 +6,7 @@ const visible = defineModel<boolean>("visible");
 const newPassword = defineModel<string>("new-password");
 
 /* Services */
-const { success, info, error, remove } = useNotify();
+const { success, info, warn, error, remove } = useNotify();
 
 /* Reactive */
 const invalid = ref(false);
@@ -22,7 +22,7 @@ const submit = async () => {
   // Validate
   if (oldPassword.value.length === 0) {
     invalid.value = true;
-    error("Old password is required", "Validation Error");
+    warn("Old password is required");
     return;
   }
 
@@ -35,8 +35,8 @@ const submit = async () => {
       oldPassword: oldPassword.value,
       newPassword: newPassword.value
     });
-    success("Successfully updated profile");
     visible.value = false;
+    success("Successfully updated profile");
   } catch (err: unknown) {
     error((err as Error).message, "Fail to Update Profile");
   }

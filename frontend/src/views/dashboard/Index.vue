@@ -2,6 +2,7 @@
 import { countAllUsrs, countRequestedCaCerts } from "@/api/admin/stats";
 import { countAllCaCerts, countAllSslCerts } from "@/api/superadmin/stats";
 import { countBindedCa, countRequestedSslCerts } from "@/api/user/stats";
+
 import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
 import LoadingPlaceholder from "@comps/placeholder/LoadingPlaceholder.vue";
 
