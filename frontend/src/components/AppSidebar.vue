@@ -77,6 +77,11 @@ const menuModel = computed(() =>
       <p class="leading-none select-none text-center text-neutral-400 text-sm">
         {{ displayRole }} View
       </p>
+      <p class="leading-none select-none text-center text-neutral-400 text-sm">
+        <a class="hover:text-blue-500" href="/devcenter-api" rel="noopener noreferer" target="_blank"
+          >API Doc</a
+        >
+      </p>
     </div>
   </aside>
 </template>
