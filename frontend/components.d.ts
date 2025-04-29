@@ -39,6 +39,7 @@ declare module 'vue' {
     InputText: typeof import('primevue/inputtext')['default']
     LoadingPlaceholder: typeof import('./src/components/placeholder/LoadingPlaceholder.vue')['default']
     Paginator: typeof import('primevue/paginator')['default']
+    Panel: typeof import('primevue/panel')['default']
     PanelMenu: typeof import('primevue/panelmenu')['default']
     Password: typeof import('primevue/password')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
