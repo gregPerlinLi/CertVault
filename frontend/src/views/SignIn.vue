@@ -8,7 +8,7 @@ import { signInSchema } from "@utils/schema";
 
 /* Services */
 const router = useRouter();
-const { success, info, error, remove } = useNotify();
+const { success, info, warn, error, remove } = useNotify();
 const { isInvalid, clearInvalid, validate } = useFormValidator(signInSchema);
 
 /* Stores */
@@ -19,11 +19,11 @@ const user = useUserStore();
 const busy = ref(false);
 
 /* Actions */
-async function trySignIn(ev: Event): Promise<void> {
+const trySignIn = async (ev: Event) => {
   // Validate form
   const result = validate(ev.target as HTMLFormElement);
   if (!result.success) {
-    error(result.issues![0].message, "Validation Error");
+    warn(result.issues![0].message);
     return;
   }
 
@@ -39,15 +39,15 @@ async function trySignIn(ev: Event): Promise<void> {
     });
 
     user.update(profile);
-    success("Successfully signed in");
     router.push("/dashboard");
+    success("Successfully signed in");
   } catch (err: unknown) {
     error((err as Error).message, "Fail to Sign in");
   }
 
   remove(msg);
   busy.value = false;
-}
+};
 </script>
 
 <template>
