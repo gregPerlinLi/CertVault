@@ -76,6 +76,8 @@ public class UserController {
      * @param status Login status (-1: all, 0: offline, 1:online)
      * @param page Page number
      * @param limit Page limit
+     * @param orderBy the order by field
+     * @param isAsc the ascending or descending
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
@@ -93,13 +95,19 @@ public class UserController {
                                                                  @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                              @Parameter(name = "limit", description = "Page limit", example = "10")
                                                                  @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                             @Parameter(name = "orderBy", description = "Order by field", example = "username")
+                                                                 @RequestParam(value = "orderBy", required = false) String orderBy,
+                                                             @Parameter(name = "isAsc", description = "Ascending or descending", example = "true")
+                                                                 @RequestParam(value = "isAsc", required = false, defaultValue = "true") Boolean isAsc,
                                                              HttpServletRequest request) {
         PageDTO<LoginRecordDTO> result = loginRecordService.getUserLoginRecords(
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
                 status,
                 request.getSession().getId(),
                 page,
-                limit);
+                limit,
+                isAsc,
+                orderBy);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -198,8 +206,11 @@ public class UserController {
     /**
      * Get user's CA list
      *
+     * @param keyword Search keywords
      * @param page Page number
      * @param limit Page limit
+     * @param orderBy the order by field
+     * @param isAsc the ascending or descending
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
@@ -217,11 +228,17 @@ public class UserController {
                                                    @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                @Parameter(name = "limit", description = "Page limit", example = "10")
                                                    @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                               @Parameter(name = "orderBy", description = "Order by field", example = "username")
+                                                   @RequestParam(value = "orderBy", required = false) String orderBy,
+                                               @Parameter(name = "isAsc", description = "Ascending or descending", example = "true")
+                                                   @RequestParam(value = "isAsc", required = false, defaultValue = "true") Boolean isAsc,
                                                HttpServletRequest request) {
         PageDTO<CaInfoDTO> result = caService.getBoundCas(keyword,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
                 page,
-                limit);
+                limit,
+                isAsc,
+                orderBy);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -269,8 +286,11 @@ public class UserController {
     /**
      * Get user's certificate list
      *
+     * @param keyword Search keywords
      * @param page Page number
      * @param limit Page limit
+     * @param orderBy the order by field
+     * @param isAsc the ascending or descending
      * @param request {@link HttpServletRequest} Request
      * @return {@link ResultVO} Result
      */
@@ -306,11 +326,17 @@ public class UserController {
                                                        @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                    @Parameter(name = "limit", description = "Page limit", example = "10")
                                                        @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                   @Parameter(name = "orderBy", description = "Order by field", example = "username")
+                                                       @RequestParam(value = "orderBy", required = false) String orderBy,
+                                                   @Parameter(name = "isAsc", description = "Ascending or descending", example = "true")
+                                                       @RequestParam(value = "isAsc", required = false, defaultValue = "true") Boolean isAsc,
                                                    HttpServletRequest request) {
         PageDTO<CertInfoDTO> result = certificateService.getCertificates(keyword,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
                 page,
-                limit);
+                limit,
+                isAsc,
+                orderBy);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -572,7 +598,7 @@ public class UserController {
     )
     @SuccessApiResponse
     @PostMapping(value = "/cert/analyze")
-    public ResultVO<CertificateDetailsDTO> getCertificateDetails(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+    public ResultVO<CertificateDetailsDTO> analyzeCertificate(@io.swagger.v3.oas.annotations.parameters.RequestBody(
                                                                          description = "Certificate Base64",
                                                                          content = @Content(
                                                                                  examples = {@ExampleObject(value =
@@ -588,6 +614,30 @@ public class UserController {
         return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
                 "success",
                 new CertificateDetailsDTO(CertAnalyzer.analyzeCertificate(certBase64.get("cert").asText())));
+    }
+
+    @Operation(
+            summary = "Analyze Private Key",
+            description = "Private key parser, used for parsing private key information"
+    )
+    @SuccessApiResponse
+    @PostMapping(value = "/cert/privkey/analyze")
+    public ResultVO<PrivkeyDetailsDTO> analyzePrivateKey(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                                 description = "Private key Base64",
+                                                                 content = @Content(
+                                                                         examples = {@ExampleObject(value =
+                                                                                 """
+                                                                                 {
+                                                                                     "privkey": "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC1GAQWvotGCPu1QAB14hzKF5C2bc9WRecF..."
+                                                                                 }
+                                                                                 """
+                                                                         )}
+                                                                 )
+                                                           )
+                                                             @RequestBody JsonNode privkeyBase64) throws Exception {
+        return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(),
+                "success",
+                new PrivkeyDetailsDTO(CertAnalyzer.analyzePrivkey(privkeyBase64.get("privkey").asText())));
     }
 
     /**

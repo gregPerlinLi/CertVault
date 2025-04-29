@@ -1,11 +1,13 @@
-import type { AbortOption } from "@/api";
-import type { CertDetailDTO } from "@/api/types";
-import { callRestfulApi } from "@/api";
+import type { BaseParams, CertDetailDTO } from "@api/types";
+import { callRestfulApi } from "@api/index";
 
-export const analyzeCert = (cert: string, abort?: AbortOption) =>
+export interface AnalyzeCertParams extends BaseParams {
+  cert: string;
+}
+export const analyzeCert = (params: AnalyzeCertParams) =>
   callRestfulApi<CertDetailDTO>({
     method: "POST",
     baseUrl: "/api/v1/user/cert/analyze",
-    payload: { cert },
-    abort
+    payload: { ...params, abort: undefined },
+    abort: params.abort
   });

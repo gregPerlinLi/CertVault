@@ -8,6 +8,7 @@
     <a href="https://github.com/gregPerlinLi/CertVault/issues"><img src="https://img.shields.io/github/issues/gregPerlinLi/CertVault?color=f85149" alt="Issues" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/issues?q=is%3Aissue%20state%3Aclosed"><img src="https://img.shields.io/github/issues-closed/gregPerlinLi/CertVault?color=ab7df8" alt="Closed issues" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/contributors"><img src="https://img.shields.io/github/contributors/gregPerlinLi/CertVault" alt="Contributors" /> </a>
+    <a href="https://github.com/gregPerlinLi/CertVault/commits"><img src="https://img.shields.io/github/commit-activity/t/gregPerlinLi/CertVault" alt="Commit activity" /> </a>
     <a href="https://github.com/gregPerlinLi/CertVault/stargazers"><img src="https://img.shields.io/github/stars/gregPerlinLi/CertVault" alt="Stars" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/releases"><img src="https://img.shields.io/github/downloads/gregPerlinLi/CertVault/total" alt="GitHub Downloads"></a>
 
@@ -107,12 +108,19 @@ cd docker-compose
 docker compose -f docker-compose-with-postgres-redis.yml up -d
 ```
 
-
 ## 📚 Guidance
 
-- How to install
+- [How to deployment](docs/Deployment.md)
 - How to use
-- Configure the environment
+
+## 🧰 Related Projects
+
+- [CertVault CLI](https://github.com/gregPerlinLi/CertVaultCLI): A CLI tool for CertVault Platform
+- [CertVault Charts](https://github.com/gregPerlinLi/certvault-charts): Helm Charts for CertVault Platform
+
+## 📊 Statistics
+
+<img alt="Alt" src="https://repobeats.axiom.co/api/embed/cf9bca15eb390e1b9ee9cb5564672e8bf7760618.svg" title="Repobeats analytics image"/>
 
 ## 🤝 Contributing
 

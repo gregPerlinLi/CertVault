@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { updateProfile } from "@/api/user/user";
-import { useNotify } from "@/utils/composable";
+import { updateProfile } from "@api/user/user";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
 const newPassword = defineModel<string>("new-password");
 
 /* Services */
-const { toast, info, success, error } = useNotify();
+const { success, info, warn, error, remove } = useNotify();
 
 /* Reactive */
 const invalid = ref(false);
@@ -23,32 +22,32 @@ const submit = async () => {
   // Validate
   if (oldPassword.value.length === 0) {
     invalid.value = true;
-    error("Validation Error", "Old password is required");
+    warn("Old password is required");
     return;
   }
 
   // Try update
   busy.value = true;
-  const msg = info("Info", "Updating");
+  const msg = info("Updating");
 
   try {
     await updateProfile({
       oldPassword: oldPassword.value,
       newPassword: newPassword.value
     });
-    success("Success", "Successfully updated profile");
     visible.value = false;
+    success("Successfully updated profile");
   } catch (err: unknown) {
-    error("Fail to Update Profile", (err as Error).message);
+    error((err as Error).message, "Fail to Update Profile");
   }
 
-  toast.remove(msg);
+  remove(msg);
   busy.value = false;
 };
 
 /* Watches */
-watch(visible, () => {
-  if (!visible.value) {
+watch(visible, (newValue) => {
+  if (!newValue) {
     invalid.value = false;
     busy.value = false;
     oldPassword.value = "";
@@ -82,7 +81,6 @@ watch(visible, () => {
           label="Confirm"
           size="small"
           type="submit"
-          :disabled="busy"
           :loading="busy"></Button>
       </div>
     </form>

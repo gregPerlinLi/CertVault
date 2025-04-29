@@ -21,9 +21,11 @@ public interface ILoginRecordService extends IService<LoginRecord> {
      * @param sessionId current session ID
      * @param page      page
      * @param limit     limit
+     * @param isAsc     ascending or descending
+     * @param orderBy   the order by field
      * @return user login records
      */
-    PageDTO<LoginRecordDTO> getLoginRecords(String keyword, Integer status, String sessionId, Integer page, Integer limit);
+    PageDTO<LoginRecordDTO> getLoginRecords(String keyword, Integer status, String sessionId, Integer page, Integer limit, Boolean isAsc, String orderBy);
 
     /**
      * Get user login records
@@ -33,9 +35,11 @@ public interface ILoginRecordService extends IService<LoginRecord> {
      * @param sessionId current session ID
      * @param page      page
      * @param limit     limit
+     * @param isAsc     ascending or descending
+     * @param orderBy   the order by field
      * @return user login records
      */
-    PageDTO<LoginRecordDTO> getUserLoginRecords(String username, Integer status, String sessionId, Integer page, Integer limit);
+    PageDTO<LoginRecordDTO> getUserLoginRecords(String username, Integer status, String sessionId, Integer page, Integer limit, Boolean isAsc, String orderBy);
 
     /**
      * Add user login record

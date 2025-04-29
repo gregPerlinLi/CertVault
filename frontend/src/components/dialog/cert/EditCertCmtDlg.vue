@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
-import { updateCaComment } from "@/api/admin/cert/ca";
-import { updateSslCertComment } from "@/api/user/cert/ssl";
-import { useNotify } from "@/utils/composable";
+import type { CaInfoDTO, CertInfoDTO } from "@api/types";
+import { updateCaComment } from "@api/admin/cert/ca";
+import { updateSslCertComment } from "@api/user/cert/ssl";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -17,7 +16,7 @@ const { variant, data } = defineProps<{
 }>();
 
 /* Services */
-const { toast, info, success, error } = useNotify();
+const { success, info, warn, error, remove } = useNotify();
 
 /* Reactive */
 const busy = ref(false);
@@ -37,30 +36,29 @@ const onSubmit = async (ev: Event) => {
   const comment = formData.get("comment")?.toString().trim() ?? "";
   if (comment === data!.comment) {
     invalid.value = true;
-    error("Validation Error", "No changes found");
+    warn("No changes found");
     return;
   }
   if (comment.length === 0) {
     invalid.value = true;
-    error("Validation Error", "Comment is required");
+    warn("Comment is required");
     return;
   }
 
   // Try to update
   busy.value = true;
-  const msg = info("Info", "Updating");
+  const msg = info("Updating");
 
   try {
-    await updCertCmtFn.value(data!.uuid, comment);
-
-    success("Success", "Successfully updated comment");
+    await updCertCmtFn.value({ uuid: data!.uuid, comment });
     emits("success");
     visible.value = false;
+    success("Successfully updated comment");
   } catch (err: unknown) {
-    error("Fail to Update Comment", (err as Error).message);
+    error((err as Error).message, "Fail to Update Comment");
   }
 
-  toast.remove(msg);
+  remove(msg);
   busy.value = false;
 };
 

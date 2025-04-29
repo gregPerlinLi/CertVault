@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { useUserStore } from "@/stores/user";
-import { useNotify } from "@/utils/composable";
-
 /* Services */
-const { error } = useNotify();
+const { warn } = useNotify();
 
 /* Stores */
-const user = useUserStore();
+const { username, displayName, email, displayRole, getRoleClass } =
+  useUserStore();
 
 /* Reactive */
 const newPassword = ref("");
@@ -22,7 +20,7 @@ const dialog = reactive({
 const onSubmitNewPassword = () => {
   if (newPassword.value.length === 0) {
     newPasswordInvalid.value = true;
-    error("Validation Error", "New password is required");
+    warn("New password is required");
     return;
   }
   dialog.editPasswd = true;
@@ -54,12 +52,12 @@ const onSubmitNewPassword = () => {
   <!-- Main -->
   <section>
     <h2>Username</h2>
-    <p>{{ user.username }}</p>
+    <p>{{ username }}</p>
   </section>
   <section>
     <h2>Display Name</h2>
     <p>
-      {{ user.displayName }}
+      {{ displayName }}
       <Button
         icon="pi pi-pen-to-square"
         severity="help"
@@ -72,7 +70,7 @@ const onSubmitNewPassword = () => {
   <section>
     <h2>Email</h2>
     <p>
-      {{ user.email }}
+      {{ email }}
       <Button
         icon="pi pi-pen-to-square"
         severity="help"
@@ -84,7 +82,7 @@ const onSubmitNewPassword = () => {
   </section>
   <section>
     <h2>Role</h2>
-    <p :class="user.getRoleClass.value()">{{ user.displayRole }}</p>
+    <p :class="getRoleClass()">{{ displayRole }}</p>
   </section>
   <section>
     <h2>New Password</h2>
@@ -108,10 +106,8 @@ const onSubmitNewPassword = () => {
   <!-- Dialogs -->
   <EditDispNameDlg
     v-model:visible="dialog.editDispName"
-    :value="user.displayName.value ?? ''" />
-  <EditEmailDlg
-    v-model:visible="dialog.editEmail"
-    :value="user.email.value ?? ''" />
+    :value="displayName ?? ''" />
+  <EditEmailDlg v-model:visible="dialog.editEmail" :value="email ?? ''" />
   <EditPasswdDlg
     v-model:visible="dialog.editPasswd"
     v-model:new-password="newPassword" />

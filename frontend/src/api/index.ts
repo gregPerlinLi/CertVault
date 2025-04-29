@@ -1,35 +1,28 @@
-import type { ResultVO } from "@/api/types";
+import type { RestfulApiOption, ResultVO } from "@api/types";
 import { useUserStore } from "@/stores/user";
 import router from "@/router";
 
-export const createURLSearchParams = (
-  params: Record<string, any>
-): URLSearchParams => {
-  const entries = Object.entries(params)
-    .filter(([_, v]) => v !== undefined && v !== null)
-    .map(([k, v]) => [k, String(v)]);
-  return new URLSearchParams(Object.fromEntries(entries));
-};
+/* Utilities */
+const createURLFromTemplate = (baseUrl: string, params: Record<string, any>) =>
+  Object.entries(params)
+    .filter(([_, v]) => typeof v === "string")
+    .reduce(
+      (prev, [k, v]) => prev.replace(`{${k}}`, encodeURIComponent(v)),
+      baseUrl
+    );
 
-export interface AbortOption {
-  timeout?: number;
-  signal?: AbortSignal;
-}
-export interface RestfulApiOption {
-  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-  baseUrl: string;
-  pathNames?: Record<string, string>;
-  searchParams?: Record<string, any>;
-  payload?: any;
-  abort?: AbortOption;
-}
+const createURLSearchParams = (params: Record<string, any>) =>
+  new URLSearchParams(
+    Object.entries(params)
+      .filter(([_, v]) => v !== undefined && v !== null)
+      .map(([k, v]) => [k, String(v)])
+  );
+
+// Wrapper
 export const callRestfulApi = async <U = null>(
   opts: RestfulApiOption
 ): Promise<U> => {
-  const pathname = Object.entries(opts.pathNames ?? {}).reduce(
-    (prev, [k, v]) => prev.replace(`{${k}}`, encodeURIComponent(v)),
-    opts.baseUrl
-  );
+  const pathname = createURLFromTemplate(opts.baseUrl, opts.pathNames ?? {});
   const params = createURLSearchParams(opts.searchParams ?? {});
   const uri = params.size > 0 ? `${pathname}?${params}` : pathname;
 
@@ -61,8 +54,10 @@ export const callRestfulApi = async <U = null>(
   if (json.code < 200 || json.code >= 300) {
     const user = useUserStore();
     if (json.code === 401 && user.isSignedIn.value) {
-      user.clear();
-      setTimeout(() => router.push("/"));
+      setTimeout(() => {
+        user.clear();
+        router.push("/");
+      });
     }
 
     throw Error(`${json.msg} (${json.code})`);

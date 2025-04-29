@@ -45,7 +45,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     ICaBindingService caBindingService;
 
     @Override
-    public PageDTO<CaInfoDTO> getCas(String keyword, String owner, Integer page, Integer limit) {
+    public PageDTO<CaInfoDTO> getCas(String keyword, String owner, Integer page, Integer limit, Boolean isAsc, String orderBy) {
         Page<Ca> caPage = new Page<>(page, limit);
         Page<Ca> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
@@ -79,6 +79,17 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
                         .eq("deleted", false);
             }
         }
+        if ( orderBy != null && !orderBy.isEmpty() ) {
+            if ( isAsc == null ) {
+                isAsc = true;
+            }
+            switch (orderBy) {
+                case "uuid" -> caQueryWrapper.orderBy(true, isAsc,"uuid");
+                case "comment" -> caQueryWrapper.orderBy(true, isAsc,"comment");
+                case "owner" -> caQueryWrapper.orderBy(true, isAsc,"owner");
+                case "status" -> caQueryWrapper.orderBy(true, isAsc,"available", "not_after");
+            }
+        }
         resultPage = this.page(caPage, caQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
             return new PageDTO<>(resultPage.getTotal(), null);
@@ -107,7 +118,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     }
 
     @Override
-    public PageDTO<CaInfoDTO> getBoundCas(String keyword, String username, Integer page, Integer limit) {
+    public PageDTO<CaInfoDTO> getBoundCas(String keyword, String username, Integer page, Integer limit, Boolean isAsc, String orderBy) {
         Page<Ca> caPage = new Page<>(page, limit);
         Page<Ca> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
@@ -136,6 +147,17 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
                     .eq("available", true)
                     .eq("deleted", false);
         }
+        if ( orderBy != null && !orderBy.isEmpty() ) {
+            if ( isAsc == null ) {
+                isAsc = true;
+            }
+            switch (orderBy) {
+                case "uuid" -> caQueryWrapper.orderBy(true, isAsc,"uuid");
+                case "comment" -> caQueryWrapper.orderBy(true, isAsc,"comment");
+                case "owner" -> caQueryWrapper.orderBy(true, isAsc,"owner");
+                case "status" -> caQueryWrapper.orderBy(true, isAsc,"available", "not_after");
+            }
+        }
         resultPage = this.page(caPage, caQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
             return new PageDTO<>(resultPage.getTotal(), null);
@@ -164,7 +186,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     }
 
     @Override
-    public PageDTO<UserProfileDTO> getBoundUsers(String keyword, String uuid, String owner, Integer page, Integer limit) {
+    public PageDTO<UserProfileDTO> getBoundUsers(String keyword, String uuid, String owner, Integer page, Integer limit, Boolean isAsc, String orderBy) {
         Page<User> userPage = new Page<>(page, limit);
         Page<User> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
@@ -207,6 +229,17 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
                     .in("id", caBindings.stream().map(CaBinding::getUid).toList())
                     .eq("deleted", false);
         }
+        if ( orderBy != null && !orderBy.isEmpty() ) {
+            if ( isAsc == null ) {
+                isAsc = true;
+            }
+            switch (orderBy) {
+                case "username" -> userQueryWrapper.orderBy(true, isAsc,"username");
+                case "displayName" -> userQueryWrapper.orderBy(true, isAsc,"display_name", "username");
+                case "email" -> userQueryWrapper.orderBy(true, isAsc,"email", "username");
+                case "role" -> userQueryWrapper.orderBy(true, isAsc,"role", "username");
+            }
+        }
         resultPage = userService.page(userPage, userQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
             return new PageDTO<>(resultPage.getTotal(), null);
@@ -216,7 +249,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
     }
 
     @Override
-    public PageDTO<UserProfileDTO> getNotBoundUsers(String keyword, String uuid, String owner, Integer page, Integer limit) {
+    public PageDTO<UserProfileDTO> getNotBoundUsers(String keyword, String uuid, String owner, Integer page, Integer limit, Boolean isAsc, String orderBy) {
         Page<User> userPage = new Page<>(page, limit);
         Page<User> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
@@ -256,6 +289,17 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
                     )
                     .notIn("id", uids)
                     .eq("deleted", false);
+        }
+        if ( orderBy != null && !orderBy.isEmpty() ) {
+            if ( isAsc == null ) {
+                isAsc = true;
+            }
+            switch (orderBy) {
+                case "username" -> userQueryWrapper.orderBy(true, isAsc,"username");
+                case "displayName" -> userQueryWrapper.orderBy(true, isAsc,"display_name", "username");
+                case "email" -> userQueryWrapper.orderBy(true, isAsc,"email", "username");
+                case "role" -> userQueryWrapper.orderBy(true, isAsc,"role", "username");
+            }
         }
         resultPage = userService.page(userPage, userQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {

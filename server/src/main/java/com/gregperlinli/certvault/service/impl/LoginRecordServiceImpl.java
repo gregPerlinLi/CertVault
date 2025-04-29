@@ -42,7 +42,7 @@ public class LoginRecordServiceImpl extends ServiceImpl<LoginRecordMapper, Login
     SessionRegistry sessionRegistry;
 
     @Override
-    public PageDTO<LoginRecordDTO> getLoginRecords(String keyword, Integer status, String sessionId, Integer page, Integer limit) {
+    public PageDTO<LoginRecordDTO> getLoginRecords(String keyword, Integer status, String sessionId, Integer page, Integer limit, Boolean isAsc, String orderBy) {
         if ( status == null ) {
             status = -1;
         }
@@ -61,6 +61,21 @@ public class LoginRecordServiceImpl extends ServiceImpl<LoginRecordMapper, Login
             }
             Set<Integer> uids = users.stream().map(User::getId).collect(Collectors.toSet());
             loginRecordQueryWrapper.in("uid", uids);
+        }
+        if ( orderBy != null && !orderBy.isEmpty() ) {
+            if ( isAsc == null ) {
+                isAsc = true;
+            }
+            switch (orderBy) {
+                case "loginTime" -> loginRecordQueryWrapper.orderBy(true, isAsc,"login_time");
+                case "ip" -> loginRecordQueryWrapper.orderBy(true, isAsc,"ip");
+                case "region" -> loginRecordQueryWrapper.orderBy(true, isAsc,"region");
+                case "province" -> loginRecordQueryWrapper.orderBy(true, isAsc,"province");
+                case "city" -> loginRecordQueryWrapper.orderBy(true, isAsc,"city");
+                case "platform" -> loginRecordQueryWrapper.orderBy(true, isAsc,"platform");
+                case "os" -> loginRecordQueryWrapper.orderBy(true, isAsc,"os");
+                case "browser" -> loginRecordQueryWrapper.orderBy(true, isAsc,"browser");
+            }
         }
         resultPage = this.page(loginRecordPage, loginRecordQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {
@@ -92,7 +107,7 @@ public class LoginRecordServiceImpl extends ServiceImpl<LoginRecordMapper, Login
     }
 
     @Override
-    public PageDTO<LoginRecordDTO> getUserLoginRecords(String username, Integer status, String sessionId, Integer page, Integer limit) {
+    public PageDTO<LoginRecordDTO> getUserLoginRecords(String username, Integer status, String sessionId, Integer page, Integer limit, Boolean isAsc, String orderBy) {
         if ( status == null ) {
             status = -1;
         }
@@ -111,6 +126,22 @@ public class LoginRecordServiceImpl extends ServiceImpl<LoginRecordMapper, Login
             loginRecordQueryWrapper.eq("online", false);
         } else if ( status == 1 ) {
             loginRecordQueryWrapper.eq("online", true);
+        }
+        if ( orderBy != null && !orderBy.isEmpty() ) {
+            if ( isAsc == null ) {
+                isAsc = true;
+            }
+            switch (orderBy) {
+                case "user" -> loginRecordQueryWrapper.orderBy(true, isAsc,"uid");
+                case "loginTime" -> loginRecordQueryWrapper.orderBy(true, isAsc,"login_time");
+                case "ip" -> loginRecordQueryWrapper.orderBy(true, isAsc,"ip");
+                case "region" -> loginRecordQueryWrapper.orderBy(true, isAsc,"region");
+                case "province" -> loginRecordQueryWrapper.orderBy(true, isAsc,"province");
+                case "city" -> loginRecordQueryWrapper.orderBy(true, isAsc,"city");
+                case "platform" -> loginRecordQueryWrapper.orderBy(true, isAsc,"platform");
+                case "os" -> loginRecordQueryWrapper.orderBy(true, isAsc,"os");
+                case "browser" -> loginRecordQueryWrapper.orderBy(true, isAsc,"browser");
+            }
         }
         resultPage = this.page(loginRecordPage, loginRecordQueryWrapper);
         if ( resultPage.getSize() == 0 || resultPage.getRecords() == null || resultPage.getRecords().isEmpty() ) {

@@ -8,6 +8,7 @@
     <a href="https://github.com/gregPerlinLi/CertVault/issues"><img src="https://img.shields.io/github/issues/gregPerlinLi/CertVault?color=f85149" alt="Issues" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/issues?q=is%3Aissue%20state%3Aclosed"><img src="https://img.shields.io/github/issues-closed/gregPerlinLi/CertVault?color=ab7df8" alt="Closed issues" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/contributors"><img src="https://img.shields.io/github/contributors/gregPerlinLi/CertVault" alt="Contributors" /> </a>
+    <a href="https://github.com/gregPerlinLi/CertVault/commits"><img src="https://img.shields.io/github/commit-activity/t/gregPerlinLi/CertVault" alt="Commit activity" /> </a>
     <a href="https://github.com/gregPerlinLi/CertVault/stargazers"><img src="https://img.shields.io/github/stars/gregPerlinLi/CertVault" alt="Stars" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/releases"><img src="https://img.shields.io/github/downloads/gregPerlinLi/CertVault/total" alt="GitHub Downloads"></a>
 </div>
@@ -61,6 +62,7 @@ CertVault 的设计目标是：
 ## 🚀 功能
 
 ### 核心功能
+
 - 🔐 **证书管理**  
   支持自签署 CA 创建、SSL 证书签发、证书详情查看、评论编辑、导出和续期
 - 🛠 **用户权限**  
@@ -75,12 +77,14 @@ CertVault 的设计目标是：
 ## 技术栈
 
 ### 🌐 前端
+
 - **Vue.js 3** + **Vite**
 - **PrimeVue** UI 组件
 - **TailwindCSS** 响应式样式
 - **TypeScript** 类型化开发
 
 ### 🖥️ 后端
+
 - **Java 17** + **Spring Boot 3**
 - **MyBatis-Plus** ORM 框架
 - **Druid** 数据库连接池
@@ -88,6 +92,7 @@ CertVault 的设计目标是：
 - **Helm Chart** Kubernetes 部署
 
 ### 📦 其他
+
 - **Kubernetes** 容器编排
 - **Prometheus** 监控指标
 - **传统/OIDC** 认证
@@ -106,9 +111,18 @@ cd docker-compose
 docker compose -f docker-compose-with-postgres-redis.yml up -d
 ```
 ## 📚 使用指南
-- 如何安装
+
+- [如何部署](docs/Deployment_CN.md)
 - 如何使用
-- 环境配置
+
+## 🧰 相关项目
+
+- [CertVault CLI](https://github.com/gregPerlinLi/CertVaultCLI): CertVault 的命令行工具
+- [CertVault Charts](https://github.com/gregPerlinLi/certvault-charts): CertVault 的 Helm Chart
+
+## 📊 统计
+
+<img alt="Alt" src="https://repobeats.axiom.co/api/embed/cf9bca15eb390e1b9ee9cb5564672e8bf7760618.svg" title="Repobeats analytics image"/>
 
 ## 🤝 贡献
 贡献使开源社区成为学习、启发和创造的绝佳场所。您所做的任何贡献都**非常宝贵**。

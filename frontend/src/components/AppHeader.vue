@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { logout } from "@/api/authentication";
-import { useUserStore } from "@/stores/user";
-import { useNotify } from "@/utils/composable";
+import { logout } from "@api/authentication";
 import { useConfirm } from "primevue/useconfirm";
 
 /* Services */
 const router = useRouter();
 const confirm = useConfirm();
-const { toast, info, success, error } = useNotify();
+const { success, info, error, remove } = useNotify();
 
 /* Stores */
 const user = useUserStore();
@@ -26,19 +24,19 @@ const trySignOut = () =>
     rejectProps: { severity: "secondary", variant: "outlined" },
     accept: async () => {
       busy.value = true;
-      const msg = info("Info", "Signing out");
+      const msg = info("Signing out");
 
       try {
-        await logout({ timeout: -1 });
+        await logout({ abort: { timeout: -1 } });
 
-        success("Success", "Successfully signed out");
         user.clear();
         router.push("/");
+        success("Successfully signed out");
       } catch (err: unknown) {
-        error("Fail to Sign out", (err as Error).message);
+        error((err as Error).message, "Fail to Sign out");
       }
 
-      toast.remove(msg);
+      remove(msg);
       busy.value = false;
     }
   });

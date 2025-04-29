@@ -1,48 +1,52 @@
-import type { AbortOption } from "@/api";
-import type { CertInfoDTO, PaginationVO, ResponseCertDTO } from "@/api/types";
-import { callRestfulApi } from "@/api";
+import type {
+  BaseParams,
+  CertInfoDTO,
+  PageParams,
+  PageVO,
+  ResponseCertDTO
+} from "@api/types";
+import { callRestfulApi } from "@api/index";
 
 export const getAllSslCertInfo = (
-  page: number,
-  limit: number,
-  keyword?: string,
-  abort?: AbortOption
+  params: BaseParams & PageParams<"uuid" | "comment" | "owner" | "status"> = {}
 ) =>
-  callRestfulApi<PaginationVO<CertInfoDTO>>({
+  callRestfulApi<PageVO<CertInfoDTO>>({
     method: "GET",
     baseUrl: "/api/v1/user/cert/ssl",
-    searchParams: { page, limit, keyword },
-    abort
+    searchParams: { ...params, abort: undefined },
+    abort: params.abort
   });
 
-export const getSslCert = (
-  uuid: string,
-  isChain?: boolean,
-  abort?: AbortOption
-) =>
+export interface GetSslCertParams extends BaseParams {
+  uuid: string;
+  isChain?: boolean;
+  needRootCa?: boolean;
+}
+export const getSslCert = (params: GetSslCertParams) =>
   callRestfulApi<string>({
     method: "GET",
     baseUrl: "/api/v1/user/cert/ssl/{uuid}/cer",
-    pathNames: { uuid },
-    searchParams: { isChain },
-    abort
+    pathNames: params,
+    searchParams: { ...params, uuid: undefined, abort: undefined },
+    abort: params.abort
   });
 
-export const getSslPrivKey = (
-  uuid: string,
-  password: string,
-  abort?: AbortOption
-) =>
+export interface GetSslPrivKeyParams extends BaseParams {
+  uuid: string;
+  password: string;
+}
+export const getSslPrivKey = (params: GetSslCertParams) =>
   callRestfulApi<string>({
     method: "POST",
     baseUrl: "/api/v1/user/cert/ssl/{uuid}/privkey",
-    pathNames: { uuid },
-    payload: { password },
-    abort
+    pathNames: params,
+    payload: { ...params, uuid: undefined, abort: undefined },
+    abort: params.abort
   });
 
-export interface RequestSslCertPayload {
+export interface RequestSslCertParams extends BaseParams {
   caUuid?: string;
+  keySize?: number;
   country: string;
   province: string;
   city: string;
@@ -56,47 +60,47 @@ export interface RequestSslCertPayload {
     value: string;
   }[];
 }
-export const requestSslCert = (
-  payload: RequestSslCertPayload,
-  abort?: AbortOption
-) =>
+export const requestSslCert = (params: RequestSslCertParams) =>
   callRestfulApi<ResponseCertDTO>({
     method: "POST",
     baseUrl: "/api/v1/user/cert/ssl",
-    payload,
-    abort
+    payload: { ...params, abort: undefined },
+    abort: params.abort
   });
 
-export const renewSslCert = (
-  uuid: string,
-  expiry: number,
-  abort?: AbortOption
-) =>
+export interface RenewSslCertParams extends BaseParams {
+  uuid: string;
+  expiry: number;
+}
+export const renewSslCert = (params: RenewSslCertParams) =>
   callRestfulApi<ResponseCertDTO>({
     method: "PUT",
     baseUrl: "/api/v1/user/cert/ssl/{uuid}",
-    pathNames: { uuid },
-    payload: { expiry },
-    abort
+    pathNames: params,
+    payload: { ...params, uuid: undefined, abort: undefined },
+    abort: params.abort
   });
 
-export const updateSslCertComment = (
-  uuid: string,
-  comment: string,
-  abort?: AbortOption
-) =>
+export interface UpdateSslCertCommentParams extends BaseParams {
+  uuid: string;
+  comment: string;
+}
+export const updateSslCertComment = (params: UpdateSslCertCommentParams) =>
   callRestfulApi({
     method: "PATCH",
     baseUrl: "/api/v1/user/cert/ssl/{uuid}/comment",
-    pathNames: { uuid },
-    payload: { comment },
-    abort
+    pathNames: params,
+    payload: { ...params, uuid: undefined, abort: undefined },
+    abort: params.abort
   });
 
-export const deleteSslCert = (uuid: string, abort?: AbortOption) =>
+export interface DeleteSslCertParams extends BaseParams {
+  uuid: string;
+}
+export const deleteSslCert = (params: DeleteSslCertParams) =>
   callRestfulApi({
     method: "DELETE",
     baseUrl: "/api/v1/user/cert/ssl/{uuid}",
-    pathNames: { uuid },
-    abort
+    pathNames: params,
+    abort: params.abort
   });

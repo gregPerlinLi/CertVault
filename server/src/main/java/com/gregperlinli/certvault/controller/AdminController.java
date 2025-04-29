@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -58,6 +57,8 @@ public class AdminController {
      * @param keyword the keyword to search
      * @param page the page number
      * @param limit the limit of the page
+     * @param orderBy the order by field
+     * @param isAsc the ascending or descending
      * @return the result
      */
     @Operation(
@@ -72,8 +73,12 @@ public class AdminController {
                                                       @Parameter(name = "page", description = "Page number", example = "1")
                                                           @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                       @Parameter(name = "limit", description = "Page limit", example = "10")
-                                                          @RequestParam(value = "limit", defaultValue = "10") Integer limit) {
-        PageDTO<UserProfileDTO> result = userService.getUsers(keyword, page, limit);
+                                                          @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                      @Parameter(name = "orderBy", description = "Order by field", example = "username")
+                                                          @RequestParam(value = "orderBy", required = false) String orderBy,
+                                                      @Parameter(name = "isAsc", description = "Ascending or descending", example = "true")
+                                                          @RequestParam(value = "isAsc", required = false, defaultValue = "true") Boolean isAsc) {
+        PageDTO<UserProfileDTO> result = userService.getUsers(keyword, page, limit, isAsc, orderBy);
         if ( result != null && result.getList() != null && !result.getList().isEmpty()) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -85,6 +90,8 @@ public class AdminController {
      *
      * @param page the page number
      * @param limit the limit of the page
+     * @param orderBy the order by field
+     * @param isAsc the ascending or descending
      * @param request the request
      * @return the result
      */
@@ -101,9 +108,13 @@ public class AdminController {
                                                    @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                @Parameter(name = "limit", description = "Page limit", example = "10")
                                                    @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                               @Parameter(name = "orderBy", description = "Order by field", example = "username")
+                                                   @RequestParam(value = "orderBy", required = false) String orderBy,
+                                               @Parameter(name = "isAsc", description = "Ascending or descending", example = "true")
+                                                   @RequestParam(value = "isAsc", required = false, defaultValue = "true") Boolean isAsc,
                                                HttpServletRequest request) {
         PageDTO<CaInfoDTO> result = caService.getCas(keyword,
-                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), page, limit);
+                ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(), page, limit, isAsc, orderBy);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
@@ -117,6 +128,8 @@ public class AdminController {
      * @param keyword the keyword to search
      * @param page the page number
      * @param limit the limit of the page
+     * @param orderBy the order by field
+     * @param isAsc the ascending or descending
      * @param request the request
      * @return the result
      */
@@ -135,18 +148,36 @@ public class AdminController {
                                                                 @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                             @Parameter(name = "limit", description = "Page limit", example = "10")
                                                                 @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                            @Parameter(name = "orderBy", description = "Order by field", example = "username")
+                                                                @RequestParam(value = "orderBy", required = false) String orderBy,
+                                                            @Parameter(name = "isAsc", description = "Ascending or descending", example = "true")
+                                                                @RequestParam(value = "isAsc", required = false, defaultValue = "true") Boolean isAsc,
                                                             HttpServletRequest request) {
         PageDTO<UserProfileDTO> result = caService.getBoundUsers(keyword,
                 uuid,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
                 page,
-                limit);
+                limit,
+                isAsc,
+                orderBy);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }
         return new ResultVO<>(ResultStatusCodeConstant.NOT_FIND.getResultCode(), "No data", result);
     }
 
+    /**
+     * Get all user information not bound to a ca
+     *
+     * @param uuid the uuid of the ca
+     * @param keyword the keyword to search
+     * @param page the page number
+     * @param limit the limit of the page
+     * @param orderBy the order by field
+     * @param isAsc the ascending or descending
+     * @param request the request
+     * @return the result
+     */
     @Operation(
             summary = "Get all user information not bound to a ca",
             description = "Retrieve all user information not bound to a ca (paged)"
@@ -162,12 +193,18 @@ public class AdminController {
                                                                     @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                                 @Parameter(name = "limit", description = "Page limit", example = "10")
                                                                     @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+                                                                @Parameter(name = "orderBy", description = "Order by field", example = "username")
+                                                                    @RequestParam(value = "orderBy", required = false) String orderBy,
+                                                                @Parameter(name = "isAsc", description = "Ascending or descending", example = "true")
+                                                                    @RequestParam(value = "isAsc", required = false, defaultValue = "true") Boolean isAsc,
                                                                 HttpServletRequest request) {
         PageDTO<UserProfileDTO> result = caService.getNotBoundUsers(keyword,
                 uuid,
                 ((UserProfileDTO) request.getSession().getAttribute("account")).getUsername(),
                 page,
-                limit);
+                limit,
+                isAsc,
+                orderBy);
         if ( result != null && result.getList() != null ) {
             return new ResultVO<>(ResultStatusCodeConstant.SUCCESS.getResultCode(), "Success", result);
         }

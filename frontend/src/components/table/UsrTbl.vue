@@ -1,26 +1,9 @@
 <script setup lang="ts">
-import type { AbortOption } from "@/api";
-import type { PaginationVO, UserProfileDTO } from "@/api/types";
+import type { AbortOption, PageVO, UserProfileDTO } from "@api/types";
 import type { DataTableCellEditCompleteEvent } from "primevue/datatable";
-import { useNotify, useReloadableAsyncGuard } from "@/utils/composable";
-
-import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
-import LoadingPlaceholder from "@comps/placeholder/LoadingPlaceholder.vue";
 
 /* Async components */
-const AsyncDataTable = defineAsyncComponent({
-  loader: () => import("primevue/datatable"),
-  loadingComponent: LoadingPlaceholder,
-  errorComponent: ErrorPlaceholer,
-  onError: (err, retry, fail, attampts) => {
-    if (attampts < 5) {
-      retry();
-    } else {
-      error("Fail to Load Data Table Component", err.message);
-      fail();
-    }
-  }
-});
+const AsyncDataTable = useAsyncDataTable();
 
 /* Models */
 const first = defineModel<number>("first", { default: 0 });
@@ -39,7 +22,7 @@ const props = defineProps<{
     limit: number,
     keyword?: string,
     abort?: AbortOption
-  ) => PaginationVO<UserProfileDTO> | Promise<PaginationVO<UserProfileDTO>>;
+  ) => PageVO<UserProfileDTO> | Promise<PageVO<UserProfileDTO>>;
   selectable?: boolean;
 }>();
 
@@ -50,7 +33,7 @@ defineEmits<{
 
 /* Services */
 const { error } = useNotify();
-const { isActivate, getSignal, reload, cancel } = useReloadableAsyncGuard();
+const { isActive, getSignal, reset, cancel } = useAsyncGuard();
 
 /* Actions */
 const resetStates = () => {
@@ -63,7 +46,7 @@ const resetStates = () => {
   loading.value = false;
 };
 const refresh = async () => {
-  if (!isActivate.value) {
+  if (!isActive.value) {
     return;
   }
 
@@ -77,15 +60,13 @@ const refresh = async () => {
       { signal: getSignal() }
     );
 
-    if (isActivate.value) {
+    if (isActive.value) {
       totalRecords.value = page.total;
-      data.value = (page.list ?? []).sort((a, b) =>
-        a.role !== b.role ? b.role - a.role : a.username < b.username ? -1 : 1
-      );
+      data.value = page.list ?? [];
     }
   } catch (err: unknown) {
-    if (isActivate.value) {
-      error("Fail to Fetch User List", (err as Error).message);
+    if (isActive.value) {
+      error((err as Error).message, "Fail to Fetch User List");
     }
   }
   loading.value = false;
@@ -99,7 +80,7 @@ watchDebounced(search, () => refresh(), { debounce: 500 });
 defineExpose({
   refresh,
   resetStates,
-  reload,
+  reset,
   cancel
 });
 </script>
@@ -175,7 +156,7 @@ defineExpose({
         <InputText v-model="data.displayName" size="small" autofocus />
       </template>
     </Column>
-    <Column field="email" header="Email">
+    <Column class="w-0" field="email" header="Email">
       <template #body="{ data }: { data: UserProfileDTO }">
         <div class="flex items-baseline w-80">
           <p

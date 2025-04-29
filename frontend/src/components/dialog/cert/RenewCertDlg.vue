@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
-import { renewCaCert } from "@/api/admin/cert/ca";
-import { renewSslCert } from "@/api/user/cert/ssl";
-import { useNotify } from "@/utils/composable";
+import type { CaInfoDTO, CertInfoDTO } from "@api/types";
+import { renewCaCert } from "@api/admin/cert/ca";
+import { renewSslCert } from "@api/user/cert/ssl";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -17,7 +16,7 @@ const { variant, data } = defineProps<{
 }>();
 
 /* Services */
-const { toast, info, success, error } = useNotify();
+const { success, info, error, remove } = useNotify();
 
 /* Reactive */
 const busy = ref(false);
@@ -35,18 +34,18 @@ const onSubmit = async (ev: Event) => {
 
   // Try to renew
   busy.value = true;
-  const msg = info("Info", "Requesting");
+  const msg = info("Requesting");
   try {
-    await renewCertFn.value(data!.uuid, expiry);
+    await renewCertFn.value({ uuid: data!.uuid, expiry });
 
-    success("Success", "Successfully renewed");
     emits("success");
     visible.value = false;
+    success("Successfully renewed");
   } catch (err: unknown) {
-    error("Fail to Renew", (err as Error).message);
+    error((err as Error).message, "Fail to Renew");
   }
 
-  toast.remove(msg);
+  remove(msg);
   busy.value = false;
 };
 
@@ -75,7 +74,7 @@ watch(visible, () => {
           size="small"
           suffix=" day(s)"
           :default-value="30"
-          :max="365"
+          :max="variant === 'ca' ? 7300 : 365"
           :min="1"
           required
           show-buttons />

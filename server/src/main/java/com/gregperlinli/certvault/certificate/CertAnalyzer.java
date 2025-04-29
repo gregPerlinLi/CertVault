@@ -1,12 +1,15 @@
 package com.gregperlinli.certvault.certificate;
 
-import com.gregperlinli.certvault.domain.entities.CertificateDetails;
+import com.gregperlinli.certvault.domain.entities.*;
 import com.gregperlinli.certvault.utils.CertUtils;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
+import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
@@ -22,6 +25,9 @@ import java.security.PublicKey;
 import java.security.Security;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.spec.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -87,6 +93,43 @@ public class CertAnalyzer {
         details.setExtensions(extensions);
 
         return details;
+    }
+
+    /**
+     * 解析私钥详细信息
+     *
+     * @param privkeyBase64 Base64编码的PEM私钥
+     * @return 私钥详细信息对象
+     * @throws Exception 解析异常
+     */
+    public static PrivkeyDetails analyzePrivkey(String privkeyBase64) throws Exception {
+        PrivateKey privateKey = CertUtils.parsePrivateKey(privkeyBase64);
+
+        PrivkeyDetails privkeyDetails = new PrivkeyDetails();
+        privkeyDetails.setAlgorithm(privateKey.getAlgorithm());
+        privkeyDetails.setEncoded(CertUtils.encodeBase64(privateKey.getEncoded()));
+        privkeyDetails.setFormat(privateKey.getFormat());
+
+        if (privateKey instanceof RSAPrivateCrtKey rsaKey) {
+            RSAPrivkeySpecific rsaPrivkeySpecific = new RSAPrivkeySpecific();
+            parseRSAKey(rsaKey, rsaPrivkeySpecific);
+            privkeyDetails.setPrivkeySpecific(rsaPrivkeySpecific);
+        } else if (privateKey instanceof ECPrivateKey ecKey) {
+            ECCPrivkeySpecific eccPrivkeySpecific = new ECCPrivkeySpecific();
+            parseECKey(ecKey, eccPrivkeySpecific);
+            ECParameterSpec params = ecKey.getParams();
+            privkeyDetails.setParams(params);
+            privkeyDetails.setPrivkeySpecific(eccPrivkeySpecific);
+        } else if ("EdDSA".equals(privateKey.getAlgorithm())) {
+            Ed25519PrivkeySpecific ed25519PrivkeySpecific = new Ed25519PrivkeySpecific();
+            parseEd25519Key(privateKey, ed25519PrivkeySpecific);
+            privkeyDetails.setPrivkeySpecific(ed25519PrivkeySpecific);
+        } else {
+            throw new IllegalArgumentException("Unsupported key type");
+        }
+
+        return privkeyDetails;
+
     }
 
     /**
@@ -345,6 +388,97 @@ public class CertAnalyzer {
 
         return signature.verify(signed);
 
+    }
+
+    /**
+     * 解析RSA私钥
+     *
+     * @param key RSA私钥
+     */
+    private static void parseRSAKey(RSAPrivateCrtKey key, RSAPrivkeySpecific specific) {
+        specific.setModulus(key.getModulus());
+        RSAPrivkeySpecific.Prime prime = new RSAPrivkeySpecific.Prime();
+        prime.setP(key.getPrimeP());
+        prime.setQ(key.getPrimeQ());
+        prime.setExponentP(key.getPrimeExponentP());
+        prime.setExponentQ(key.getPrimeExponentQ());
+        specific.setPrime(prime);
+        specific.setPrivateExponent(key.getPrivateExponent());
+        specific.setPublicExponent(key.getPublicExponent());
+        specific.setCoefficient(key.getCrtCoefficient());
+    }
+
+    /**
+     * 解析EC私钥
+     *
+     * @param key EC私钥
+     */
+    private static void parseECKey(ECPrivateKey key, ECCPrivkeySpecific specific) {
+        ECParameterSpec params = key.getParams();
+        ECPoint w = key.getParams().getGenerator();
+
+        specific.setD(key.getS().toString());
+        String curveName = "Unknown";
+        try {
+            // 将JCE参数转换为BC参数规格
+            org.bouncycastle.jce.spec.ECParameterSpec bcSpec = EC5Util.convertSpec(params);
+
+            // 通过参数规格查找OID
+            ASN1ObjectIdentifier oid = ECUtil.getNamedCurveOid(bcSpec);
+
+            if (oid != null) {
+                // 通过 OID 获取人类可读名称
+                String name = ECNamedCurveTable.getName(oid);
+                curveName = name != null ?
+                        oid.getId() + " (" + name + ")" :
+                        oid.getId();
+            } else {
+                // 非标准曲线的备选显示方案
+                curveName = "Custom Curve [" +
+                        params.getCurve().getField().getFieldSize() + " bits]";
+            }
+            // 备选方案：通过参数规格查找OID
+            // ASN1ObjectIdentifier oid = ECUtil.getNamedCurveOid(
+            //         org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util.convertSpec(params)
+            // );
+            // if (oid != null) {
+            //     curveName = oid.getId() + " (" + ECUtil.getCurveName(oid) + ")";
+            // }
+        } catch (Exception e) {
+            curveName = "Unrecognized Curve";
+        }
+        specific.setCurveName(curveName);
+        ECCPrivkeySpecific.Q q = new ECCPrivkeySpecific.Q();
+        q.setX(w.getAffineX());
+        q.setY(w.getAffineY());
+        q.setCoordinateSystem(params.getCurve().getField().getFieldSize());
+        specific.setQ(q);
+    }
+
+    /**
+     * 解析Ed25519私钥
+     *
+     * @param key Ed25519私钥
+     */
+    private static void parseEd25519Key(PrivateKey key, Ed25519PrivkeySpecific specific) {
+        byte[] privateKeyBytes = key.getEncoded();
+
+        // 1. 提取 X 坐标（前31字节）
+        byte[] xBytes = Arrays.copyOf(privateKeyBytes, 31);
+        // 前导零不影响数值
+        BigInteger x = new BigInteger(1, xBytes);
+
+        // 2. 解析 Y 的奇偶性（最后一位的最高位）
+        boolean yOdd = (privateKeyBytes[31] & 0x80) != 0;
+
+        // 3. 设置到 Point 对象
+        Ed25519PrivkeySpecific.Point point = new Ed25519PrivkeySpecific.Point();
+        point.setX(x);
+        point.setYodd(yOdd);
+        specific.setPoint(point);
+
+        // 3. 设置私钥编码（DER格式）
+        specific.setPointEncoding(Base64.getEncoder().encodeToString(key.getEncoded()));
     }
 
 }

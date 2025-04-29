@@ -1,6 +1,4 @@
-import { useCommonStore } from "@/stores/common";
-import { useUserStore } from "@stores/user";
-import { useNotify } from "@/utils/composable";
+import { useToast } from "primevue/usetoast";
 import { createRouter, createWebHistory } from "vue-router";
 
 // Sync views
@@ -68,7 +66,7 @@ router.beforeEach(async (to) => {
   /* Services */
   const toast = (() => {
     try {
-      const { toast } = useNotify();
+      const toast = useToast();
       return toast;
     } catch {
       return undefined;

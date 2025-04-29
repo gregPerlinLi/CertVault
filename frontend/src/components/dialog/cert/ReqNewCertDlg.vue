@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type { CaInfoDTO } from "@/api/types";
-import { requestCaCert } from "@/api/admin/cert/ca";
-import { requestSslCert } from "@/api/user/cert/ssl";
-import { useFormValidator, useNotify } from "@/utils/composable";
-import { reqNewCertSchema } from "@/utils/schema";
+import type { CaInfoDTO } from "@api/types";
+import { requestCaCert } from "@api/admin/cert/ca";
+import { requestSslCert } from "@api/user/cert/ssl";
+import { reqNewCertSchema } from "@utils/schema";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -15,7 +14,7 @@ const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 const emits = defineEmits<{ success: [] }>();
 
 /* Services */
-const { toast, info, success, warn, error } = useNotify();
+const { success, info, warn, error, remove } = useNotify();
 const { isInvalid, setInvalid, clearInvalid, validate } =
   useFormValidator(reqNewCertSchema);
 
@@ -24,45 +23,65 @@ const busy = ref(false);
 
 const caSelection = ref<CaInfoDTO | null>(null);
 const allowSubCa = ref(true);
+const algorithm = ref<string | null>(null);
+const keySize = ref<number | null>(null);
 
 /* Computed */
 const reqNewCertFn = computed(() =>
   variant === "ca" ? requestCaCert : requestSslCert
 );
+const isKeySizeRequired = computed(() =>
+  ["RSA", "EC"].includes(caSelection.value?.algorithm ?? "")
+);
+const keySizeOptions = computed(() => {
+  switch (caSelection.value?.algorithm || algorithm.value) {
+    case "RSA":
+      return [2048, 3072, 4096, 5120];
+    case "EC":
+      return [256, 384, 521];
+    case "Ed25519":
+      return [256];
+    default:
+      return [];
+  }
+});
 
 /* Actions */
 const onSubmit = async (ev: Event) => {
   // Validate form
   const result = validate(ev.target as HTMLFormElement);
   if (!result.success) {
-    error("Validation Error", result.issues![0].message);
+    warn(result.issues![0].message, "Validation Error");
     return;
   }
   if (variant === "ssl" && caSelection.value === null) {
     setInvalid("ca-uuid");
-    error("Validation Error", "CA is required");
+    warn("CA is required", "Validation Error");
     return;
   }
 
   // Try to require
   busy.value = true;
-  const msg = info("Info", "Requesting");
+  const msg = info("Requesting");
 
   try {
     await reqNewCertFn.value({
       ...result.output,
-      caUuid: caSelection.value!.uuid,
-      allowSubCa: allowSubCa.value
+      caUuid: caSelection.value?.uuid,
+      allowSubCa: allowSubCa.value,
+      algorithm: algorithm.value,
+      keySize: keySize.value,
+      abort: { timeout: -1 }
     });
 
-    success("Success", "Successfully requested");
     emits("success");
     visible.value = false;
+    success("Successfully requested");
   } catch (err: unknown) {
-    error("Fail to Request", (err as Error).message);
+    error((err as Error).message, "Fail to Request");
   }
 
-  toast.remove(msg);
+  remove(msg);
   busy.value = false;
 };
 
@@ -71,18 +90,41 @@ watch(visible, (newValue) => {
   if (!newValue) {
     busy.value = false;
     allowSubCa.value = true;
+    algorithm.value = null;
+    keySize.value = null;
   }
 });
 watch(caSelection, (newValue) => {
-  if (newValue !== null && !newValue.allowSubCa) {
+  if (variant === "ca" && newValue !== null && !newValue.allowSubCa) {
     queueMicrotask(() => {
       caSelection.value = null;
-      warn("Warning", `"${newValue.comment}" is not allowed to have sub-CA`);
+      warn(`"${newValue.comment}" is not allowed to have sub-CA`);
     });
     return;
   }
 
   allowSubCa.value = newValue === null;
+  algorithm.value = null;
+  switch (newValue?.algorithm) {
+    case "RSA":
+      keySize.value = 2048;
+      break;
+    case "EC":
+    case "Ed25519":
+      keySize.value = 256;
+      break;
+  }
+});
+watch(algorithm, (newValue) => {
+  switch (newValue) {
+    case "RSA":
+      keySize.value = 2048;
+      break;
+    case "EC":
+    case "Ed25519":
+      keySize.value = 256;
+      break;
+  }
 });
 </script>
 
@@ -104,9 +146,9 @@ watch(caSelection, (newValue) => {
             v-model:selection="caSelection"
             option-label="uuid"
             :invalid="isInvalid('ca-uuid')"
+            :show-clear="variant === 'ca'"
             :visible="visible ?? false"
-            @focus="clearInvalid('ca-uuid')"
-            show-clear />
+            @focus="clearInvalid('ca-uuid')" />
         </section>
         <section v-if="variant === 'ca'" class="w-1/4">
           <label>Allow Sub CA</label>
@@ -114,6 +156,32 @@ watch(caSelection, (newValue) => {
             v-model="allowSubCa"
             size="small"
             :disabled="caSelection === null" />
+        </section>
+      </div>
+
+      <div class="flex gap-8">
+        <section class="w-1/2">
+          <label :required="variant === 'ca'">Algorithm</label>
+          <InputText
+            v-if="variant === 'ssl' || caSelection !== null"
+            size="small"
+            :model-value="caSelection?.algorithm"
+            disabled />
+          <Select
+            v-else
+            v-model:model-value="algorithm"
+            size="small"
+            :options="['RSA', 'EC', 'Ed25519']"></Select>
+        </section>
+        <section class="w-1/2">
+          <label :required="isKeySizeRequired">Key Size</label>
+          <Select
+            v-model:model-value="keySize"
+            size="small"
+            :disabled="
+              caSelection?.algorithm === undefined && algorithm === null
+            "
+            :options="keySizeOptions"></Select>
         </section>
       </div>
 
@@ -196,7 +264,7 @@ watch(caSelection, (newValue) => {
             suffix=" day(s)"
             :default-value="30"
             :invalid="isInvalid('expiry')"
-            :max="365"
+            :max="variant === 'ca' ? 7300 : 365"
             :min="1"
             @focus="clearInvalid('expiry')"
             required

@@ -1,34 +1,39 @@
-import type { AbortOption } from "@/api";
-import { callRestfulApi } from "@/api";
+import type { BaseParams } from "@api/types";
+import { callRestfulApi } from "@api/index";
 
+export interface CountAllUsrsParams extends BaseParams {
+  role?: 0 | 1 | 2 | 3;
+}
+export const countAllUsrs = (params: CountAllUsrsParams = {}) =>
+  callRestfulApi<number>({
+    method: "GET",
+    baseUrl: "/api/v1/admin/users/count",
+    searchParams: { ...params, abort: undefined },
+    abort: params.abort
+  });
+
+export interface CountRequestedCaCertsParams extends BaseParams {
+  condition?: "available" | "unavailable" | "none";
+}
 export const countRequestedCaCerts = (
-  condition: "available" | "unavailable" | "none" = "none",
-  abort?: AbortOption
+  params: CountRequestedCaCertsParams = {}
 ) =>
   callRestfulApi<number>({
     method: "GET",
     baseUrl: "/api/v1/admin/cert/ca/count",
-    searchParams: { condition },
-    abort
+    searchParams: { ...params, abort: undefined },
+    abort: params.abort
   });
 
-export const countCaRequestedCerts = (
-  uuid: string,
-  caOrSsl: boolean,
-  abort?: AbortOption
-) =>
+export interface CountCaRequestedCertsParams extends BaseParams {
+  uuid: string;
+  caOrSsl?: boolean;
+}
+export const countCaRequestedCerts = (params: CountCaRequestedCertsParams) =>
   callRestfulApi<number>({
     method: "GET",
     baseUrl: "/api/v1/admin/cert/ca/{uuid}/count",
-    pathNames: { uuid },
-    searchParams: { caOrSsl },
-    abort
-  });
-
-export const countAllUsrs = (role: 1 | 2 | 3 | 0 = 0, abort?: AbortOption) =>
-  callRestfulApi<number>({
-    method: "GET",
-    baseUrl: "/api/v1/superadmin/user/count",
-    searchParams: { role },
-    abort
+    pathNames: params,
+    searchParams: { ...params, uuid: undefined, abort: undefined },
+    abort: params.abort
   });

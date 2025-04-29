@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { MenuItem } from "primevue/menuitem";
-import { useUserStore } from "@/stores/user";
 
 /* Services */
 const router = useRouter();
@@ -77,6 +76,11 @@ const menuModel = computed(() =>
       <hr class="border-neutral-200 border-t-2 dark:border-neutral-500" />
       <p class="leading-none select-none text-center text-neutral-400 text-sm">
         {{ displayRole }} View
+      </p>
+      <p class="leading-none select-none text-center text-neutral-400 text-sm">
+        <a class="hover:text-blue-500" href="/swagger-ui/index.html" rel="noopener noreferer" target="_blank"
+          >API Doc</a
+        >
       </p>
     </div>
   </aside>

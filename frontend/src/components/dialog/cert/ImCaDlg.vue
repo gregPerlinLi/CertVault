@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { FileUploadSelectEvent } from "primevue";
-import { importCa } from "@/api/admin/cert/ca";
-import { useNotify } from "@/utils/composable";
+import { importCa } from "@api/admin/cert/ca";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -10,7 +9,7 @@ const visible = defineModel<boolean>("visible");
 const emits = defineEmits<{ success: [] }>();
 
 /* Services */
-const { toast, info, success, error } = useNotify();
+const { success, info, warn, error, remove } = useNotify();
 
 /* Reactive */
 const busy = ref(false);
@@ -43,36 +42,40 @@ const onSubmit = async (ev: Event) => {
 
   // Validate data
   if (certData.value === undefined) {
-    error("Validation Error", "Certificate not selected");
+    warn("Certificate not selected");
     return;
   }
 
   if (keyData.value === undefined) {
-    error("Validation Error", "Private key not selected");
+    warn("Private key not selected");
     return;
   }
 
   const comment = formData.get("comment")?.toString().trim() ?? "";
   if (comment.length === 0) {
     invalid.value = true;
-    error("Validation Error", "Comment is required");
+    warn("Comment is required");
     return;
   }
 
   // Try to import
   busy.value = true;
-  const msg = info("Info", "Importing");
+  const msg = info("Importing");
 
   try {
-    await importCa(certData.value, keyData.value, comment);
-    success("Success", "Successfully imported");
+    await importCa({
+      certificate: certData.value,
+      privkey: keyData.value,
+      comment
+    });
     emits("success");
     visible.value = false;
+    success("Successfully imported");
   } catch (err: unknown) {
-    error("Fail to Import", (err as Error).message);
+    error((err as Error).message, "Fail to Import");
   }
 
-  toast.remove(msg);
+  remove(msg);
   busy.value = false;
 };
 

@@ -95,11 +95,13 @@ public interface IUserService extends IService<User> {
      * Get all users
      *
      * @param keyword search keyword
-     * @param page page
-     * @param limit limit
+     * @param page    page
+     * @param limit   limit
+     * @param isAsc   ascending or descending
+     * @param orderBy the order by field
      * @return user profile list
      */
-    PageDTO<UserProfileDTO> getUsers(String keyword, Integer page, Integer limit);
+    PageDTO<UserProfileDTO> getUsers(String keyword, Integer page, Integer limit, Boolean isAsc, String orderBy);
 
     /**
      * Create user

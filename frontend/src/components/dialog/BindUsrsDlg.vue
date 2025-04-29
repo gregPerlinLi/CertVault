@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { CaInfoDTO, UserProfileDTO } from "@/api/types";
-import { useNotify } from "@/utils/composable";
-import { bindCaToUsrs, getAllCaNotBindedUsrs } from "@/api/admin/cert/binding";
+import type { CaInfoDTO, UserProfileDTO } from "@api/types";
+import { bindCaToUsrs, getAllCaNotBindedUsrs } from "@api/admin/cert/binding";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -13,7 +12,7 @@ const props = defineProps<{ ca: CaInfoDTO | null }>();
 const emits = defineEmits<{ success: [] }>();
 
 /* Services */
-const { toast, info, success, error } = useNotify();
+const { success, info, error, remove } = useNotify();
 
 const refUsrTable = useTemplateRef("usr-table");
 
@@ -28,22 +27,22 @@ const usrTable = reactive({
 /* Actions */
 const tryBind = async () => {
   busyBind.value = true;
-  const msg = info("Info", "Binding");
+  const msg = info("Binding");
 
   try {
-    await bindCaToUsrs(
-      props.ca!.uuid,
-      usrTable.selection.map(({ username }) => username)
-    );
+    await bindCaToUsrs({
+      caUuid: props.ca!.uuid,
+      usernames: usrTable.selection.map(({ username }) => username)
+    });
 
-    success("Success", "Successfully binded");
     emits("success");
     visible.value = false;
+    success("Successfully binded");
   } catch (err: unknown) {
-    error("Fail to Bind", (err as Error).message);
+    error((err as Error).message, "Fail to Bind");
   }
 
-  toast.remove(msg);
+  remove(msg);
   busyBind.value = false;
 };
 
@@ -51,7 +50,7 @@ const tryBind = async () => {
 watch(visible, async (newValue) => {
   if (newValue) {
     await nextTick();
-    refUsrTable.value?.reload();
+    refUsrTable.value?.reset();
     refUsrTable.value?.refresh();
   } else {
     refUsrTable.value?.cancel();
@@ -64,13 +63,21 @@ watch(visible, async (newValue) => {
 <template>
   <Dialog v-model:visible="visible" header="Bind Users" :closable="false" modal>
     <!-- User table -->
-    <UsrTable
+    <UsrTbl
       v-model:selection="usrTable.selection"
       v-model:loading="usrTable.loading"
       ref="usr-table"
       :refresh-fn="
         (page, limit, keyword, abort) =>
-          getAllCaNotBindedUsrs(ca!.uuid, page, limit, keyword, abort)
+          getAllCaNotBindedUsrs({
+            uuid: ca!.uuid,
+            page,
+            limit,
+            keyword,
+            orderBy: 'role',
+            isAsc: false,
+            abort
+          })
       "
       selectable />
 

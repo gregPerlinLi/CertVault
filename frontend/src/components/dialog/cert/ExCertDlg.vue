@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
-import { getCaPrivKey } from "@/api/admin/cert/ca";
-import { getCaCert } from "@/api/user/cert/ca";
-import { getSslCert, getSslPrivKey } from "@/api/user/cert/ssl";
-import { useUserStore } from "@/stores/user";
-import { b64ToU8Arr, saveFile } from "@/utils";
-import { useNotify } from "@/utils/composable";
+import type { CaInfoDTO, CertInfoDTO } from "@api/types";
+import { getCaPrivKey } from "@api/admin/cert/ca";
+import { getCaCert } from "@api/user/cert/ca";
+import { getSslCert, getSslPrivKey } from "@api/user/cert/ssl";
+import { b64ToU8Arr, saveFile } from "@utils/index";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -17,7 +15,7 @@ const { variant, data } = defineProps<{
 }>();
 
 /* Services */
-const { toast, info, success, error } = useNotify();
+const { success, info, error, remove } = useNotify();
 
 /* Stores */
 const { isAdmin, isSuperadmin } = useUserStore();
@@ -26,12 +24,17 @@ const { isAdmin, isSuperadmin } = useUserStore();
 const busy = reactive({
   exportCert: false,
   exportChain: false,
+  exportChainRoot: false,
   exportPrivKey: false
 });
 
 /* Computed */
 const canClose = computed(
-  () => !busy.exportCert && !busy.exportChain && !busy.exportPrivKey
+  () =>
+    !busy.exportCert &&
+    !busy.exportChain &&
+    !busy.exportChainRoot &&
+    !busy.exportPrivKey
 );
 const getCertFn = computed(() => (variant === "ca" ? getCaCert : getSslCert));
 const getPrivKeyFn = computed(() =>
@@ -39,33 +42,44 @@ const getPrivKeyFn = computed(() =>
 );
 
 /* Actions */
-const exportCert = async (fullchain: boolean = false) => {
+const exportCert = async (
+  isChain: boolean = false,
+  needRootCa: boolean = false
+) => {
   const msg = (() => {
-    if (fullchain) {
+    if (needRootCa) {
+      busy.exportChainRoot = true;
+      return info("Exporting fullchain with root CA");
+    } else if (isChain) {
       busy.exportChain = true;
-      return info("Info", "Exporting fullchain");
+      return info("Exporting fullchain");
     } else {
       busy.exportCert = true;
-      return info("Info", "Exporting");
+      return info("Exporting");
     }
   })();
 
   try {
-    const cert = await getCertFn.value(data!.uuid, fullchain);
+    const cert = await getCertFn.value({
+      uuid: data!.uuid,
+      isChain,
+      needRootCa
+    });
     const pem = new TextDecoder().decode(b64ToU8Arr(cert));
     const file = new Blob([pem], { type: "application/x-pem-file" });
     saveFile(`${data!.uuid}.pem`, file);
 
     success(
-      "Success",
-      fullchain ? "Successfully exported fullchain" : "Successfully exported"
+      isChain ? "Successfully exported fullchain" : "Successfully exported"
     );
   } catch (err: unknown) {
-    error("Fail to Export SSL Certificate", (err as Error).message);
+    error((err as Error).message, "Fail to Export SSL Certificate");
   }
 
-  toast.remove(msg);
-  if (fullchain) {
+  remove(msg);
+  if (needRootCa) {
+    busy.exportChainRoot = false;
+  } else if (isChain) {
     busy.exportChain = false;
   } else {
     busy.exportCert = false;
@@ -73,24 +87,24 @@ const exportCert = async (fullchain: boolean = false) => {
 };
 const onSumbit = async (ev: Event) => {
   busy.exportPrivKey = true;
-  const msg = info("Info", "Exporting private key");
+  const msg = info("Exporting private key");
 
   try {
     const formData = new FormData(ev.target as HTMLFormElement);
     const password = formData.get("password")!.toString();
 
-    const cert = await getPrivKeyFn.value(data!.uuid, password);
+    const cert = await getPrivKeyFn.value({ uuid: data!.uuid, password });
     const pem = new TextDecoder().decode(b64ToU8Arr(cert));
     const file = new Blob([pem], { type: "application/x-pem-file" });
     saveFile(`${data!.uuid}.pem`, file);
 
     (ev.target as HTMLFormElement).querySelector("input")!.value = "";
-    success("Success", "Successfully exported private key");
+    success("Successfully exported private key");
   } catch (err: unknown) {
-    error("Fail to Export SSL Private Key", (err as Error).message);
+    error((err as Error).message, "Fail to Export SSL Private Key");
   }
 
-  toast.remove(msg);
+  remove(msg);
   busy.exportPrivKey = false;
 };
 
@@ -125,6 +139,12 @@ watch(visible, () => {
           :disabled="busy.exportChain"
           :loading="busy.exportChain"
           @click="exportCert(true)"></Button>
+        <Button
+          label="Export Fullchain with Root CA"
+          size="small"
+          :disabled="busy.exportChainRoot"
+          :loading="busy.exportChainRoot"
+          @click="exportCert(true, true)"></Button>
       </div>
     </section>
     <section v-if="variant === 'ssl' || isAdmin || isSuperadmin" class="mt-8">

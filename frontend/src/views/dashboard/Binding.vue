@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import type { CaInfoDTO, UserProfileDTO } from "@/api/types";
-import { useNotify } from "@/utils/composable";
-import { getAllCaBindedUsrs, unbindCaFromUsrs } from "@/api/admin/cert/binding";
+import type { CaInfoDTO, UserProfileDTO } from "@api/types";
+import { getAllCaBindedUsrs, unbindCaFromUsrs } from "@api/admin/cert/binding";
 import { useConfirm } from "primevue/useconfirm";
 
 /* Services */
 const confirm = useConfirm();
-const { toast, info, success, error } = useNotify();
-
-const refUsrTable = useTemplateRef("usr-table");
+const { success, info, error, remove } = useNotify();
 
 /* Reactives */
+const refUsrTable = useTemplateRef("usr-table");
 const busyUnbind = ref(false);
-const dialogBind = ref(false);
 const caSelection = ref<CaInfoDTO | null>(null);
 
 const usrTable = reactive({
   search: "",
   selection: [] as UserProfileDTO[],
   loading: false
+});
+const dialog = reactive({
+  bind: false,
+  info: false
 });
 
 /* Actions */
@@ -32,22 +33,22 @@ const tryUnbind = () =>
     rejectProps: { severity: "secondary", variant: "outlined" },
     accept: async () => {
       busyUnbind.value = true;
-      const msg = info("Info", "Unbinding");
+      const msg = info("Unbinding");
 
       try {
-        await unbindCaFromUsrs(
-          caSelection.value!.uuid,
-          usrTable.selection.map(({ username }) => username)
-        );
+        await unbindCaFromUsrs({
+          caUuid: caSelection.value!.uuid,
+          usernames: usrTable.selection.map(({ username }) => username)
+        });
 
-        success("Success", "Successfully unbinded");
         usrTable.selection = [];
         refUsrTable.value?.refresh();
+        success("Successfully unbinded");
       } catch (err: unknown) {
-        error("Fail to Unbind", (err as Error).message);
+        error((err as Error).message, "Fail to Unbind");
       }
 
-      toast.remove(msg);
+      remove(msg);
       busyUnbind.value = false;
     }
   });
@@ -88,7 +89,7 @@ watch(caSelection, async () => {
           label="Bind"
           size="small"
           :disabled="caSelection === null || usrTable.loading"
-          @click="dialogBind = true"></Button>
+          @click="dialog.bind = true"></Button>
         <Button
           icon="pi pi-trash"
           label="Unbind Selected"
@@ -107,6 +108,13 @@ watch(caSelection, async () => {
           size="small"
           :disabled="caSelection === null || usrTable.loading"
           @click="refUsrTable?.refresh()"></Button>
+        <Button
+          icon="pi pi-info-circle"
+          label="CA Info"
+          severity="secondary"
+          size="small"
+          :disabled="caSelection === null"
+          @click="dialog.info = true"></Button>
       </div>
     </template>
     <template #end>
@@ -123,7 +131,7 @@ watch(caSelection, async () => {
   <div v-if="caSelection === null" class="font-bold py-24 text-2xl text-center">
     Please Select a CA
   </div>
-  <UsrTable
+  <UsrTbl
     v-else
     v-model:search="usrTable.search"
     v-model:selection="usrTable.selection"
@@ -131,13 +139,25 @@ watch(caSelection, async () => {
     ref="usr-table"
     :refresh-fn="
       (page, limit, keyword, abort) =>
-        getAllCaBindedUsrs(caSelection!.uuid, page, limit, keyword, abort)
+        getAllCaBindedUsrs({
+          uuid: caSelection!.uuid,
+          page,
+          limit,
+          keyword,
+          orderBy: 'role',
+          isAsc: false,
+          abort
+        })
     "
     selectable />
 
   <!-- Dialogs -->
   <BindUsrsDlg
-    v-model:visible="dialogBind"
+    v-model:visible="dialog.bind"
     :ca="caSelection"
     @success="refUsrTable?.refresh()" />
+  <DispCertInfoDlg
+    v-model:visible="dialog.info"
+    variant="ca"
+    :data="caSelection ?? undefined" />
 </template>

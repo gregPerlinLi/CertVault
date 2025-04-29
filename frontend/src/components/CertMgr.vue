@@ -1,41 +1,24 @@
 <script setup lang="ts">
-import type { CaInfoDTO, CertInfoDTO } from "@/api/types";
+import type { CaInfoDTO, CertInfoDTO } from "@api/types";
 import {
   deleteCaCert,
   getAllCaInfo,
   toggleCaAvailability
-} from "@/api/admin/cert/ca";
-import { getAllBindedCaInfo } from "@/api/user/cert/ca";
-import { deleteSslCert, getAllSslCertInfo } from "@/api/user/cert/ssl";
-import { useUserStore } from "@/stores/user";
-import { useAsyncGuard, useNotify } from "@/utils/composable";
+} from "@api/admin/cert/ca";
+import { getAllBindedCaInfo } from "@api/user/cert/ca";
+import { deleteSslCert, getAllSslCertInfo } from "@api/user/cert/ssl";
 import { useConfirm } from "primevue/useconfirm";
 
-import ErrorPlaceholer from "@comps/placeholder/ErrorPlaceholer.vue";
-import LoadingPlaceholder from "@comps/placeholder/LoadingPlaceholder.vue";
-
 /* Async components */
-const AsyncDataTable = defineAsyncComponent({
-  loader: () => import("primevue/datatable"),
-  loadingComponent: LoadingPlaceholder,
-  errorComponent: ErrorPlaceholer,
-  onError: (err, retry, fail, attampts) => {
-    if (attampts < 5) {
-      retry();
-    } else {
-      error("Fail to Load Data Table Component", err.message);
-      fail();
-    }
-  }
-});
+const AsyncDataTable = useAsyncDataTable();
 
 // Properties
 const { variant } = defineProps<{ variant: "ca" | "ssl" }>();
 
 /* Services */
 const confirm = useConfirm();
-const { toast, info, success, error } = useNotify();
-const { isActivate, signal } = useAsyncGuard();
+const { success, info, error, remove } = useNotify();
+const { isActive, getSignal } = useAsyncGuard();
 
 /* Stores */
 const { isUser, isAdmin, isSuperadmin } = useUserStore();
@@ -81,24 +64,27 @@ const refresh = async () => {
   loading.value = true;
 
   try {
-    const page = await getCertInfo.value(
-      pagination.first / pagination.limit + 1,
-      pagination.limit,
-      searchKeyword.value.length === 0 ? undefined : searchKeyword.value,
-      { signal }
-    );
+    const page = await getCertInfo.value({
+      page: pagination.first / pagination.limit + 1,
+      limit: pagination.limit,
+      keyword:
+        searchKeyword.value.length === 0 ? undefined : searchKeyword.value,
+      orderBy: "status",
+      isAsc: false,
+      abort: { signal: getSignal() }
+    });
 
-    if (isActivate.value) {
+    if (isActive.value) {
       pagination.total = page.total;
       pagination.data = page.list ?? [];
     }
   } catch (err: unknown) {
-    if (isActivate.value) {
+    if (isActive.value) {
       error(
+        (err as Error).message,
         variant === "ca"
           ? "Fail to Fetch CA Certificates List"
-          : "Fail to Fetch SSL Certificates List",
-        (err as Error).message
+          : "Fail to Fetch SSL Certificates List"
       );
     }
   }
@@ -124,17 +110,17 @@ const tryToggleCertAvailable = (data: CaInfoDTO) =>
     acceptProps: { severity: "danger" },
     rejectProps: { severity: "secondary" },
     accept: async () => {
-      const msg = info("Info", "Toggling");
+      const msg = info("Toggling");
 
       try {
-        await toggleCaAvailability(data.uuid);
-        success("Success", "Successfully toggled");
+        await toggleCaAvailability({ uuid: data.uuid });
+        success("Successfully toggled");
         refresh();
       } catch (err: unknown) {
-        error("Fail to Delete", (err as Error).message);
+        error((err as Error).message, "Fail to Delete");
       }
 
-      toast.remove(msg);
+      remove(msg);
     }
   });
 
@@ -148,17 +134,17 @@ const tryDelCert = (data: CertInfoDTO) =>
     acceptProps: { severity: "danger" },
     rejectProps: { severity: "secondary" },
     accept: async () => {
-      const msg = info("Info", "Deleting");
+      const msg = info("Deleting");
 
       try {
-        await delCertFn.value(data.uuid);
-        success("Success", "Successfully deleted");
+        await delCertFn.value({ uuid: data.uuid });
+        success("Successfully deleted");
         refresh();
       } catch (err: unknown) {
-        error("Fail to Delete", (err as Error).message);
+        error((err as Error).message, "Fail to Delete");
       }
 
-      toast.remove(msg);
+      remove(msg);
     }
   });
 
@@ -320,77 +306,49 @@ onBeforeMount(() => refresh());
     <Column>
       <template #body="{ data }">
         <div class="gap-2 hidden justify-end group-hover:flex">
-          <Button
-            v-tooltip.top="{ value: 'Info', class: 'text-sm' }"
-            aria-label="Certificate information"
-            class="h-6 w-6"
-            icon="pi pi-info-circle"
+          <OperationButton
+            icon="pi-info-circle"
+            label="Show Details"
             severity="info"
-            size="small"
-            variant="text"
-            rounded
             @click="
               () => {
                 targetCertData = data;
                 dialog.showInfo = true;
               }
-            "></Button>
-          <Button
-            v-tooltip.top="{ value: 'Export', class: 'text-sm' }"
-            aria-label="Export certificate"
-            class="h-6 w-6"
-            icon="pi pi-file-export"
+            " />
+          <OperationButton
+            icon="pi-file-export"
+            label="Export"
             severity="success"
-            size="small"
-            variant="text"
-            rounded
             @click="
               () => {
                 targetCertData = data;
                 dialog.exportCert = true;
               }
-            "></Button>
-          <Button
+            " />
+          <OperationButton
             v-if="variant === 'ssl' || isAdmin || isSuperadmin"
-            v-tooltip.top="{ value: 'Renew', class: 'text-sm' }"
-            aria-label="Renew certificate"
-            class="h-6 w-6"
-            icon="pi pi-sync"
-            severity="secondary"
-            size="small"
-            variant="text"
-            rounded
+            icon="pi-sync"
+            label="Renew"
+            severity="help"
             @click="
               () => {
                 targetCertData = data;
                 dialog.renewCert = true;
               }
-            "></Button>
-          <Button
+            " />
+          <OperationButton
             v-if="variant === 'ca' && (isAdmin || isSuperadmin)"
-            v-tooltip.top="{
-              value: data.available ? 'Disable' : 'Enable',
-              class: 'text-sm'
-            }"
-            class="h-6 w-6"
-            size="small"
-            variant="text"
-            :aria-label="data.available ? 'Disable' : 'Enable'"
-            :icon="data.available ? 'pi pi-ban' : 'pi pi-check-circle'"
+            :icon="data.available ? 'pi-ban' : 'pi-check-circle'"
+            :label="data.available ? 'Disable' : 'Enable'"
             :severity="data.available ? 'danger' : 'success'"
-            rounded
-            @click="tryToggleCertAvailable(data)"></Button>
-          <Button
+            @click="tryToggleCertAvailable(data)" />
+          <OperationButton
             v-if="variant === 'ssl' || isAdmin || isSuperadmin"
-            v-tooltip.top="{ value: 'Delete', class: 'text-sm' }"
-            aria-label="Delete certificate"
-            class="h-6 w-6"
-            icon="pi pi-trash"
+            icon="pi-trash"
+            label="Delete"
             severity="danger"
-            size="small"
-            variant="text"
-            rounded
-            @click="tryDelCert(data)"></Button>
+            @click="tryDelCert(data)" />
         </div>
       </template>
     </Column>

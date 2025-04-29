@@ -49,7 +49,7 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
     CaMapper caMapper;
 
     @Override
-    public PageDTO<CertInfoDTO> getCertificates(String keyword, String owner, Integer page, Integer limit) {
+    public PageDTO<CertInfoDTO> getCertificates(String keyword, String owner, Integer page, Integer limit, Boolean isAsc, String orderBy) {
         Page<Certificate> certificatePage = new Page<>(page, limit);
         Page<Certificate> resultPage;
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
@@ -119,6 +119,17 @@ public class CertificateServiceImpl extends ServiceImpl<CertificateMapper, Certi
                                 .like("ca_uuid", keyword))
                         .eq("owner", user.getId())
                         .eq("deleted", false);
+            }
+        }
+        if ( orderBy != null && !orderBy.isEmpty() ) {
+            if ( isAsc == null ) {
+                isAsc = true;
+            }
+            switch (orderBy) {
+                case "uuid" -> certificateQueryWrapper.orderBy(true, isAsc,"uuid");
+                case "comment" -> certificateQueryWrapper.orderBy(true, isAsc,"comment");
+                case "owner" -> certificateQueryWrapper.orderBy(true, isAsc,"owner");
+                case "status" -> certificateQueryWrapper.orderBy(true, isAsc,"not_after");
             }
         }
         resultPage = this.page(certificatePage, certificateQueryWrapper);

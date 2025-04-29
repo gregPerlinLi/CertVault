@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useCommonStore } from "@/stores/common";
+import { useCommonStore } from "@stores/common";
 
 /* Stores */
 const { initialized } = useCommonStore();

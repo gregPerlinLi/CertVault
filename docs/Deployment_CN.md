@@ -151,6 +151,11 @@ certvault .
 ```bash
 curl -I http://svc-ip:1888/api/v1/
 ```
+
+### 配置选项
+
+请参考：[CertVault Helm Chart | certvault-charts](https://gregperlinli.github.io/certvault-charts/)
+
 ---
 
 ## 4. 源码编译部署

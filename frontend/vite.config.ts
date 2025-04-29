@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
       tsconfigPaths({ loose: true, projects: ["tsconfig.app.json"] }),
       vue(),
       autoImport.vite({
+        dirs: ["./src/composables/**", "./src/stores/**"],
         dts: true,
         imports: ["vue", "vue-router", "@vueuse/core"]
       }),
@@ -34,6 +35,10 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         "/api": {
+          changeOrigin: true,
+          target: env.VITE_TEST_SERVER_TARGET
+        },
+        "/swagger-ui": {
           changeOrigin: true,
           target: env.VITE_TEST_SERVER_TARGET
         }

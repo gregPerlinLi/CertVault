@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { getProfile, updateProfile } from "@/api/user/user";
-import { useUserStore } from "@/stores/user";
-import { useNotify } from "@/utils/composable";
+import { getProfile, updateProfile } from "@api/user/user";
 
 /* Models */
 const visible = defineModel<boolean>("visible");
@@ -10,7 +8,7 @@ const visible = defineModel<boolean>("visible");
 const props = defineProps<{ value: string }>();
 
 /* Services */
-const { toast, info, success, error } = useNotify();
+const { success, info, warn, error, remove } = useNotify();
 
 /* Stores */
 const user = useUserStore();
@@ -29,39 +27,40 @@ const submit = async () => {
   // Validate
   if (newEmail.value.length === 0) {
     invalid.value = true;
-    error("Validation Error", "New email is required");
+    warn("New email is required");
     return;
   }
   if (newEmail.value === props.value) {
     invalid.value = true;
-    error("Validation Error", "No changes found");
+    warn("No changes found");
     return;
   }
 
   // Try to update
   busy.value = true;
-  const msg = info("Info", "Updating");
+  const msg = info("Updating");
 
   try {
     await updateProfile({ email: newEmail.value });
-    const profile = await getProfile({ timeout: -1 });
+    const profile = await getProfile({ abort: { timeout: -1 } });
     user.update(profile);
-    success("Success", "Successfully updated profile");
     visible.value = false;
+    success("Successfully updated profile");
   } catch (err: unknown) {
-    error("Fail to Update Profile", (err as Error).message);
+    error((err as Error).message, "Fail to Update Profile");
   }
 
-  toast.remove(msg);
+  remove(msg);
   busy.value = false;
 };
 
 /* Watches */
-watch(visible, () => {
-  if (!visible.value) {
+watch(visible, (newValue) => {
+  if (newValue) {
+    newEmail.value = props.value;
+  } else {
     invalid.value = false;
     busy.value = false;
-    newEmail.value = props.value;
   }
 });
 </script>
@@ -87,7 +86,6 @@ watch(visible, () => {
           label="Save"
           size="small"
           type="submit"
-          :disabled="busy"
           :loading="busy"></Button>
       </div>
     </form>

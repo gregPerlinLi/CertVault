@@ -1,36 +1,40 @@
-import type { AbortOption } from "@/api";
-import type { CaInfoDTO, PaginationVO, ResponseCaDTO } from "@/api/types";
-import { callRestfulApi } from "@/api";
+import type {
+  BaseParams,
+  CaInfoDTO,
+  PageParams,
+  PageVO,
+  ResponseCaDTO
+} from "@api/types";
+import { callRestfulApi } from "@api/index";
 
 export const getAllCaInfo = (
-  page: number,
-  limit: number,
-  keyword?: string,
-  abort?: AbortOption
+  params: BaseParams & PageParams<"uuid" | "comment" | "owner" | "status"> = {}
 ) =>
-  callRestfulApi<PaginationVO<CaInfoDTO>>({
+  callRestfulApi<PageVO<CaInfoDTO>>({
     method: "GET",
     baseUrl: "/api/v1/admin/cert/ca",
-    searchParams: { page, limit, keyword },
-    abort
+    searchParams: { ...params, abort: undefined },
+    abort: params.abort
   });
 
-export const getCaPrivKey = (
-  uuid: string,
-  password: string,
-  abort?: AbortOption
-) =>
+export interface GetCaPrivKeyParams extends BaseParams {
+  uuid: string;
+  password: string;
+}
+export const getCaPrivKey = (params: GetCaPrivKeyParams) =>
   callRestfulApi<string>({
     method: "POST",
     baseUrl: "/api/v1/admin/cert/ca/{uuid}/privkey",
-    pathNames: { uuid },
-    payload: { password },
-    abort
+    pathNames: params,
+    payload: { ...params, uuid: undefined, abort: undefined },
+    abort: params.abort
   });
 
-export interface RequestCaCertPayload {
+export interface RequestCaCertParams extends BaseParams {
   caUuid?: string;
   allowSubCa?: boolean;
+  algorithm?: string;
+  keySize?: number;
   country: string;
   province: string;
   city: string;
@@ -44,68 +48,71 @@ export interface RequestCaCertPayload {
     value: string;
   }[];
 }
-export const requestCaCert = (
-  payload: RequestCaCertPayload,
-  abort?: AbortOption
-) =>
+export const requestCaCert = (params: RequestCaCertParams) =>
   callRestfulApi<ResponseCaDTO>({
     method: "POST",
     baseUrl: "/api/v1/admin/cert/ca",
-    payload,
-    abort
+    payload: { ...params, abort: undefined },
+    abort: params.abort
   });
 
-export const importCa = (
-  certificate: string,
-  privkey: string,
-  comment: string,
-  abort?: AbortOption
-) =>
+export interface ImportCaParams extends BaseParams {
+  certificate: string;
+  privkey: string;
+  comment: string;
+}
+export const importCa = (params: ImportCaParams) =>
   callRestfulApi<ResponseCaDTO>({
     method: "POST",
     baseUrl: "/api/v1/admin/cert/ca/import",
-    payload: { certificate, privkey, comment },
-    abort
+    payload: { ...params, abort: undefined },
+    abort: params.abort
   });
 
-export const renewCaCert = (
-  uuid: string,
-  expiry: number,
-  abort?: AbortOption
-) =>
+export interface RenewCaCertParams extends BaseParams {
+  uuid: string;
+  expiry: number;
+}
+export const renewCaCert = (params: RenewCaCertParams) =>
   callRestfulApi<ResponseCaDTO>({
     method: "PUT",
     baseUrl: "/api/v1/admin/cert/ca/{uuid}",
-    pathNames: { uuid },
-    payload: { expiry },
-    abort
+    pathNames: params,
+    payload: { ...params, uuid: undefined, abort: undefined },
+    abort: params.abort
   });
 
-export const toggleCaAvailability = (uuid: string, abort?: AbortOption) =>
+export interface ToggleCaAvailabilityParams extends BaseParams {
+  uuid: string;
+}
+export const toggleCaAvailability = (params: ToggleCaAvailabilityParams) =>
   callRestfulApi({
     method: "PATCH",
     baseUrl: "/api/v1/admin/cert/ca/{uuid}/available",
-    pathNames: { uuid },
-    abort
+    pathNames: params,
+    abort: params.abort
   });
 
-export const updateCaComment = (
-  uuid: string,
-  comment: string,
-  abort?: AbortOption
-) =>
+export interface UpdateCaCommentParams extends BaseParams {
+  uuid: string;
+  comment: string;
+}
+export const updateCaComment = (params: UpdateCaCommentParams) =>
   callRestfulApi({
     method: "PATCH",
     baseUrl: "/api/v1/admin/cert/ca/{uuid}/comment",
-    pathNames: { uuid },
-    payload: { comment },
-    abort
+    pathNames: params,
+    payload: { ...params, uuid: undefined, abort: undefined },
+    abort: params.abort
   });
 
-export const deleteCaCert = (uuid: string, abort?: AbortOption) =>
+export interface DeleteCaCertParams extends BaseParams {
+  uuid: string;
+}
+export const deleteCaCert = (params: DeleteCaCertParams) =>
   callRestfulApi({
     method: "DELETE",
     baseUrl: "/api/v1/admin/cert/ca/{uuid}",
-    pathNames: { uuid },
-    abort
+    pathNames: params,
+    abort: params.abort
   });

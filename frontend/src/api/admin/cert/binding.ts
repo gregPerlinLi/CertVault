@@ -1,57 +1,65 @@
-import type { AbortOption } from "@/api";
-import type { PaginationVO, UserProfileDTO } from "@/api/types";
-import { callRestfulApi } from "@/api";
+import type {
+  BaseParams,
+  PageParams,
+  PageVO,
+  UserProfileDTO
+} from "@api/types";
+import { callRestfulApi } from "@api/index";
 
-export const getAllCaBindedUsrs = (
-  uuid: string,
-  page: number,
-  limit: number,
-  keyword?: string,
-  abort?: AbortOption
-) =>
-  callRestfulApi<PaginationVO<UserProfileDTO>>({
+export interface GetAllCaBindedUsrsParams
+  extends BaseParams,
+    PageParams<"username" | "displayName" | "email" | "role"> {
+  uuid: string;
+}
+export const getAllCaBindedUsrs = (params: GetAllCaBindedUsrsParams) =>
+  callRestfulApi<PageVO<UserProfileDTO>>({
     method: "GET",
     baseUrl: "/api/v1/admin/cert/ca/{uuid}/bind",
-    pathNames: { uuid },
-    searchParams: { page, limit, keyword },
-    abort
+    pathNames: params,
+    searchParams: { ...params, uuid: undefined, abort: undefined },
+    abort: params.abort
   });
 
-export const getAllCaNotBindedUsrs = (
-  uuid: string,
-  page: number,
-  limit: number,
-  keyword?: string,
-  abort?: AbortOption
-) =>
-  callRestfulApi<PaginationVO<UserProfileDTO>>({
+export interface GetAllCaNotBindedUsrsParams
+  extends BaseParams,
+    PageParams<"username" | "displayName" | "email" | "role"> {
+  uuid: string;
+}
+export const getAllCaNotBindedUsrs = (params: GetAllCaNotBindedUsrsParams) =>
+  callRestfulApi<PageVO<UserProfileDTO>>({
     method: "GET",
     baseUrl: "/api/v1/admin/cert/ca/{uuid}/bind/not",
-    pathNames: { uuid },
-    searchParams: { page, limit, keyword },
-    abort
+    pathNames: params,
+    searchParams: { ...params, uuid: undefined, abort: undefined },
+    abort: params.abort
   });
 
-export const bindCaToUsrs = (
-  caUuid: string,
-  usernames: string[],
-  abort?: AbortOption
-) =>
+export interface BindCaToUsrsParams extends BaseParams {
+  caUuid: string;
+  usernames: string[];
+}
+export const bindCaToUsrs = (params: BindCaToUsrsParams) =>
   callRestfulApi({
     method: "POST",
     baseUrl: "/api/v1/admin/cert/ca/binds/create",
-    payload: usernames.map((username) => ({ caUuid, username })),
-    abort
+    payload: params.usernames.map((username) => ({
+      caUuid: params.caUuid,
+      username
+    })),
+    abort: params.abort
   });
 
-export const unbindCaFromUsrs = (
-  caUuid: string,
-  usernames: string[],
-  abort?: AbortOption
-) =>
+export interface UnbindCaFromUsrsParams extends BaseParams {
+  caUuid: string;
+  usernames: string[];
+}
+export const unbindCaFromUsrs = (params: UnbindCaFromUsrsParams) =>
   callRestfulApi({
     method: "POST",
     baseUrl: "/api/v1/admin/cert/ca/binds/delete",
-    payload: usernames.map((username) => ({ caUuid, username })),
-    abort
+    payload: params.usernames.map((username) => ({
+      caUuid: params.caUuid,
+      username
+    })),
+    abort: params.abort
   });
