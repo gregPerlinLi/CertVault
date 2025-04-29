@@ -153,6 +153,8 @@ curl -I http://svc-ip:1888/api/v1/
 
 ### Configuration Options
 
+See [CertVault Helm Chart | certvault-charts](https://gregperlinli.github.io/certvault-charts/)
+
 ---
 
 ## 4. Source Code Deployment
