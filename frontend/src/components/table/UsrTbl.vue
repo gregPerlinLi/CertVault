@@ -79,9 +79,7 @@ const refresh = async () => {
 
     if (isActivate.value) {
       totalRecords.value = page.total;
-      data.value = (page.list ?? []).sort((a, b) =>
-        a.role !== b.role ? b.role - a.role : a.username < b.username ? -1 : 1
-      );
+      data.value = page.list ?? [];
     }
   } catch (err: unknown) {
     if (isActivate.value) {

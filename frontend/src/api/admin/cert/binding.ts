@@ -8,7 +8,7 @@ import { callRestfulApi } from "@api/index";
 
 export interface GetAllCaBindedUsrsParams
   extends BaseParams,
-    PageParams<"username" | "displayName" | "email"> {
+    PageParams<"username" | "displayName" | "email" | "role"> {
   uuid: string;
 }
 export const getAllCaBindedUsrs = (params: GetAllCaBindedUsrsParams) =>
@@ -22,7 +22,7 @@ export const getAllCaBindedUsrs = (params: GetAllCaBindedUsrsParams) =>
 
 export interface GetAllCaNotBindedUsrsParams
   extends BaseParams,
-    PageParams<"username" | "displayName" | "email"> {
+    PageParams<"username" | "displayName" | "email" | "role"> {
   uuid: string;
 }
 export const getAllCaNotBindedUsrs = (params: GetAllCaNotBindedUsrsParams) =>

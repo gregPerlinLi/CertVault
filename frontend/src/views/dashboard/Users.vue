@@ -176,7 +176,14 @@ onMounted(() => refUsrTable.value?.refresh());
     :editable="isSuperadmin"
     :refresh-fn="
       (page, limit, keyword, abort) =>
-        getAllUsrInfo({ page, limit, keyword, abort })
+        getAllUsrInfo({
+          page,
+          limit,
+          keyword,
+          orderBy: 'role',
+          isAsc: false,
+          abort
+        })
     "
     @cell-edit-complete="onEdit"
     selectable>

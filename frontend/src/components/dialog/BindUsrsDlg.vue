@@ -74,6 +74,8 @@ watch(visible, async (newValue) => {
             page,
             limit,
             keyword,
+            orderBy: 'role',
+            isAsc: false,
             abort
           })
       "

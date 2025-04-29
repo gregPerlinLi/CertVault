@@ -7,7 +7,8 @@ import type {
 import { callRestfulApi } from "@api/index";
 
 export const getAllUsrInfo = (
-  params: BaseParams & PageParams<"username" | "displayName" | "email"> = {}
+  params: BaseParams &
+    PageParams<"username" | "displayName" | "email" | "role"> = {}
 ) =>
   callRestfulApi<PageVO<UserProfileDTO>>({
     method: "GET",
