@@ -8,6 +8,7 @@
     <a href="https://github.com/gregPerlinLi/CertVault/issues"><img src="https://img.shields.io/github/issues/gregPerlinLi/CertVault?color=f85149" alt="Issues" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/issues?q=is%3Aissue%20state%3Aclosed"><img src="https://img.shields.io/github/issues-closed/gregPerlinLi/CertVault?color=ab7df8" alt="Closed issues" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/contributors"><img src="https://img.shields.io/github/contributors/gregPerlinLi/CertVault" alt="Contributors" /> </a>
+    <a href="https://github.com/gregPerlinLi/CertVault/commits"><img src="https://img.shields.io/github/commit-activity/t/gregPerlinLi/CertVault" alt="Commit activity" /> </a>
     <a href="https://github.com/gregPerlinLi/CertVault/stargazers"><img src="https://img.shields.io/github/stars/gregPerlinLi/CertVault" alt="Stars" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/releases"><img src="https://img.shields.io/github/downloads/gregPerlinLi/CertVault/total" alt="GitHub Downloads"></a>
 </div>
