@@ -20,5 +20,4 @@
 - [x] Get all users with filter of binded CA
 - [x] Extract user table component
 - [x] Waiting for pagination order by update
-- [ ] Optimize profile/cert info update, less dialogs
 - [ ] Buttons disable logic

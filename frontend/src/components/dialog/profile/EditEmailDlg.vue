@@ -85,7 +85,6 @@ watch(visible, () => {
           label="Save"
           size="small"
           type="submit"
-          :disabled="busy"
           :loading="busy"></Button>
       </div>
     </form>
