@@ -6,12 +6,11 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Spring Doc Configuration
@@ -50,7 +49,13 @@ public class SpringDocConfig {
                         .name("Apache 2.0")
                         .url("https://www.apache.org/licenses/LICENSE-2.0"))
                 .summary("CertVault RESTful API Doc")
-                .version(appVersion);
+                .version(appVersion)
+                .extensions(Map.of(
+                        "x-logo", Map.of(
+                                "url", "https://raw.githubusercontent.com/gregPerlinLi/CertVault/refs/heads/main/docs/img/Logo.svg",
+                                "altText", "CertVault Logo"
+                        )
+                ));
     }
 
 }
