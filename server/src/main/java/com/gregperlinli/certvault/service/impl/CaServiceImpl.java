@@ -278,8 +278,7 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
         Set<Integer> uids = caBindings.stream().map(CaBinding::getUid).collect(Collectors.toSet());
         userQueryWrapper.clear();
         if ( keyword == null || keyword.isEmpty() ) {
-            userQueryWrapper.notIn("id", uids)
-                    .eq("deleted", false);
+            userQueryWrapper.eq("deleted", false);
         } else {
             userQueryWrapper.and(wrapper -> wrapper.like("username", keyword)
                             .or()
@@ -287,8 +286,10 @@ public class CaServiceImpl extends ServiceImpl<CaMapper, Ca> implements ICaServi
                             .or()
                             .like("email", keyword)
                     )
-                    .notIn("id", uids)
                     .eq("deleted", false);
+        }
+        if ( !uids.isEmpty() ) {
+            userQueryWrapper.notIn("id", uids);
         }
         if ( orderBy != null && !orderBy.isEmpty() ) {
             if ( isAsc == null ) {
