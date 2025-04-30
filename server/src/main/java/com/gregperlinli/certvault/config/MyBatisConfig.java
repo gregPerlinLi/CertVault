@@ -32,6 +32,8 @@ public class MyBatisConfig {
         DbType dbType = null;
         if ("org.postgresql.Driver".equals(driverClassName)) {
             dbType = DbType.POSTGRE_SQL;
+        } else if ("org.h2.Driver".equals(driverClassName)) {
+            dbType = DbType.H2;
         } else {
             dbType = DbType.MYSQL;
         }
