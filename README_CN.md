@@ -115,6 +115,10 @@ docker compose -f docker-compose-with-postgres-redis.yml up -d
 - [如何部署](docs/Deployment_CN.md)
 - 如何使用
 
+## ⚙️ API 文档
+
+[CertVault API 文档（英文）](https://gregperlinli.github.io/certvault-api-doc/)
+
 ## 🧰 相关项目
 
 - [CertVault CLI](https://github.com/gregPerlinLi/CertVaultCLI): CertVault 的命令行工具
