@@ -12,7 +12,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -127,15 +129,16 @@ public class UserController {
             responses = {
                     @ApiResponse(
                             responseCode = "422",
-                            description = "Success",
+                            description = "Password validation failed",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
                                                 "code": 422,
                                                 "msg": "The old password is incorrect.",
                                                 "data": null,
-                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                                "timestamp": "2025-04-04T16:16:02+08:00"
                                             }
                                             """
                                     )}
@@ -143,8 +146,9 @@ public class UserController {
                     )
             }
     )
-    @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @PatchMapping(value = "/profile")
     public ResultVO<Void> updateProfile(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Update user profile entity")
                                             @RequestBody UpdateUserProfileDTO updateUserProfileDTO,
@@ -170,9 +174,10 @@ public class UserController {
             summary = "User Session Logout",
             description = "Force logout user's session"
     )
-    @SuccessAndFailedApiResponse
     @NotYourResourceApiResponse
     @DoesNotExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @DeleteMapping(value = "/session/{uuid}/logout")
     public ResultVO<Void> forceLogoutSession(@Parameter(name = "uuid", description = "Login record UUID", example = "ce9aa242-796e-4baa-9f59-c82a918a9380")
                                                  @PathVariable("uuid") String uuid,
@@ -193,8 +198,9 @@ public class UserController {
             summary = "Force Logout User",
             description = "Force logout user's all sessions"
     )
-    @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @DeleteMapping(value = "/logout")
     public ResultVO<Void> forceLogoutUser(HttpServletRequest request) {
         if ( loginRecordService.userForceLogout(((UserProfileDTO) request.getSession().getAttribute("account")).getUsername()) ) {
@@ -302,13 +308,14 @@ public class UserController {
                             responseCode = "404",
                             description = "Admin with no CA",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
                                                 "code": 404,
                                                 "msg": "The admin user does not have any CA.",
                                                 "data": null,
-                                                "timestamp": "2025-04-04T09:45:34.622698063+08:00"
+                                                "timestamp": "2025-04-04T09:45:34+08:00"
                                             }
                                             """
                                     )}
@@ -436,9 +443,10 @@ public class UserController {
             summary = "Update Certificate Comment",
             description = "Update the comment of the certificate"
     )
-    @SuccessAndFailedApiResponse
     @NotYourResourceApiResponse
     @DoesNotExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @PatchMapping(value = "/cert/ssl/{uuid}/comment")
     public ResultVO<Void> updateCertComment(@Parameter(name = "uuid", description = "SSL certificate UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                                 @PathVariable("uuid") String uuid,
@@ -481,16 +489,23 @@ public class UserController {
                             responseCode = "200",
                             description = "Success",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.CertResponseResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
-                                                "uuid": "2f2d63a8-b29c-4404-ae10-81f5ff023a69",
-                                                "privkey": null,
-                                                "cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk...",
-                                                "caUuid": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
-                                                "notBefore": "2025-03-22T23:05:54.773",
-                                                "notAfter": "2035-03-20T23:05:54.773",
-                                                "comment": "CertVault Website SSL Certificate"
+                                                "code": 200,
+                                                "message": "Success",
+                                                "data": {
+                                                    "uuid": "2f2d63a8-b29c-4404-ae10-81f5ff023a69",
+                                                    "algorithm": "RSA",
+                                                    "keySize": 2048,
+                                                    "privkey": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2Z0lCQU...",
+                                                    "cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk...",
+                                                    "caUuid": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
+                                                    "notBefore": "2025-03-22T23:05:54.773",
+                                                    "notAfter": "2035-03-20T23:05:54.773",
+                                                    "comment": "CertVault Website SSL Certificate"
+                                                }
                                             }
                                             """
                                     )}
@@ -524,7 +539,35 @@ public class UserController {
      */
     @Operation(
             summary = "Renew Certificate",
-            description = "Renew the SSL certificate"
+            description = "Renew the SSL certificate",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Success",
+                            content = @Content(
+                                    schema = @Schema(implementation = ResultVO.CertResponseResult.class),
+                                    examples = {@ExampleObject(value =
+                                            """
+                                            {
+                                                "code": 200,
+                                                "message": "Success",
+                                                "data": {
+                                                    "uuid": "2f2d63a8-b29c-4404-ae10-81f5ff023a69",
+                                                    "algorithm": "RSA",
+                                                    "keySize": 2048,
+                                                    "privkey": null,
+                                                    "cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk...",
+                                                    "caUuid": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
+                                                    "notBefore": "2025-03-22T23:05:54.773",
+                                                    "notAfter": "2035-03-20T23:05:54.773",
+                                                    "comment": "CertVault Website SSL Certificate"
+                                                }
+                                            }
+                                            """
+                                    )}
+                            )
+                    )
+            }
     )
     @SuccessAndFailedApiResponse
     @NotYourResourceApiResponse
@@ -564,15 +607,12 @@ public class UserController {
      */
     @Operation(
             summary = "Delete Certificate",
-            description = "Delete the SSL certificate",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Delete Success"),
-                    @ApiResponse(responseCode = "444", description = "Delete Failed")
-            }
+            description = "Delete the SSL certificate"
     )
-    @SuccessAndFailedApiResponse
     @NotYourResourceApiResponse
     @DoesNotExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @DeleteMapping(value = "/cert/ssl/{uuid}")
     public ResultVO<Void> deleteCert(@Parameter(name = "uuid", description = "SSL certificate UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                          @PathVariable("uuid") String uuid,
