@@ -20,6 +20,7 @@ const { success, info, error, remove } = useNotify();
 
 /* Reactive */
 const busy = ref(false);
+const expiry = ref(30);
 
 /* Computed */
 const renewCertFn = computed(() =>
@@ -27,16 +28,12 @@ const renewCertFn = computed(() =>
 );
 
 /* Actions */
-const onSubmit = async (ev: Event) => {
-  // Parse form data
-  const formData = new FormData(ev.target as HTMLFormElement);
-  const expiry = parseInt(formData.get("expiry")!.toString().trim());
-
+const onSubmit = async () => {
   // Try to renew
   busy.value = true;
   const msg = info("Requesting");
   try {
-    await renewCertFn.value({ uuid: data!.uuid, expiry });
+    await renewCertFn.value({ uuid: data!.uuid, expiry: expiry.value });
 
     emits("success");
     visible.value = false;
@@ -53,6 +50,7 @@ const onSubmit = async (ev: Event) => {
 watch(visible, () => {
   if (!visible.value) {
     busy.value = false;
+    expiry.value = 30;
   }
 });
 </script>
@@ -69,11 +67,11 @@ watch(visible, () => {
       <section class="flex flex-col gap-1 my-2">
         <label for="expiry" required>New Expiry</label>
         <InputNumber
+          v-model="expiry"
           input-id="expiry"
           name="expiry"
           size="small"
           suffix=" day(s)"
-          :default-value="30"
           :max="variant === 'ca' ? 7300 : 365"
           :min="1"
           required
