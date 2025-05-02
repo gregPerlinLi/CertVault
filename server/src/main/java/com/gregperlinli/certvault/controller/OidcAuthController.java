@@ -21,13 +21,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -78,7 +78,7 @@ public class OidcAuthController {
     ILoginRecordService loginRecordService;
 
     @Resource
-    RedisTemplate redisTemplate;
+    RedisTemplate<String, UserProfileDTO> redisTemplate;
 
     @Resource
     OidcProperties oidcProperties;
@@ -96,6 +96,7 @@ public class OidcAuthController {
                             responseCode = "200",
                             description = "OIDC Enabled",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.OidcProviderListResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
@@ -141,6 +142,7 @@ public class OidcAuthController {
                             responseCode = "302",
                             description = "Redirect to OIDC Login Page",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
@@ -190,6 +192,7 @@ public class OidcAuthController {
                             responseCode = "302",
                             description = "Redirect to OIDC Login Page",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.UserProfileResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
@@ -211,6 +214,7 @@ public class OidcAuthController {
                             responseCode = "444",
                             description = "OIDC User is Null",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
