@@ -52,7 +52,7 @@ public class SpringDocConfig {
                 .version(appVersion)
                 .extensions(Map.of(
                         "x-logo", Map.of(
-                                "url", "https://raw.githubusercontent.com/gregPerlinLi/CertVault/refs/heads/main/docs/img/Logo.svg",
+                                "url", "https://raw.githubusercontent.com/gregPerlinLi/CertVault/main/docs/img/Banner.svg",
                                 "altText", "CertVault Logo"
                         )
                 ));
