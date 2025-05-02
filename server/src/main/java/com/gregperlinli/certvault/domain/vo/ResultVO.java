@@ -1,5 +1,9 @@
 package com.gregperlinli.certvault.domain.vo;
 
+import com.gregperlinli.certvault.domain.dto.OidcProviderDTO;
+import com.gregperlinli.certvault.domain.dto.PageDTO;
+import com.gregperlinli.certvault.domain.dto.ResponseCertDTO;
+import com.gregperlinli.certvault.domain.dto.UserProfileDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * Universal Result Object
@@ -33,7 +38,7 @@ public class ResultVO<T> {
                     "200", "204", "302", "400", "401", "403", "404", "405", "417", "422", "444", "500", "501"
             },
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "Integer"
+            type = "integer"
     )
     private Integer code;
 
@@ -45,7 +50,7 @@ public class ResultVO<T> {
             description = "Return message",
             example = "Success",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String msg;
 
@@ -55,6 +60,7 @@ public class ResultVO<T> {
     @Schema(
             name = "data",
             description = "Data",
+            type = "T",
             nullable = true
     )
     private T data;
@@ -67,9 +73,19 @@ public class ResultVO<T> {
             description = "Timestamp",
             example = "2025-03-19T01:38:31+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "OffsetDateTime"
+            type = "date-time"
     )
     private String timestamp;
+
+    public static class UserProfileResult extends ResultVO<UserProfileDTO> {}
+
+    public static class CertResponseResult extends ResultVO<ResponseCertDTO> {}
+
+    public static class OidcProviderListResult extends ResultVO<List<OidcProviderDTO>> {}
+
+    public static class NullResult extends ResultVO<Void> {}
+
+    public static class NullPageResult extends ResultVO<PageDTO<Void>> {}
 
     /**
      * 返回错误结果方法
