@@ -30,7 +30,7 @@ public class RequestPrivkeyDTO {
             description = "UUID of the CA/SSL Private Key",
             example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "UUID"
+            type = "string"
     )
     private String uuid;
 
@@ -42,7 +42,7 @@ public class RequestPrivkeyDTO {
             description = "Password of the User",
             example = "secureAccess123",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "password"
     )
     private String password;
 

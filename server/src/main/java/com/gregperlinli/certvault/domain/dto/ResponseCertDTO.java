@@ -33,7 +33,7 @@ public class ResponseCertDTO {
             description = "Unique identifier for the certificate",
             example = "9777b56b-90c3-4315-91c6-79ea658b0d9a",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "UUID"
+            type = "string"
     )
     private String uuid;
 
@@ -45,7 +45,7 @@ public class ResponseCertDTO {
             description = "Algorithm used for generating the certificate",
             example = "RSA",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String algorithm;
 
@@ -57,7 +57,7 @@ public class ResponseCertDTO {
             description = "Size of the key in bits",
             example = "2048",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "Integer"
+            type = "integer"
     )
     private Integer keySize;
 
@@ -69,7 +69,7 @@ public class ResponseCertDTO {
             description = "Private key with BASE64 encoding",
             example = "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2Z0lCQU...",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String privkey;
 
@@ -81,7 +81,7 @@ public class ResponseCertDTO {
             description = "Certificate with BASE64 encoding",
             example = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUV2Z0lCQU...",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String cert;
 
@@ -93,7 +93,7 @@ public class ResponseCertDTO {
             description = "CA UUID",
             example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "UUID"
+            type = "string"
     )
     private String caUuid;
 
@@ -103,9 +103,9 @@ public class ResponseCertDTO {
     @Schema(
             name = "notBefore",
             description = "Start date of certificate validity period (ISO 8601 format)",
-            example = "2025-03-18T17:54:38.021",
+            example = "2025-03-18T17:54:38+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "OffsetDateTime"
+            type = "date-time"
     )
     private LocalDateTime notBefore;
 
@@ -115,9 +115,9 @@ public class ResponseCertDTO {
     @Schema(
             name = "notAfter",
             description = "End date of certificate validity period (ISO 8601 format)",
-            example = "2025-04-17T17:54:38.021",
+            example = "2025-04-17T17:54:38+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "OffsetDateTime"
+            type = "date-time"
     )
     private LocalDateTime notAfter;
 
@@ -128,7 +128,7 @@ public class ResponseCertDTO {
             name = "comment",
             description = "Optional description or notes about the certificate",
             example = "CertVault SSL Certificate",
-            type = "String"
+            type = "string"
     )
     private String comment;
 

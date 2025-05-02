@@ -30,7 +30,7 @@ public class UpdateUserProfileDTO {
             description = "Display name of the user",
             example = "John Doe",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String displayName;
 
@@ -42,7 +42,7 @@ public class UpdateUserProfileDTO {
             description = "Email of the user",
             example = "john.doe@example.com",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String email;
 

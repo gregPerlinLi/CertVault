@@ -34,7 +34,7 @@ public class UserProfileDTO {
             description = "Username of the user",
             example = "john.doe",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String username;
 
@@ -46,7 +46,7 @@ public class UserProfileDTO {
             description = "Display name of the user",
             example = "John Doe",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String displayName;
 
@@ -58,7 +58,7 @@ public class UserProfileDTO {
             description = "Email of the user",
             example = "john.doe@example.com",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String email;
 
@@ -70,7 +70,7 @@ public class UserProfileDTO {
             description = "Role of the user (1: User, 2: Admin, 3: Superadmin)",
             example = "2",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "Integer"
+            type = "integer"
     )
     private Integer role;
 

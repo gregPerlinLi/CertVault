@@ -31,7 +31,7 @@ public class LoginDTO {
             description = "User account(can be username or email)",
             example = "testadmin",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String username;
 
@@ -43,7 +43,7 @@ public class LoginDTO {
             description = "Password of the user",
             example = "123456",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "password"
     )
     private String password;
 

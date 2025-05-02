@@ -32,7 +32,7 @@ public class CaInfoDTO {
             description = "Unique identifier of the Certificate Authority",
             example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "UUID"
+            type = "string"
     )
     private String uuid;
 
@@ -44,7 +44,7 @@ public class CaInfoDTO {
             description = "Algorithm used for generating the CA certificate",
             example = "RSA",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String algorithm;
 
@@ -56,7 +56,7 @@ public class CaInfoDTO {
             description = "Size of the key in bits",
             example = "2048",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "Integer"
+            type = "integer"
     )
     private Integer keySize;
 
@@ -68,7 +68,7 @@ public class CaInfoDTO {
             description = "Username of the CA owner",
             example = "gregPerlinLi",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String owner;
 
@@ -78,7 +78,9 @@ public class CaInfoDTO {
     @Schema(
             name = "parentCa",
             description = "UUID of the parent Certificate Authority (if any)",
-            example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0"
+            example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            type = "string"
     )
     private String parentCa;
 
@@ -89,7 +91,8 @@ public class CaInfoDTO {
             name = "allowSubCa",
             description = "Whether sub CAs can be created under this CA",
             example = "true",
-            type = "Boolean"
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            type = "boolean"
     )
     private Boolean allowSubCa;
 
@@ -101,7 +104,7 @@ public class CaInfoDTO {
             description = "Optional description or notes about the CA",
             example = "Cert Vault Default Intermediate Certificate Authority",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String comment;
 
@@ -113,7 +116,7 @@ public class CaInfoDTO {
             description = "Indicates if the CA is currently active",
             example = "true",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "Boolean"
+            type = "string"
     )
     private Boolean available;
 
@@ -125,7 +128,7 @@ public class CaInfoDTO {
             description = "Start date of CA validity period (ISO 8601 format)",
             example = "2025-03-23T10:14:45+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "LocalDateTime"
+            type = "date-time"
     )
     private LocalDateTime notBefore;
 
@@ -137,7 +140,7 @@ public class CaInfoDTO {
             description = "End date of CA validity period (ISO 8601 format)",
             example = "2035-03-21T10:14:45+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "LocalDateTime"
+            type = "date-time"
     )
     private LocalDateTime notAfter;
 
@@ -149,7 +152,7 @@ public class CaInfoDTO {
             description = "Date when the CA was created (ISO 8601 format)",
             example = "2025-03-18T11:10:14+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "OffsetDateTime"
+            type = "date-time"
     )
     private LocalDateTime createdAt;
 
@@ -161,7 +164,7 @@ public class CaInfoDTO {
             description = "Date when the CA was last modified (ISO 8601 format)",
             example = "2025-03-23T10:14:45+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "OffsetDateTime"
+            type = "date-time"
     )
     private LocalDateTime modifiedAt;
 
