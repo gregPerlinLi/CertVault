@@ -4,8 +4,6 @@ import com.gregperlinli.certvault.domain.entities.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import java.util.List;
-
 /**
  * User Profile DTO
  *
@@ -74,11 +72,33 @@ public class UserProfileDTO {
     )
     private Integer role;
 
+    /**
+     * Whether the user has initialized their password
+     */
+    @Schema(
+            name = "isPasswordInitialized",
+            description = "Whether the user has initialized their password",
+            example = "true",
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            type = "boolean"
+    )
+    private Boolean isPasswordInitialized = true;
+
+    public UserProfileDTO(String testUser, String testDisplayName, String mail, int role) {
+        this.username = testUser;
+        this.displayName = testDisplayName;
+        this.email = mail;
+        this.role = role;
+    }
+
     public UserProfileDTO(User user) {
         this.username = user.getUsername();
         this.displayName = user.getDisplayName();
         this.email = user.getEmail();
         this.role = user.getRole();
+        if ( user.getPassword() == null || user.getPassword().isEmpty() ) {
+            this.isPasswordInitialized = false;
+        }
     }
 
 }
