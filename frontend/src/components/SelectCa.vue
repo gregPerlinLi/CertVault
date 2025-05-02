@@ -105,12 +105,12 @@ onBeforeMount(() => refresh());
     :options="caList.data"
     :pt="{
       virtualScroller: {
-        root: { class: 'overflow-hidden! [&_.p-select-list]:w-full' }
+        root: { class: 'overflow-x-hidden! [&_.p-select-list]:w-full' }
       }
     }"
     :show-clear="showClear"
     :virtual-scroller-options="{
-      itemSize: 30,
+      itemSize: 40,
       lazy: true,
       loading: caList.loading,
       showLoader: true
