@@ -14,6 +14,7 @@ export const useUserStore = createGlobalState(() => {
   const displayName = ref<string | null>(null);
   const email = ref<string | null>(null);
   const role = ref<UserRole | null>(null);
+  const isPasswdInit = ref<boolean | null>(null);
 
   /* Getters */
   const displayRole = computed(() => {
@@ -55,6 +56,7 @@ export const useUserStore = createGlobalState(() => {
     displayName.value = dto.displayName;
     email.value = dto.email;
     role.value = dto.role;
+    isPasswdInit.value = dto.isPasswordInitialized;
   };
 
   // Returns
@@ -63,6 +65,7 @@ export const useUserStore = createGlobalState(() => {
     displayName,
     email,
     role,
+    isPasswdInit,
 
     displayRole,
     isUser,
