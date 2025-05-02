@@ -1,7 +1,9 @@
 package com.gregperlinli.certvault.annotation;
 
+import com.gregperlinli.certvault.domain.vo.ResultVO;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import java.lang.annotation.ElementType;
@@ -21,14 +23,17 @@ import java.lang.annotation.Target;
         responseCode = "444",
         description = "Request Failed",
         content = @Content(
-                examples = {@ExampleObject(value = """
+                schema = @Schema(implementation = ResultVO.NullResult.class),
+                examples = {@ExampleObject(value =
+                        """
                         {
                             "code": 444,
                             "msg": "Failed",
                             "data": null,
-                            "timestamp": "2025-04-04T09:45:34.622698063+08:00"
+                            "timestamp": "2025-04-04T09:45:34+08:00"
                         }
-                        """)}
+                        """
+                )}
         )
 )
 @Target({ElementType.TYPE, ElementType.METHOD})

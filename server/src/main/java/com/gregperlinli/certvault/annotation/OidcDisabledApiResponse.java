@@ -1,7 +1,9 @@
 package com.gregperlinli.certvault.annotation;
 
+import com.gregperlinli.certvault.domain.vo.ResultVO;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import java.lang.annotation.ElementType;
@@ -21,13 +23,14 @@ import java.lang.annotation.Target;
         responseCode = "204",
         description = "OIDC Disabled",
         content = @Content(
+                schema = @Schema(implementation = ResultVO.NullResult.class),
                 examples = {@ExampleObject(value =
                         """
                         {
                             "code": 204,
                             "msg": "OIDC Disabled",
                             "data": null,
-                            "timestamp": "2025-03-29T00:59:00.06971"
+                            "timestamp": "2025-03-29T00:59:00+08:00"
                         }
                         """
                 )}
