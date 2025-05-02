@@ -7,6 +7,7 @@ import com.gregperlinli.certvault.domain.vo.ResultVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
@@ -60,6 +61,16 @@ public class GlobalExceptionHandler {
             // response.setStatus(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION);
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode()));
             return new ResultVO<>(((ParamValidateException) e).getCode(), msg);
+        }
+        if ( e instanceof DuplicateKeyException ) {
+            // response.setStatus(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION);
+            response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode()));
+            if ( msg.contains("for key 'user.email'") ) {
+                return new ResultVO<>(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The email is already existed!");
+            } else if ( msg.contains("for key 'user.username'") ) {
+                return new ResultVO<>(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The username is already existed!");
+            }
+            return new ResultVO<>(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "Duplicate entry");
         }
         if ( e instanceof NoSuchAlgorithmException) {
             // response.setStatus(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION);
