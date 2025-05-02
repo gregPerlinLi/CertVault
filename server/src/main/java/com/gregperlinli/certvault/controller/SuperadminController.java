@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -134,8 +135,9 @@ public class SuperadminController {
             summary = "Force Logout a User",
             description = "Force logout a user's all sessions"
     )
-    @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @DeleteMapping(value = "/user/{username}/logout")
     public ResultVO<Void> userForceLogout(@Parameter(name = "username", description = "Username")
                                               @PathVariable("username") String username) {
@@ -182,9 +184,10 @@ public class SuperadminController {
             summary = "Create users",
             description = "Create multiple new users (i.e., import users)"
     )
-    @SuccessAndFailedApiResponse
     @ParamNotNullApiResponse
     @AlreadyExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @PostMapping(value = "/users/create")
     public ResultVO<Void> createUsers(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "List of create user entities")
                                           @RequestBody List<CreateUserDTO> createUserDTOs) throws Exception {
@@ -206,8 +209,9 @@ public class SuperadminController {
             summary = "Update user information",
             description = "Update user information"
     )
-    @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @PatchMapping(value = "/user/{username}")
     public ResultVO<Void> updateUserInfo(@Parameter(name = "username", description = "Username of the user to be updated", example = "user")
                                              @PathVariable("username") String username,
@@ -236,13 +240,14 @@ public class SuperadminController {
                             responseCode = "403",
                             description = "Can not modify own role",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
                                                 "code": 403,
                                                 "msg": "You cannot modify your own role.",
                                                 "data": null,
-                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                                "timestamp": "2025-04-04T16:16:02+08:00"
                                             }
                                             """
                                     )}
@@ -250,9 +255,10 @@ public class SuperadminController {
                     )
             }
     )
-    @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
     @ParamNotNullApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @PatchMapping(value = "/user/role")
     public ResultVO<Void> updateUserRole(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Update user role entity")
                                              @RequestBody UpdateRoleDTO updateRoleDTO,
@@ -281,13 +287,14 @@ public class SuperadminController {
                             responseCode = "403",
                             description = "Can not modify own role",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
                                                 "code": 403,
                                                 "msg": "You cannot modify your own role.",
                                                 "data": null,
-                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                                "timestamp": "2025-04-04T16:16:02+08:00"
                                             }
                                             """
                                     )}
@@ -295,9 +302,10 @@ public class SuperadminController {
                     )
             }
     )
-    @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
     @ParamNotNullApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @PatchMapping(value = "/users/role")
     public ResultVO<Void> updateUsersRole(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "List of update user role entities")
                                               @RequestBody List<UpdateRoleDTO> updateRoleDTOs,
@@ -325,13 +333,14 @@ public class SuperadminController {
                             responseCode = "403",
                             description = "Can not delete own account",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
                                                 "code": 403,
                                                 "msg": "You cannot delete your own account.",
                                                 "data": null,
-                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                                "timestamp": "2025-04-04T16:16:02+08:00"
                                             }
                                             """
                                     )}
@@ -339,9 +348,10 @@ public class SuperadminController {
                     )
             }
     )
-    @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
     @ParamNotNullApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @DeleteMapping(value = "/user/{username}")
     public ResultVO<Void> deleteUser(@Parameter(name = "username", description = "Username of the user to be deleted", example = "user")
                                          @PathVariable("username") String username,
@@ -369,13 +379,14 @@ public class SuperadminController {
                             responseCode = "403",
                             description = "Can not delete own account",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
                                                 "code": 403,
                                                 "msg": "You cannot delete your own account.",
                                                 "data": null,
-                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                                "timestamp": "2025-04-04T16:16:02+08:00"
                                             }
                                             """
                                     )}
@@ -383,9 +394,10 @@ public class SuperadminController {
                     )
             }
     )
-    @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
     @ParamNotNullApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @PostMapping(value = "/users/delete")
     public ResultVO<Void> deleteUsers(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Username list of the users to be deleted")
                                           @RequestBody List<String> usernames,
