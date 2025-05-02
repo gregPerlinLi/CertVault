@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -502,8 +501,8 @@ public class UserController {
                                                     "privkey": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2Z0lCQU...",
                                                     "cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk...",
                                                     "caUuid": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
-                                                    "notBefore": "2025-03-22T23:05:54.773",
-                                                    "notAfter": "2035-03-20T23:05:54.773",
+                                                    "notBefore": "2025-03-22T23:05:54+08:00",
+                                                    "notAfter": "2035-03-20T23:05:54+08:00",
                                                     "comment": "CertVault Website SSL Certificate"
                                                 }
                                             }
@@ -558,8 +557,8 @@ public class UserController {
                                                     "privkey": null,
                                                     "cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk...",
                                                     "caUuid": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
-                                                    "notBefore": "2025-03-22T23:05:54.773",
-                                                    "notAfter": "2035-03-20T23:05:54.773",
+                                                    "notBefore": "2025-03-22T23:05:54+08:00",
+                                                    "notAfter": "2035-03-20T23:05:54+08:00",
                                                     "comment": "CertVault Website SSL Certificate"
                                                 }
                                             }
