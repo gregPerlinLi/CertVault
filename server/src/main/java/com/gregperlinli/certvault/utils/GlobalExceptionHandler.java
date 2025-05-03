@@ -91,6 +91,7 @@ public class GlobalExceptionHandler {
             // response.setStatus(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode());
             if ( !request.getRequestURI().startsWith("/api/") ) {
                 request.getRequestDispatcher("/index.html").forward(request, response);
+                return null;
             }
             response.setHeader(GeneralConstant.STATUS_CODE.getValue(), String.valueOf(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode()));
             return new ResultVO<>(ResultStatusCodeConstant.PAGE_NOT_FIND.getResultCode(), msg);
