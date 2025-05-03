@@ -100,8 +100,10 @@ watch(visible, () => {
         header="CSV File Format Tips"
         :collapsed="true"
         toggleable>
+        <p>File <b class="text-red-500">SHOULD</b> be in UTF-8 encoding</p>
         <p>
-          Table <b>SHOULD EXACTLY</b> contains 5 columns, each corresponds to:
+          Table <b class="text-red-500">SHOULD EXACTLY</b> contains 5 columns,
+          each corresponds to:
         </p>
         <p class="indent-4">
           <i class="text-green-500">Username</i>,
@@ -115,7 +117,7 @@ watch(visible, () => {
           <i class="text-green-500">admin</i> and
           <i class="text-green-500">user</i>
         </p>
-        <p>Table headers are unnecessary</p>
+        <p>Table headers are <b class="text-red-500">UNNECESSARY</b></p>
         <p>Table rows would be uniquified by usernames and emails</p>
       </Panel>
 
