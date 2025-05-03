@@ -31,7 +31,7 @@ public class CertPrivkeyDTO {
             description = "Certificate with BASE64 encoding",
             example = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUV2QUl...",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String cert;
 
@@ -43,7 +43,7 @@ public class CertPrivkeyDTO {
             description = "Private key with BASE64 encoding",
             example = "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2QUl...",
             requiredMode = Schema.RequiredMode.NOT_REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String privkey;
 

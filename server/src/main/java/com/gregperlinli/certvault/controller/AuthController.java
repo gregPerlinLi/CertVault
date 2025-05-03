@@ -15,6 +15,7 @@ import com.gregperlinli.certvault.utils.IpUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -65,13 +66,14 @@ public class AuthController {
                             responseCode = "444",
                             description = "Login Failed",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
                                                 "code": 444,
                                                 "msg": "Login failed, username or password error",
                                                 "data": null,
-                                                "timestamp": "2025-04-04T09:45:34.622698063+08:00"
+                                                "timestamp": "2025-04-04T09:45:34+08:00"
                                             }
                                             """)}
                             )
@@ -150,19 +152,36 @@ public class AuthController {
                             responseCode = "444",
                             description = "Logout Failed",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
                                                 "code": 444,
                                                 "msg": "Logout failed, please login first!",
                                                 "data": null,
-                                                "timestamp": "2025-04-04T09:45:34.622698063+08:00"
+                                                "timestamp": "2025-04-04T09:45:34+08:00"
                                             }
                                             """
                                     )}
                             )
                     ),
-                    @ApiResponse(responseCode = "200", description = "Logout Success")
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Logout Success",
+                            content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
+                                    examples = {@ExampleObject(value =
+                                            """
+                                            {
+                                                "code": 200,
+                                                "msg": "Logout Success",
+                                                "data": null,
+                                                "timestamp": "2025-04-04T09:45:34+08:00"
+                                            }
+                                            """
+                                    )}
+                            )
+                    )
             }
     )
     @NoValidSessionApiResponse

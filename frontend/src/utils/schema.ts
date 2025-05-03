@@ -13,14 +13,6 @@ export const reqNewCertSchema = v.pipe(
     organization: v.pipe(v.string(), v.trim(), v.nonEmpty()),
     "organizational-unit": v.pipe(v.string(), v.trim(), v.nonEmpty()),
     "common-name": v.pipe(v.string(), v.trim(), v.nonEmpty()),
-    expiry: v.pipe(
-      v.string(),
-      v.trim(),
-      v.transform(parseInt),
-      v.number(),
-      v.minValue(1),
-      v.maxValue(365)
-    ),
     "subject-alt-names": v.pipe(
       v.string(),
       v.transform((v) =>
@@ -57,7 +49,6 @@ export const reqNewCertSchema = v.pipe(
     organization: obj.organization,
     organizationalUnit: obj["organizational-unit"],
     commonName: obj["common-name"],
-    expiry: obj.expiry,
     subjectAltNames: obj["subject-alt-names"],
     comment: obj.comment
   }))

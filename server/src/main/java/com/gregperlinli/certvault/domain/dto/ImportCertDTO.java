@@ -27,7 +27,7 @@ public class ImportCertDTO {
             description = "Private key of the certificate",
             example = "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRd0lCQURBTkJn...",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "Base64"
+            type = "string"
     )
     private String privkey;
 
@@ -36,7 +36,7 @@ public class ImportCertDTO {
             description = "Certificate of the certificate",
             example = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUdFekNDQ...",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "Base64"
+            type = "string"
     )
     private String certificate;
 
@@ -45,7 +45,7 @@ public class ImportCertDTO {
             description = "Comment of the certificate",
             example = "Testing CA",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String comment;
 

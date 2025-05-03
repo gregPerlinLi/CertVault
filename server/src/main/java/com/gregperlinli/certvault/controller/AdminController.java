@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -302,9 +303,10 @@ public class AdminController {
             summary = "Update CA Comment",
             description = "Update the comment of the CA allocated to the user"
     )
-    @SuccessAndFailedApiResponse
     @NotYourResourceApiResponse
     @DoesNotExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @PatchMapping(value = "/cert/ca/{uuid}/comment")
     public ResultVO<Void> updateCaComment(@Parameter(name = "uuid", description = "CA UUID", example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0")
                                               @PathVariable("uuid") String uuid,
@@ -373,13 +375,14 @@ public class AdminController {
                             responseCode = "444",
                             description = "Certificate Invalid",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
                                                 "code": 444,
                                                 "msg": "The certificate is invalid.",
                                                 "data": null,
-                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                                "timestamp": "2025-04-04T16:16:02+08:00"
                                             }
                                             """
                                     )}
@@ -389,13 +392,42 @@ public class AdminController {
                             responseCode = "444",
                             description = "Certificate is not CA",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
                                                 "code": 444,
                                                 "msg": "The certificate is not a CA.",
                                                 "data": null,
-                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                                "timestamp": "2025-04-04T16:16:02+08:00"
+                                            }
+                                            """
+                                    )}
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Success",
+                            content = @Content(
+                                    schema = @Schema(implementation = ResultVO.CertResponseResult.class),
+                                    examples = {@ExampleObject(value =
+                                            """
+                                            {
+                                                "code": 200,
+                                                "msg": "Success",
+                                                "data": {
+                                                    "uuid": "bf35ecb1-9b67-4083-9476-e264ba153188",
+                                                    "algorithm": "RSA",
+                                                    "keySize": 2048,
+                                                    "privkey": null,
+                                                    "cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUV2QUl...",
+                                                    "parentCa": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
+                                                    "allowSubCa": true,
+                                                    "notBefore": "2025-03-23T12:49:45.733",
+                                                    "notAfter": "2025-09-19T12:49:45.733",
+                                                    "comment": "Cert Vault Default Intermediate Certificate Authority"
+                                                },
+                                                "timestamp": "2025-03-19T01:38:31+08:00"
                                             }
                                             """
                                     )}
@@ -403,7 +435,7 @@ public class AdminController {
                     )
             }
     )
-    @SuccessAndFailedApiResponse
+    @FailedApiResponse
     @PostMapping(value = "/cert/ca/import")
     public ResultVO<ResponseCaDTO> importCa(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Import certificate entity")
                                                 @RequestBody ImportCertDTO importCertDTO,
@@ -432,13 +464,14 @@ public class AdminController {
                             responseCode = "403",
                             description = "Parent CA Does Not Allow Sub CA",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.NullResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
                                                 "code": 403,
                                                 "msg": "The CA does not allow sub CA.",
                                                 "data": null,
-                                                "timestamp": "2025-04-04T16:16:02.5641+08:00"
+                                                "timestamp": "2025-04-04T16:16:02+08:00"
                                             }
                                             """
                                     )}
@@ -497,6 +530,7 @@ public class AdminController {
                             responseCode = "200",
                             description = "Renew CA certificate successfully",
                             content = @Content(
+                                    schema = @Schema(implementation = ResultVO.CertResponseResult.class),
                                     examples = {@ExampleObject(value =
                                             """
                                             {
@@ -504,6 +538,8 @@ public class AdminController {
                                                 "msg": "Success",
                                                 "data": {
                                                     "uuid": "bf35ecb1-9b67-4083-9476-e264ba153188",
+                                                    "algorithm": "RSA",
+                                                    "keySize": 2048,
                                                     "privkey": null,
                                                     "cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUV2QUl...",
                                                     "parentCa": "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
@@ -559,9 +595,10 @@ public class AdminController {
             summary = "Delete CA Certificate",
             description = "Delete the specified CA certificate"
     )
-    @SuccessAndFailedApiResponse
     @NotYourResourceApiResponse
     @DoesNotExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @DeleteMapping(value = "/cert/ca/{uuid}")
     public ResultVO<Void> deleteCa(@Parameter(name = "uuid", description = "CA UUID", example = "bf35ecb1-9b67-4083-9476-e264ba153188")
                                        @PathVariable("uuid") String uuid,
@@ -584,8 +621,9 @@ public class AdminController {
             summary = "Bind CA Certificate to User",
             description = "Bind a specified CA for user to sign SSL certificates"
     )
-    @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @PostMapping(value = "/cert/ca/bind/create")
     public ResultVO<Void> bindCaToUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "CA-User binding entity")
                                            @RequestBody CaBindingDTO caBindingDTO) {
@@ -607,9 +645,10 @@ public class AdminController {
             summary = "Bind CA Certificate to Users",
             description = "Batch bind users to specified CA certificate"
     )
-    @SuccessAndFailedApiResponse
     @ParamNotNullApiResponse
     @DoesNotExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @PostMapping(value = "/cert/ca/binds/create")
     public ResultVO<Void> bindCasToUsers(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "List of CA-User binding entities")
                                              @RequestBody List<CaBindingDTO> caBindingDTOs) throws Exception {
@@ -630,8 +669,9 @@ public class AdminController {
             summary = "Unbind CA Certificate from User",
             description = "Unbind a specified CA certificate from a user"
     )
-    @SuccessAndFailedApiResponse
     @DoesNotExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @PostMapping(value = "/cert/ca/bind/delete")
     public ResultVO<Void> unbindCaFromUser(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "CA-User binding entity")
                                                @RequestBody CaBindingDTO caBindingDTO) {
@@ -653,9 +693,10 @@ public class AdminController {
             summary = "Unbind CA Certificate from Users",
             description = "Batch unbind users from specified CA certificate"
     )
-    @SuccessAndFailedApiResponse
     @ParamNotNullApiResponse
     @DoesNotExistApiResponse
+    @NullSuccessApiResponse
+    @FailedApiResponse
     @PostMapping(value = "/cert/ca/binds/delete")
     public ResultVO<Void> unbindCasFromUsers(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "List of CA-User binding entities")
                                                  @RequestBody List<CaBindingDTO> caBindingDTOs) throws Exception {

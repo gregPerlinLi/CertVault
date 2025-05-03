@@ -27,13 +27,19 @@ public class PageDTO<T> {
             name = "total",
             description = "Total",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "Long",
+            type = "long",
             examples = "100"
     )
     private Long total;
 
     /**
-     * Current page
+     * List
      */
+    @Schema(
+            name = "list",
+            description = "Current Page Data List",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "array"
+    )
     private List<T> list;
 }

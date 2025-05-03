@@ -30,7 +30,7 @@ public class TestDTO implements Serializable {
             description = "HTTP method used for the request",
             example = "GET",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String method;
 
@@ -39,7 +39,7 @@ public class TestDTO implements Serializable {
             description = "Response message",
             example = "success getting",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String message;
 
@@ -48,7 +48,7 @@ public class TestDTO implements Serializable {
             description = "Version of the Server",
             example = "1.1.3",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String version;
 
@@ -57,7 +57,7 @@ public class TestDTO implements Serializable {
             description = "Timezone of the Server",
             example = "+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String serverTimezone;
 

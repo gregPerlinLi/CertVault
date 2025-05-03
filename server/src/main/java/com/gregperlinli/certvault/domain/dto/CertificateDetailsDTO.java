@@ -57,7 +57,7 @@ public class CertificateDetailsDTO {
             description = "Subject of the certificate",
             example = "C=CN,ST=Guangdong,L=Canton,O=GregPerlinLi,OU=CertVault,CN=a.b.c,E=test@example.com",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String subject;
 
@@ -69,7 +69,7 @@ public class CertificateDetailsDTO {
             description = "Issuer of the certificate",
             example = "C=CN,ST=Guangdong,L=Canton,O=GregPerlinLi,OU=CertVault,CN=CertVault,E=test@example.com",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String issuer;
 
@@ -81,7 +81,7 @@ public class CertificateDetailsDTO {
             description = "Not Before of the certificate",
             example = "2025-03-16T17:47:31+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "OffsetDateTime"
+            type = "date-time"
     )
     private LocalDateTime notBefore;
 
@@ -93,7 +93,7 @@ public class CertificateDetailsDTO {
             description = "Not After of the certificate",
             example = "2025-04-15T17:47:31+08:00",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "OffsetDateTime"
+            type = "date-time"
     )
     private LocalDateTime notAfter;
 
@@ -105,7 +105,7 @@ public class CertificateDetailsDTO {
             description = "Serial Number of the certificate",
             example = "270437134803127796822084897079779361349",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String serialNumber;
 
@@ -116,7 +116,7 @@ public class CertificateDetailsDTO {
             name = "publicKey",
             description = "Public Key of the certificate",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "PublicKey"
+            type = "java.security.PublicKey"
     )
     private PublicKey publicKey;
 
@@ -127,7 +127,7 @@ public class CertificateDetailsDTO {
             name = "extensions",
             description = "Extensions of the certificate",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "Map<String, String>"
+            type = "map"
     )
     private Map<String, String> extensions;
 

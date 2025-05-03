@@ -30,7 +30,7 @@ public class CaBindingDTO {
             description = "The UUID of the Certificate Authority (CA)",
             example = "2f2d63a8-b29c-4404-ae10-81f5ff023a69",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "UUID"
+            type = "string"
     )
     private String caUuid;
 
@@ -42,7 +42,7 @@ public class CaBindingDTO {
             description = "The username of the user associated with the CA binding",
             example = "john.doe",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String username;
 }

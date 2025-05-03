@@ -12,31 +12,32 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * OpenID Connect Disabled API Response
+ * Success API Response
  *
  * @author gregPerlinLi
  * @version 1.0.0
- * @className OidcDisabledApiResponse
- * @date 2025/4/4 23:14
+ * @className SuccessApiResponse
+ * @date 2025/4/4 16:40
  */
 @ApiResponse(
-        responseCode = "204",
-        description = "OIDC Disabled",
+        responseCode = "200",
+        description = "Request Success",
         content = @Content(
                 schema = @Schema(implementation = ResultVO.NullResult.class),
                 examples = {@ExampleObject(value =
                         """
                         {
-                            "code": 204,
-                            "msg": "OIDC Disabled",
+                            "code": 200,
+                            "msg": "Success",
                             "data": null,
-                            "timestamp": "2025-03-29T00:59:00+08:00"
+                            "timestamp": "2025-04-04T16:16:02+08:00"
                         }
                         """
                 )}
         )
 )
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface OidcDisabledApiResponse {
+public @interface NullSuccessApiResponse {
+
 }

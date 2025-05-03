@@ -187,7 +187,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The user does not exist.");
         }
         if ( GenericUtils.ofNullable(updateUserProfileDTO.getOldPassword()) || GenericUtils.ofNullable(updateUserProfileDTO.getNewPassword()) ) {
-            if ( isSuperadmin || AuthUtils.matchesPassword(updateUserProfileDTO.getOldPassword(), user.getPassword()) ) {
+            if ( isSuperadmin || AuthUtils.matchesPassword(updateUserProfileDTO.getOldPassword(), user.getPassword()) || ( user.getPassword() == null || user.getPassword().isEmpty() ) ) {
                 user.setPassword(AuthUtils.encryptPassword(updateUserProfileDTO.getNewPassword()));
             } else {
                 throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "The old password is incorrect.");

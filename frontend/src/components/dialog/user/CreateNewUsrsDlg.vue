@@ -30,15 +30,18 @@ const onFileSelected = (ev: FileUploadSelectEvent) => {
         columns: ["username", "displayName", "email", "password", "role"],
         skip_empty_lines: true
       });
-      const uniqData = _.uniqBy(data, ({ username }: any) => username)
+      const uniqData = _(data)
+        .uniqBy(({ username }: any) => username)
+        .uniqBy(({ email }: any) => email)
         .filter(({ role }: any) => ["admin", "user"].includes(role))
-        .map((row) => ({ ...row, role: row.role === "user" ? 1 : 2 }));
+        .map((row) => ({ ...row, role: row.role === "user" ? 1 : 2 }))
+        .value();
       success(`${uniqData.length} user(s) loaded`);
 
-      users.value = _.uniqBy(
-        [...users.value.slice(), ...uniqData],
-        ({ username }: any) => username
-      );
+      users.value = _([...users.value.slice(), ...uniqData])
+        .uniqBy(({ username }: any) => username)
+        .uniqBy(({ email }: any) => email)
+        .value();
 
       refUsrTbl.value?.refresh();
     } catch (err: unknown) {}
@@ -92,6 +95,32 @@ watch(visible, () => {
     :closable="false"
     modal>
     <form @submit.prevent="submit">
+      <Panel
+        class="mb-4"
+        header="CSV File Format Tips"
+        :collapsed="true"
+        toggleable>
+        <p>File <b class="text-red-500">SHOULD</b> be in UTF-8 encoding</p>
+        <p>
+          Table <b class="text-red-500">SHOULD EXACTLY</b> contains 5 columns,
+          each corresponds to:
+        </p>
+        <p class="indent-4">
+          <i class="text-green-500">Username</i>,
+          <i class="text-green-500">DisplayName</i>,
+          <i class="text-green-500">Email</i>,
+          <i class="text-green-500">Password</i>,
+          <i class="text-green-500">Role</i>
+        </p>
+        <p>
+          For role column, available values are
+          <i class="text-green-500">admin</i> and
+          <i class="text-green-500">user</i>
+        </p>
+        <p>Table headers are <b class="text-red-500">UNNECESSARY</b></p>
+        <p>Table rows would be uniquified by usernames and emails</p>
+      </Panel>
+
       <div class="flex gap-4 mb-4">
         <FileUpload
           accept=".csv"

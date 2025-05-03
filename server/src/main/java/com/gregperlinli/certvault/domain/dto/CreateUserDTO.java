@@ -31,7 +31,7 @@ public class CreateUserDTO {
             description = "Username of the user",
             example = "hello",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String username;
 
@@ -40,7 +40,7 @@ public class CreateUserDTO {
             description = "Display name of the user",
             example = "Hello Admin",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String displayName;
 
@@ -49,7 +49,7 @@ public class CreateUserDTO {
             description = "Email address of the user",
             example = "k8qscp.k65@yahoo.com.cn",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String email;
 
@@ -58,7 +58,7 @@ public class CreateUserDTO {
             description = "Password of the user",
             example = "1234567890",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String password;
 
@@ -67,7 +67,7 @@ public class CreateUserDTO {
             description = "Role of the user (1: User, 2: Admin, 3: Superadmin)",
             example = "2",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "Integer"
+            type = "integer"
     )
     private Integer role;
 

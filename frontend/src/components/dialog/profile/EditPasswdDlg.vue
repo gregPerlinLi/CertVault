@@ -8,6 +8,9 @@ const newPassword = defineModel<string>("new-password");
 /* Services */
 const { success, info, warn, error, remove } = useNotify();
 
+/* Stores */
+const { isPasswdInit } = useUserStore();
+
 /* Reactive */
 const invalid = ref(false);
 const busy = ref(false);
@@ -20,7 +23,7 @@ const submit = async () => {
   invalid.value = false;
 
   // Validate
-  if (oldPassword.value.length === 0) {
+  if (isPasswdInit.value && oldPassword.value.length === 0) {
     invalid.value = true;
     warn("Old password is required");
     return;
@@ -59,16 +62,18 @@ watch(visible, (newValue) => {
 <template>
   <Dialog
     v-model:visible="visible"
-    header="Confirm Old Password"
     :closable="false"
+    :header="isPasswdInit ? 'Confirm Old Password' : 'Confirm Change'"
     modal>
     <form @submit.prevent="submit">
       <InputText
+        v-if="isPasswdInit"
         v-model="oldPassword"
         class="mb-4 w-full"
         type="password"
         :disabled="busy"
         :invalid="invalid" />
+      <p v-else class="mb-4">Are you sure to initialize your password?</p>
       <div class="flex justify-end gap-2">
         <Button
           label="Cancel"

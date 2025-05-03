@@ -58,7 +58,7 @@ const trySignIn = async (ev: Event) => {
           <!-- Form elements -->
           <InputText
             name="username"
-            placeholder="Username"
+            placeholder="Username / Email"
             :disabled="busy"
             :invalid="isInvalid('username')"
             @focus="clearInvalid('username')" />

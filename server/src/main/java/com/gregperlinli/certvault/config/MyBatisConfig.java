@@ -32,6 +32,8 @@ public class MyBatisConfig {
         DbType dbType = null;
         if ("org.postgresql.Driver".equals(driverClassName)) {
             dbType = DbType.POSTGRE_SQL;
+        } else if ("org.h2.Driver".equals(driverClassName)) {
+            dbType = DbType.H2;
         } else {
             dbType = DbType.MYSQL;
         }
@@ -47,7 +49,7 @@ public class MyBatisConfig {
             GlobalConfig globalConfig = properties.getGlobalConfig();
             GlobalConfig.DbConfig dbConfig = globalConfig.getDbConfig();
             // 设置字段和表名双引号包裹
-            if ("org.postgresql.Driver".equals(driverClassName)) {
+            if ( "org.postgresql.Driver".equals(driverClassName) || "org.h2.Driver".equals(driverClassName) ) {
                 dbConfig.setColumnFormat("\"%s\"");
                 dbConfig.setTableFormat("\"%s\"");
             } else {

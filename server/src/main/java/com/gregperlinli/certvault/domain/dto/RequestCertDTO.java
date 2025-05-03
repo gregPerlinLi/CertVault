@@ -32,7 +32,7 @@ public class RequestCertDTO {
             name = "caUuid",
             description = "CA UUID",
             example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
-            type = "UUID"
+            type = "string"
     )
     private String caUuid;
 
@@ -43,7 +43,7 @@ public class RequestCertDTO {
             name = "allowSubCa",
             description = "Whether to allow sub-CA",
             example = "true",
-            type = "Boolean"
+            type = "boolean"
     )
     private Boolean allowSubCa;
 
@@ -52,7 +52,7 @@ public class RequestCertDTO {
             description = "Algorithm (Can be RSA, EC, Ed25519)",
             example = "RSA",
             requiredMode = Schema.RequiredMode.NOT_REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String algorithm = "RSA";
 
@@ -61,7 +61,7 @@ public class RequestCertDTO {
             description = "Key Size",
             example = "2048",
             requiredMode = Schema.RequiredMode.NOT_REQUIRED,
-            type = "Integer"
+            type = "integer"
     )
     private Integer keySize = 2048;
 
@@ -73,7 +73,7 @@ public class RequestCertDTO {
             description = "Country",
             example = "CN",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String country;
 
@@ -85,7 +85,7 @@ public class RequestCertDTO {
             description = "Province",
             example = "Guangdong",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String province;
 
@@ -97,7 +97,7 @@ public class RequestCertDTO {
             description = "City",
             example = "Canton",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String city;
 
@@ -109,7 +109,7 @@ public class RequestCertDTO {
             description = "Organization",
             example = "GregPerlinLi",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String organization;
 
@@ -121,7 +121,7 @@ public class RequestCertDTO {
             description = "Organizational Unit",
             example = "Cert Vault",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String organizationalUnit;
 
@@ -133,7 +133,7 @@ public class RequestCertDTO {
             description = "Common Name",
             example = "a.b.c",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String commonName;
 
@@ -145,7 +145,7 @@ public class RequestCertDTO {
             description = "Expiry (day)",
             example = "30",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "Integer"
+            type = "integer"
     )
     private Integer expiry;
 
@@ -155,6 +155,8 @@ public class RequestCertDTO {
     @Schema(
             name = "subjectAltNames",
             description = "Subject Alternative Name",
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            type = "array",
             example = """
             [
                 {
@@ -181,7 +183,8 @@ public class RequestCertDTO {
             name = "comment",
             description = "Comment",
             example = "CertVault SSL Certificate",
-            type = "String"
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            type = "string"
     )
     private String comment;
 

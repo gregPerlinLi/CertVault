@@ -32,7 +32,7 @@ public class LoginRecordDTO {
             description = "Session UUID",
             example = "1234567890",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String uuid;
 
@@ -42,7 +42,9 @@ public class LoginRecordDTO {
     @Schema(
             name = "username",
             description = "Username",
-            example = "gregPerlinLi"
+            example = "gregPerlinLi",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "string"
     )
     private String username;
 
@@ -52,7 +54,9 @@ public class LoginRecordDTO {
     @Schema(
             name = "ipAddress",
             description = "IP address",
-            example = "10.18.0.1"
+            example = "10.18.0.1",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "string"
     )
     private String ipAddress;
 
@@ -62,7 +66,9 @@ public class LoginRecordDTO {
     @Schema(
             name = "region",
             description = "Region",
-            example = "China"
+            example = "China",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "string"
     )
     private String region;
 
@@ -72,7 +78,9 @@ public class LoginRecordDTO {
     @Schema(
             name = "province",
             description = "Province",
-            example = "Guangdong"
+            example = "Guangdong",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "string"
     )
     private String province;
 
@@ -82,7 +90,9 @@ public class LoginRecordDTO {
     @Schema(
             name = "city",
             description = "City",
-            example = "Canton"
+            example = "Canton",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "string"
     )
     private String city;
 
@@ -92,7 +102,9 @@ public class LoginRecordDTO {
     @Schema(
             name = "browser",
             description = "Browser",
-            example = "Chrome"
+            example = "Chrome",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "string"
     )
     private String browser;
 
@@ -102,7 +114,9 @@ public class LoginRecordDTO {
     @Schema(
             name = "os",
             description = "Operating system",
-            example = "Windows 10"
+            example = "Windows 10",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "string"
     )
     private String os;
 
@@ -112,7 +126,9 @@ public class LoginRecordDTO {
     @Schema(
             name = "platform",
             description = "Platform",
-            example = "Windows"
+            example = "Windows",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "string"
     )
     private String platform;
 
@@ -122,7 +138,9 @@ public class LoginRecordDTO {
     @Schema(
             name = "loginTime",
             description = "Login time",
-            example = "2025-04-05 20:34:00"
+            example = "2025-04-05T20:34:00+08:00",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "date-time"
     )
     private LocalDateTime loginTime;
 
@@ -132,7 +150,9 @@ public class LoginRecordDTO {
     @Schema(
             name = "isOnline",
             description = "Online status",
-            example = "true"
+            example = "true",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "boolean"
     )
     private Boolean isOnline;
 
@@ -141,8 +161,10 @@ public class LoginRecordDTO {
      */
     @Schema(
             name = "isCurrentSession",
-            description = "Current session status",
-            example = "false"
+            description = "This session is current session",
+            example = "false",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "boolean"
     )
     private Boolean isCurrentSession = false;
 

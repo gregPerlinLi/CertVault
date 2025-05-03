@@ -34,7 +34,7 @@ public class ResponseCaDTO {
             description = "Unique identifier for the CA certificate",
             example = "bf35ecb1-9b67-4083-9476-e264ba153188",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String uuid;
 
@@ -46,7 +46,7 @@ public class ResponseCaDTO {
             description = "Algorithm used to generate the CA certificate",
             example = "RSA",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String algorithm;
 
@@ -58,7 +58,7 @@ public class ResponseCaDTO {
             description = "Size of the key in bits",
             example = "2048",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "Integer"
+            type = "integer"
     )
     private Integer keySize;
 
@@ -70,7 +70,7 @@ public class ResponseCaDTO {
             description = "Private key with BASE64 encoding",
             example = "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2QUl...",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String privkey;
 
@@ -82,7 +82,7 @@ public class ResponseCaDTO {
             description = "Certificate with BASE64 encoding",
             example = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUV2QUl...",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String cert;
 
@@ -93,7 +93,8 @@ public class ResponseCaDTO {
             name = "parentCa",
             description = "Parent CA UUID",
             example = "3885be11-4084-4538-9fa0-70ffe4c4cbe0",
-            type = "String"
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            type = "string"
     )
     private String parentCa;
 
@@ -104,7 +105,8 @@ public class ResponseCaDTO {
             name = "allowSubCa",
             description = "Whether to allow issue subordinate CA",
             example = "true",
-            type = "Boolean"
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            type = "boolean"
     )
     private Boolean allowSubCa;
 
@@ -114,8 +116,9 @@ public class ResponseCaDTO {
     @Schema(
             name = "notBefore",
             description = "Start date of CA validity period (ISO 8601 format)",
-            example = "2025-03-23T12:49:45.733",
-            type = "OffsetDateTime"
+            example = "2025-03-23T12:49:45+08:00",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "date-time"
     )
     private LocalDateTime notBefore;
 
@@ -125,8 +128,9 @@ public class ResponseCaDTO {
     @Schema(
             name = "notAfter",
             description = "End date of CA validity period (ISO 8601 format)",
-            example = "2025-09-19T12:49:45.733",
-            type = "OffsetDateTime"
+            example = "2025-09-19T12:49:45.733+08:00",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            type = "date-time"
     )
     private LocalDateTime notAfter;
 
@@ -137,7 +141,8 @@ public class ResponseCaDTO {
             name = "comment",
             description = "Optional description or notes about the CA",
             example = "Cert Vault Default Intermediate Certificate Authority",
-            type = "String"
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            type = "string"
     )
     private String comment;
 

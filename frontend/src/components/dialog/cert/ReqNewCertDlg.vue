@@ -25,6 +25,7 @@ const caSelection = ref<CaInfoDTO | null>(null);
 const allowSubCa = ref(true);
 const algorithm = ref<string | null>(null);
 const keySize = ref<number | null>(null);
+const expiry = ref(30);
 
 /* Computed */
 const reqNewCertFn = computed(() =>
@@ -71,6 +72,7 @@ const onSubmit = async (ev: Event) => {
       allowSubCa: allowSubCa.value,
       algorithm: algorithm.value,
       keySize: keySize.value,
+      expiry: expiry.value,
       abort: { timeout: -1 }
     });
 
@@ -92,6 +94,7 @@ watch(visible, (newValue) => {
     allowSubCa.value = true;
     algorithm.value = null;
     keySize.value = null;
+    expiry.value = 30;
   }
 });
 watch(caSelection, (newValue) => {
@@ -258,6 +261,7 @@ watch(algorithm, (newValue) => {
         <section class="w-1/3">
           <label for="expiry" required>Expiry</label>
           <InputNumber
+            v-model="expiry"
             input-id="expiry"
             name="expiry"
             size="small"

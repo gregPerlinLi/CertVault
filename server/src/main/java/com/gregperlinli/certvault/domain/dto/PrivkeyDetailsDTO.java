@@ -34,7 +34,7 @@ public class PrivkeyDetailsDTO {
             description = "Algorithm of the private key",
             example = "RSA",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String algorithm;
 
@@ -46,7 +46,7 @@ public class PrivkeyDetailsDTO {
             description = "Encoded of the private key",
             example = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC1GAQWvotGCPu1QAB14hzKF5C2bc9WRecF...",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String encoded;
 
@@ -58,7 +58,7 @@ public class PrivkeyDetailsDTO {
             description = "Format of the private key",
             example = "PKCS#8",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String format;
 
@@ -69,7 +69,7 @@ public class PrivkeyDetailsDTO {
             name = "params",
             description = "Algorithm Parameter Spec of the private key",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "AlgorithmParameterSpec"
+            type = "java.security.spec.AlgorithmParameterSpec"
     )
     private AlgorithmParameterSpec params;
 
@@ -80,8 +80,9 @@ public class PrivkeyDetailsDTO {
             name = "privkey",
             description = "Private Key Specific",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "PrivkeySpecific",
-            example = """
+            type = "com.gregperlinli.certvault.domain.entities.PrivkeySpecific",
+            example =
+                    """
                     {
                         "modulus": "228609759160589102334607729602696527515026450133506517096342257090026912981548985018...",
                         "prime": {

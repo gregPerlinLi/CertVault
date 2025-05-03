@@ -113,10 +113,15 @@ docker compose -f docker-compose-with-postgres-redis.yml up -d
 - [How to deployment](docs/Deployment.md)
 - How to use
 
+## ⚙️ API Documentation
+
+[CertVault API Documentation](https://gregperlinli.github.io/certvault-api-doc/)
+
 ## 🧰 Related Projects
 
 - [CertVault CLI](https://github.com/gregPerlinLi/CertVaultCLI): A CLI tool for CertVault Platform
 - [CertVault Charts](https://github.com/gregPerlinLi/certvault-charts): Helm Charts for CertVault Platform
+- [CertVault API Docs](https://github.com/gregPerlinLi/certvault-api-doc): API documentation for CertVault Platform
 
 ## 📊 Statistics
 

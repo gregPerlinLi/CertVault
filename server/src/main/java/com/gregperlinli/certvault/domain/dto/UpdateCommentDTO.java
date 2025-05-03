@@ -30,7 +30,7 @@ public class UpdateCommentDTO {
             description = "The UUID of the certificate to update",
             example = "99d6cb53-1151-4b2d-a9d1-d1a71d58d47c",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "UUID"
+            type = "string"
     )
     private String uuid;
 
@@ -42,7 +42,7 @@ public class UpdateCommentDTO {
             description = "The updated comment for the certificate",
             example = "Updated security policy requirements",
             requiredMode = Schema.RequiredMode.REQUIRED,
-            type = "String"
+            type = "string"
     )
     private String comment;
 

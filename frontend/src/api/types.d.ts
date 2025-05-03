@@ -124,6 +124,7 @@ export interface UserProfileDTO {
   displayName: string;
   email: string;
   role: 1 | 2 | 3;
+  isPasswordInitialized: boolean;
 }
 
 export interface ResponseCaDTO {
