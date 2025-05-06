@@ -12,7 +12,7 @@ on:
 #      - created
 
 env:
-  REGISTRY: ghcr.io
+#  REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
