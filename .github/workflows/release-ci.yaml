@@ -13,7 +13,7 @@ jobs:
     permissions:
       contents: write
       packages: write
-      attestations: write
+#      attestations: write
       id-token: write
 
     steps:
