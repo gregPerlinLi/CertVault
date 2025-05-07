@@ -22,7 +22,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-#      attestations: write
+      attestations: write
       id-token: write
 
     services:
@@ -91,6 +91,12 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # 构建 Docker 镜像
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.6.0
+
+      - name: Set up Docker BuildX
+        uses: docker/setup-buildx-action@v3.10.0
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
@@ -104,10 +110,38 @@ jobs:
         id: push
         uses: docker/build-push-action@v6
         with:
+          platforms: linux/amd64,linux/arm/v7,linux/arm64
           context: server/
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.8.2
+
+      - name: Sign image with a key
+        run: |
+          images=""
+          for tag in ${TAGS}; do
+            images+="${tag}@${DIGEST} "
+          done
+          cosign sign --yes --key env://COSIGN_PRIVATE_KEY ${images}
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          DIGEST: ${{ steps.push.outputs.digest }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+
+      - name: Sign the images with GitHub OIDC Token
+        run: |
+          images=""
+          for tag in ${TAGS}; do
+            images+="${tag}@${DIGEST} "
+          done
+          cosign sign --yes ${images}
+        env:
+          DIGEST: ${{ steps.push.outputs.digest }}
+          TAGS: ${{ steps.meta.outputs.tags }}
 
       - name: Generate OpenAPI Documentation
         run: |       # 启动应用并导出 YAML 格式文档
