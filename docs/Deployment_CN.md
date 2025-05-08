@@ -19,6 +19,10 @@
 
 [CertVault 发布版本](https://github.com/gregPerlinLi/CertVault/releases)
 
+```bash
+curl -L --output certvault.jar https://github.com/gregPerlinLi/CertVault/releases/latest/download/certvault.jar
+```
+
 #### 2. 准备配置文件
 
 ```bash
