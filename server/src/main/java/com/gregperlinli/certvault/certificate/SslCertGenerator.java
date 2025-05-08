@@ -167,7 +167,7 @@ public class SslCertGenerator {
                     )
             );
 
-            // 签名算法选择
+            // 11. 签名算法选择
             String signerAlg = switch (algorithm) {
                 case "RSA" -> "SHA256WithRSAEncryption";
                 case "EC" -> "SHA256withECDSA";
@@ -175,22 +175,22 @@ public class SslCertGenerator {
                 default -> throw new IllegalArgumentException("Unsupported algorithm");
             };
 
-            // 11. 创建签名器（使用CA私钥）
+            // 12. 创建签名器（使用CA私钥）
             ContentSigner signer = new JcaContentSignerBuilder(signerAlg)
                     .build(caPrivateKey);
 
-            // 12. 生成最终证书
+            // 13. 生成最终证书
             X509CertificateHolder sslCertHolder = certBuilder.build(signer);
 
-            // 13. 生成PEM格式的证书和私钥
+            // 14. 生成PEM格式的证书和私钥
             String pemCert = CertUtils.generatePemCertificate(sslCertHolder);
             String pemPrivateKey = CertUtils.generatePemPrivateKey(sslKeyPair.getPrivate());
 
-            // 14. Base64编码
+            // 15. Base64编码
             String certBase64 = CertUtils.encodeBase64(pemCert.getBytes());
             String privKeyBase64 = CertUtils.encodeBase64(pemPrivateKey.getBytes());
 
-            // 15. 返回响应
+            // 16. 返回响应
             return new GenResponse()
                     .setUuid(UUID.randomUUID().toString())
                     .setAlgorithm(algorithm)
@@ -282,7 +282,7 @@ public class SslCertGenerator {
                 );
             }
 
-            // 签名算法选择
+            // 9. 签名算法选择
             String algorithm = publicKey.getAlgorithm();
             String signerAlg = switch (algorithm) {
                 case "RSA" -> "SHA256WithRSAEncryption";
@@ -291,20 +291,20 @@ public class SslCertGenerator {
                 default -> throw new IllegalArgumentException("Unsupported algorithm");
             };
 
-            // 9. 使用CA私钥签名新证书
+            // 10. 使用CA私钥签名新证书
             ContentSigner signer = new JcaContentSignerBuilder(signerAlg)
                     .build(caPrivateKey);
             X509CertificateHolder newCertHolder = certBuilder.build(signer);
 
-            // 10. 生成PEM格式的证书和私钥（私钥与原证书一致）
+            // 11. 生成PEM格式的证书和私钥（私钥与原证书一致）
             String pemCert = CertUtils.generatePemCertificate(newCertHolder);
             String pemPrivateKey = CertUtils.generatePemPrivateKey(oldPrivateKey);
 
-            // 11. Base64编码
+            // 12. Base64编码
             String certBase64 = CertUtils.encodeBase64(pemCert.getBytes());
             String privKeyBase64 = CertUtils.encodeBase64(pemPrivateKey.getBytes());
 
-            // 获取密钥长度
+            // 13. 获取密钥长度
             Integer keySize = null;
             if (publicKey instanceof RSAPublicKey) {
                 // RSA 密钥长度（模数位数）
@@ -319,7 +319,7 @@ public class SslCertGenerator {
                 throw new UnsupportedOperationException("Unsupported key algorithm: " + publicKey.getAlgorithm());
             }
 
-            // 12. 返回响应
+            // 14. 返回响应
             return new GenResponse()
                     .setUuid(request.getUuid())
                     .setAlgorithm(algorithm)
