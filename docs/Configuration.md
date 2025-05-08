@@ -136,3 +136,4 @@ oidc:
     oidc:
       name: "OpenID Connect"
       logo: "https://cdn.jsdelivr.net/gh/gregperlinli/certvault-frontend@v1.0.0/src/assets/logo.png"
+```
