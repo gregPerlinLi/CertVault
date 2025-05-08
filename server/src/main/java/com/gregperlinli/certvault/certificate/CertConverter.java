@@ -55,34 +55,34 @@ public class CertConverter {
      */
     public static String convertFromPemToPfx(String encodedCertPem, String encodedKeyPem, String password) throws Exception {
         try {
-            // 参数基础校验
+            // 1. 参数基础校验
             if ( encodedCertPem == null || encodedCertPem.isEmpty() ) {
                 throw new ParamValidateException(ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(), "At least a certificate must be provided.");
             }
 
-            // 初始化构建器
+            // 2. 初始化构建器
             PKCS12PfxPduBuilder pfxBuilder = new PKCS12PfxPduBuilder();
             X509Certificate certificate = null;
             PrivateKey privateKey = null;
 
-            // 解析证书
+            // 3. 解析证书
             certificate = new JcaX509CertificateConverter()
                     .setProvider("BC")
                     .getCertificate(CertUtils.parseCertificate(encodedCertPem));
             pfxBuilder.addData(new JcaPKCS12SafeBagBuilder(certificate).build());
 
-            // 解析私钥（如果存在）
+            // 4. 解析私钥（如果存在）
             if ( encodedKeyPem != null && !encodedKeyPem.isEmpty() ) {
                 privateKey = CertUtils.parsePrivateKey(encodedKeyPem);
                 pfxBuilder.addData(new JcaPKCS12SafeBagBuilder(privateKey).build());
             }
 
-            // 创建加密器和MAC计算器
+            // 5. 创建加密器和MAC计算器
             PKCS12MacCalculatorBuilder macCalculatorBuilder = new JcePKCS12MacCalculatorBuilder()
                     .setProvider("BC")
                     .setIterationCount(1000);
 
-            // 构建PFX
+            // 6. 构建PFX
             PKCS12PfxPdu pfx = pfxBuilder.build(
                     macCalculatorBuilder,
                     ( password != null && !password.isEmpty() ) ? password.toCharArray() : new char[0]
@@ -111,7 +111,7 @@ public class CertConverter {
             Pfx pfx = Pfx.getInstance(asn1In.readObject());
             ContentInfo authSafe = pfx.getAuthSafe();
 
-            // 关键修正点：正确解析authSafe内容
+            // 2. 解析authSafe内容
             ASN1OctetString authSafeOctets = (ASN1OctetString) authSafe.getContent();
             ASN1InputStream authSafeStream = new ASN1InputStream(authSafeOctets.getOctets());
             ASN1Sequence authSafeSeq = ASN1Sequence.getInstance(authSafeStream.readObject());
@@ -119,20 +119,20 @@ public class CertConverter {
             StringWriter certWriter = new StringWriter();
             StringWriter keyWriter = new StringWriter();
 
-            // 2. 遍历认证安全单元
+            // 3. 遍历认证安全单元
             for (ASN1Encodable contentObj : authSafeSeq) {
                 ContentInfo contentInfo = ContentInfo.getInstance(contentObj);
                 ASN1OctetString contentOctets = (ASN1OctetString) contentInfo.getContent();
 
-                // 关键修正点：正确解析安全内容
+                // 4. 解析安全内容
                 ASN1InputStream contentStream = new ASN1InputStream(contentOctets.getOctets());
                 ASN1Sequence safeContents = ASN1Sequence.getInstance(contentStream.readObject());
 
-                // 3. 解析安全内容
+                // 5. 处理安全内容
                 for (ASN1Encodable safeBagObj : safeContents) {
                     SafeBag safeBag = SafeBag.getInstance(safeBagObj);
 
-                    // 处理证书
+                    // 6. 处理证书
                     if (safeBag.getBagId().equals(PKCSObjectIdentifiers.certBag)) {
                         CertBag certBag = CertBag.getInstance(safeBag.getBagValue());
                         ASN1OctetString certValue = ASN1OctetString.getInstance(certBag.getCertValue());
@@ -142,7 +142,7 @@ public class CertConverter {
                         }
                     }
 
-                    // 处理加密私钥
+                    // 7. 处理加密私钥
                     if (safeBag.getBagId().equals(PKCSObjectIdentifiers.keyBag)) {
                         // 未加密私钥
                         try {
@@ -178,7 +178,7 @@ public class CertConverter {
                 }
             }
 
-            // 4. 生成结果
+            // 8. 生成结果
             return new CertPrivkeyResult(
                     Base64.getEncoder().encodeToString(certWriter.toString().getBytes()),
                     (!keyWriter.toString().isEmpty()) ?
@@ -200,7 +200,7 @@ public class CertConverter {
      * @throws Exception 抛出异常
      */
     public static CertPrivkeyResult convertFromPemToDer(String encodedCertPem, String encodedKeyPem) throws Exception {
-        // 参数校验：证书 PEM 数据必须存在
+        // 1. 参数校验：证书 PEM 数据必须存在
         if (encodedCertPem == null || encodedCertPem.isEmpty()) {
             throw new ParamValidateException(
                     ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(),
@@ -208,12 +208,12 @@ public class CertConverter {
             );
         }
 
-        // 处理证书部分（必选）
+        // 2. 处理证书部分（必选）
         X509CertificateHolder certHolder = CertUtils.parseCertificate(encodedCertPem);
         byte[] certDerBytes = certHolder.getEncoded();
         String certBase64 = Base64.getEncoder().encodeToString(certDerBytes);
 
-        // 处理私钥部分（可选）
+        // 3. 处理私钥部分（可选）
         String keyBase64 = null;
         if (encodedKeyPem != null && !encodedKeyPem.isEmpty()) {
             PrivateKey privateKey = CertUtils.parsePrivateKey(encodedKeyPem);
@@ -229,7 +229,7 @@ public class CertConverter {
     }
 
     public static CertPrivkeyResult convertFromDerToPem(String encodedCertDer, String encodedKeyDer) throws Exception {
-        // 参数校验：证书 DER 数据必须存在
+        // 1. 参数校验：证书 DER 数据必须存在
         if (encodedCertDer == null || encodedCertDer.isEmpty()) {
             throw new ParamValidateException(
                     ResultStatusCodeConstant.PARAM_VALIDATE_EXCEPTION.getResultCode(),
@@ -237,13 +237,13 @@ public class CertConverter {
             );
         }
 
-        // 处理证书部分（必选）
+        // 2. 处理证书部分（必选）
         byte[] certDerBytes = Base64.getDecoder().decode(encodedCertDer);
         X509CertificateHolder certHolder = new X509CertificateHolder(certDerBytes);
         String pemCert = CertUtils.generatePemCertificate(certHolder);
         String certBase64 = CertUtils.encodeBase64(pemCert.getBytes());
 
-        // 处理私钥部分（可选）
+        // 3. 处理私钥部分（可选）
         String keyBase64 = null;
         if (encodedKeyDer != null && !encodedKeyDer.isEmpty()) {
             byte[] keyDerBytes = Base64.getDecoder().decode(encodedKeyDer);
