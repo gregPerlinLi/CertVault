@@ -123,7 +123,7 @@ docker compose -f docker-compose-with-postgres-redis.yml up -d
 
 - [CertVault CLI](https://github.com/gregPerlinLi/CertVaultCLI): CertVault 的命令行工具
 - [CertVault Charts](https://github.com/gregPerlinLi/certvault-charts): CertVault 的 Helm Chart
-- [CertVault API Docs](https://gregperlinli.github.io/certvault-api-doc/): CertVault 平台 API 文档
+- [CertVault API Docs](https://github.com/gregPerlinLi/certvault-api-doc): CertVault 平台 API 文档
 
 ## 📊 统计
 
