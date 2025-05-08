@@ -62,7 +62,7 @@ jobs:
         run: echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)" >> $GITHUB_ENV
 
       - name: Rename JAR File
-        run: mv server/target/*.jar server/target/certvault-v${{ env.VERSION }}.jar
+        run: mv server/target/*.jar server/target/certvault.jar
 
       # 新增步骤：获取最后一次合并的 PR 号码
       - name: Find Last Merged PR Number
@@ -92,5 +92,5 @@ jobs:
           name: Release v${{ env.VERSION }}
           draft: false
           prerelease: false
-          files: server/target/certvault-v${{ env.VERSION }}.jar
+          files: server/target/certvault.jar
           body_path: comments.md
