@@ -188,7 +188,7 @@ public class CaGenerator {
                 certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
             }
 
-            // 签名算法选择
+            // 12. 签名算法选择
             String signerAlg = switch (algorithm) {
                 case "RSA" -> "SHA256WithRSAEncryption";
                 case "EC" -> "SHA256withECDSA";
@@ -196,7 +196,7 @@ public class CaGenerator {
                 default -> throw new IllegalArgumentException("Unsupported algorithm");
             };
 
-            // 12. 创建签名器（SHA256withRSA）
+            // 13. 创建签名器（SHA256withRSA）
             // ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
             //         .build(caKeyPair.getPrivate());
             ContentSigner signer = isIntermediate
@@ -205,18 +205,18 @@ public class CaGenerator {
                     : new JcaContentSignerBuilder(signerAlg)
                     .build(caKeyPair.getPrivate());
 
-            // 13. 生成最终证书
+            // 14. 生成最终证书
             X509CertificateHolder certHolder = certBuilder.build(signer);
 
-            // 14. 生成 PEM 格式的证书和私钥字符串（包含头尾）
+            // 15. 生成 PEM 格式的证书和私钥字符串（包含头尾）
             String pemCert = generatePemCertificate(certHolder);
             String pemPrivateKey = generatePemPrivateKey(caKeyPair.getPrivate());
 
-            // 15. 对 PEM 内容进行 Base64 编码
+            // 16. 对 PEM 内容进行 Base64 编码
             String certBase64 = encodeBase64(pemCert.getBytes());
             String privKeyBase64 = encodeBase64(pemPrivateKey.getBytes());
 
-            // 16. 填充并返回响应 DTO
+            // 17. 填充并返回响应 DTO
             return new GenResponse()
                     .setUuid(UUID.randomUUID().toString())
                     .setAlgorithm(algorithm)
@@ -320,7 +320,7 @@ public class CaGenerator {
                 certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
             }
 
-            // 签名算法选择
+            // 12. 签名算法选择
             String algorithm = publicKey.getAlgorithm();
             String signerAlg = switch (algorithm) {
                 case "RSA" -> "SHA256WithRSAEncryption";
@@ -329,25 +329,25 @@ public class CaGenerator {
                 default -> throw new IllegalArgumentException("Unsupported algorithm");
             };
 
-            // 12. 创建签名器（使用原始私钥）
+            // 13. 创建签名器（使用原始私钥）
             // ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
             //         .build(privateKey);
             ContentSigner signer = isIntermediate
                     ? new JcaContentSignerBuilder(signerAlg).build(parentPrivateKey)
                     : new JcaContentSignerBuilder(signerAlg).build(privateKey);
 
-            // 13. 生成最终证书
+            // 14. 生成最终证书
             X509CertificateHolder newCertHolder = certBuilder.build(signer);
 
-            // 14. 生成 PEM 格式的证书和私钥字符串（包含头尾）
+            // 15. 生成 PEM 格式的证书和私钥字符串（包含头尾）
             String pemCert = generatePemCertificate(newCertHolder);
             String pemPrivateKey = generatePemPrivateKey(privateKey);
 
-            // 15. 对 PEM 内容进行 Base64 编码
+            // 16. 对 PEM 内容进行 Base64 编码
             String newCertBase64 = encodeBase64(pemCert.getBytes());
             String newPrivKeyBase64 = encodeBase64(pemPrivateKey.getBytes());
 
-            // 16. 获取密钥长度
+            // 17. 获取密钥长度
             Integer keySize = null;
             if (publicKey instanceof RSAPublicKey) {
                 // RSA 密钥长度（模数位数）
@@ -362,7 +362,7 @@ public class CaGenerator {
                 throw new UnsupportedOperationException("Unsupported key algorithm: " + publicKey.getAlgorithm());
             }
 
-            // 17. 填充并返回响应 DTO
+            // 18. 填充并返回响应 DTO
             return new GenResponse()
                     .setUuid(request.getUuid())
                     .setAlgorithm(algorithm)
