@@ -255,7 +255,7 @@ mysql:
     password: "password"
 
 ## PostgreSQL configuration
-## @param postgresql.internal [default: false] Whether to use an internal PostgreSQL instance (true) or an external PostgreSQL instance (false)
+## @param postgresql.internal [default: true] Whether to use an internal PostgreSQL instance (true) or an external PostgreSQL instance (false)
 ## @param postgresql.auth.postgresPassword [default: your-postgres-password] PostgreSQL root user password for internal PostgreSQL deployment
 ## @param postgresql.auth.database [default: certvault] Database name to use (both internal and external)
 ## @param postgresql.auth.username [default: certvault] Username for PostgreSQL access (used in internal deployment)
@@ -269,7 +269,7 @@ mysql:
 ## @param postgresql.external.password [default: password] Password for PostgreSQL user (used in internal deployment)
 ##
 postgresql:
-  internal: false
+  internal: true
   auth:
     postgresPassword: "your-postgres-password"
     database: certvault
