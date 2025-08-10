@@ -11,6 +11,7 @@ keywords:
 type: application
 version: 0.0.0
 appVersion: "0.0.0"
+kubeVersion: ">= 1.19.0-0"
 maintainers:
   - email: lihaolin13@outlook.com
     name: gregPerlinLi
@@ -30,3 +31,25 @@ dependencies:
     version: 16.6.0
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.internal
+annotations:
+  artifacthub.io/images: |
+    - image: ghcr.io/gregperlinli/certvault:0.0.0
+      alias: CertVault
+    - image: bitnami/redis:20.11.4
+      alias: Redis
+    - image: bitnami/mysql:12.3.2
+      alias: MySQL
+    - image: bitnami/postgresql:16.6.0
+      alias: PostgreSQL
+  artifacthub.io/links: |
+    - name: support
+      url: https://github.com/gregPerlinLi/CertVault/issues
+  artifacthub.io/screenshots: |
+    - title: Dashboard
+      url: https://raw.githubusercontent.com/gregPerlinLi/CertVault/main/docs/img/Screenshot2.png
+    - title: CA Certificate Management
+      url: https://raw.githubusercontent.com/gregPerlinLi/CertVault/main/docs/img/Screenshot1.png
+    - title: SSL Certificate Management
+      url: https://raw.githubusercontent.com/gregPerlinLi/CertVault/main/docs/img/Screenshot3.png
+    - title: User Management
+      url: https://raw.githubusercontent.com/gregPerlinLi/CertVault/main/docs/img/Screenshot4.png
