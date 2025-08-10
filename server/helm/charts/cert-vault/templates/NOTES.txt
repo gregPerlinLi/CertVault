@@ -1,3 +1,13 @@
+________  _______   ________  _________        ___      ___ ________  ___  ___  ___   _________
+|\   ____\|\  ___ \ |\   __  \|\___   ___\     |\  \    /  /|\   __  \|\  \|\  \|\  \ |\___   ___\
+\ \  \___|\ \   __/|\ \  \|\  \|___ \  \_|     \ \  \  /  / | \  \|\  \ \  \\\  \ \  \\|___ \  \_|
+ \ \  \    \ \  \_|/_\ \   _  _\   \ \  \       \ \  \/  / / \ \   __  \ \  \\\  \ \  \    \ \  \
+  \ \  \____\ \  \_|\ \ \  \\  \|   \ \  \       \ \    / /   \ \  \ \  \ \  \\\  \ \  \____\ \  \
+   \ \_______\ \_______\ \__\\ _\    \ \__\       \ \__/ /     \ \__\ \__\ \_______\ \_______\ \__\
+    \|_______|\|_______|\|__|\|__|    \|__|        \|__|/       \|__|\|__|\|_______|\|_______|\|__|
+
+🔑Welcome To CertVault Self-Signed SSL Certificate Management Platform🔒~
+
 ##########################################################
 # CertVault successfully installed!                      #
 ##########################################################
@@ -59,3 +69,4 @@ OIDC authentication is enabled. You can log in using the configured OIDC provide
 {{- end }}
 
 For more information, please visit: https://github.com/gregPerlinLi/CertVault
+If you love this project, please don't hesitate give us a star ~
