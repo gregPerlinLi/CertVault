@@ -35,6 +35,7 @@ jobs:
       - name: Backup README.md
         run: |
           cp README.md ..
+          cp README.md charts/cert-vault/README.md
 
       - name: Checkout gh-pages branch
         uses: actions/checkout@v4
