@@ -1,0 +1,61 @@
+##########################################################
+# CertVault successfully installed!                      #
+##########################################################
+
+Access the CertVault application via the following methods:
+
+{{- if .Values.ingress.enabled }}
+# Ingress is enabled
+{{- range $host := .Values.ingress.hosts }}
+{{- range .paths }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+{{- end }}
+{{- end }}
+{{- else }}
+# Port-forward (default method)
+kubectl --namespace {{ .Release.Namespace }} port-forward service/{{ include "cert-vault.fullname" . }} 8080:{{ .Values.service.ports.business }}
+Then access CertVault at http://127.0.0.1:8080
+
+# Or get the service URL using:
+export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "cert-vault.fullname" . }} -o jsonpath='{.spec.clusterIP}')
+echo http://$SERVICE_IP:{{ .Values.service.ports.business }}
+{{- end }}
+
+#####################################################
+# Default Superadmin Credentials                    #
+#####################################################
+
+Username: {{ .Values.init.superadmin.username }}
+Password: {{ .Values.init.superadmin.password }}
+Email: {{ .Values.init.superadmin.email }}
+
+Please change the default password after first login for security reasons!
+
+{{- if .Values.apiDocs.enabled }}
+#####################################################
+# API Documentation                                 #
+#####################################################
+
+API documentation is available at:
+http://<your-certvault-url>/swagger-ui.html
+http://<your-certvault-url>/v3/api-docs
+{{- end }}
+
+{{- if .Values.serviceMonitor.enabled }}
+#####################################################
+# Monitoring                                        #
+#####################################################
+
+Prometheus metrics are available at:
+http://<your-certvault-url>:{{ .Values.service.ports.management }}{{ .Values.serviceMonitor.path }}
+{{- end }}
+
+{{- if .Values.oidc.enabled }}
+#####################################################
+# OIDC Authentication                               #
+#####################################################
+
+OIDC authentication is enabled. You can log in using the configured OIDC providers.
+{{- end }}
+
+For more information, please visit: https://github.com/gregPerlinLi/CertVault
