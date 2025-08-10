@@ -1,0 +1,766 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "CertVault Helm Chart Values Schema",
+  "description": "Schema for CertVault Helm Chart values.yaml file",
+  "properties": {
+    "image": {
+      "type": "object",
+      "description": "Docker image configuration",
+      "properties": {
+        "registry": {
+          "type": "string",
+          "default": "ghcr.io",
+          "description": "The URL of the Docker image registry"
+        },
+        "repository": {
+          "type": "string",
+          "default": "gregperlinli/certvault",
+          "description": "The repository name in the Docker image registry"
+        },
+        "tag": {
+          "type": "string",
+          "default": "",
+          "description": "The tag of the Docker image to be used (e.g., latest, v1.0.0)"
+        },
+        "pullPolicy": {
+          "type": "string",
+          "default": "IfNotPresent",
+          "description": "The policy for pulling the Docker image"
+        }
+      }
+    },
+    "global": {
+      "type": "object",
+      "description": "Global configuration",
+      "properties": {
+        "defaultStorageClass": {
+          "type": "string",
+          "default": "standard",
+          "description": "Global default StorageClass for Persistent Volume(s)"
+        },
+        "storageClass": {
+          "type": "string",
+          "default": "",
+          "description": "DEPRECATED: use global.defaultStorageClass instead"
+        }
+      }
+    },
+    "replicaCount": {
+      "type": "integer",
+      "default": 1,
+      "description": "The number of pod replicas to be created for the deployment"
+    },
+    "springBoot": {
+      "type": "object",
+      "description": "Spring Boot application configuration",
+      "properties": {
+        "profile": {
+          "type": "string",
+          "default": "dev",
+          "description": "The active profile for the Spring Boot application"
+        },
+        "logging": {
+          "type": "object",
+          "properties": {
+            "level": {
+              "type": "object",
+              "properties": {
+                "com_gregperlinli_certvault": {
+                  "type": "string",
+                  "default": "debug",
+                  "description": "Logging level for the com.gregperlinli.certvault package"
+                },
+                "org_springframework": {
+                  "type": "string",
+                  "default": "warn",
+                  "description": "Logging level for the org.springframework package"
+                }
+              }
+            }
+          }
+        },
+        "javaOpts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "JVM options to be passed to the Java Virtual Machine"
+        }
+      }
+    },
+    "server": {
+      "type": "object",
+      "description": "Server configuration",
+      "properties": {
+        "baseUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:1888",
+          "description": "The base URL of the server"
+        }
+      }
+    },
+    "oidc": {
+      "type": "object",
+      "description": "OIDC configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether OIDC authentication is enabled"
+        },
+        "providers": {
+          "type": "object",
+          "properties": {
+            "oidc": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Whether OIDC authentication is enabled"
+                },
+                "name": {
+                  "type": "string",
+                  "default": "OpenID Connect",
+                  "description": "Name of the OIDC provider"
+                },
+                "logo": {
+                  "type": "string",
+                  "description": "Logo of the OIDC provider in base64 encoded format"
+                },
+                "clientId": {
+                  "type": "string",
+                  "default": "oidc-client-id",
+                  "description": "The client ID for the OIDC provider"
+                },
+                "clientSecret": {
+                  "type": "string",
+                  "default": "oidc-client-secret",
+                  "description": "The client secret for the OIDC provider"
+                },
+                "scope": {
+                  "type": "string",
+                  "default": "openid,profile,email",
+                  "description": "The scope for the OIDC provider"
+                },
+                "authorizationUri": {
+                  "type": "string",
+                  "default": "https://oidc-provider.example.com/auth",
+                  "description": "The authorization URI for the OIDC provider"
+                },
+                "tokenUri": {
+                  "type": "string",
+                  "default": "https://oidc-provider.example.com/token",
+                  "description": "The token URI for the OIDC provider"
+                },
+                "userInfoUri": {
+                  "type": "string",
+                  "default": "https://oidc-provider.example.com/userinfo",
+                  "description": "The user info URI for the OIDC provider"
+                },
+                "jwkSetUri": {
+                  "type": "string",
+                  "default": "https://oidc-provider.example.com/certs",
+                  "description": "The JWK set URI for the OIDC provider"
+                },
+                "usernameAttributes": {
+                  "type": "string",
+                  "default": "preferred_username",
+                  "description": "The username attributes for the OIDC provider"
+                }
+              }
+            },
+            "github": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Whether GitHub OAuth authentication is enabled"
+                },
+                "name": {
+                  "type": "string",
+                  "default": "GitHub OAuth",
+                  "description": "Name of the GitHub OAuth provider"
+                },
+                "logo": {
+                  "type": "string",
+                  "description": "Logo of the GitHub OAuth provider in base64 encoded format"
+                },
+                "clientId": {
+                  "type": "string",
+                  "default": "github-client-id",
+                  "description": "The client ID for the GitHub OAuth provider"
+                },
+                "clientSecret": {
+                  "type": "string",
+                  "default": "github-client-secret",
+                  "description": "The client secret for the GitHub OAuth provider"
+                },
+                "scope": {
+                  "type": "string",
+                  "default": "openid,profile,email",
+                  "description": "The scope for the GitHub OAuth provider"
+                },
+                "authorizationUri": {
+                  "type": "string",
+                  "default": "https://github.com/login/oauth/authorize",
+                  "description": "The authorization URI for the GitHub OAuth provider"
+                },
+                "tokenUri": {
+                  "type": "string",
+                  "default": "https://github.com/login/oauth/access_token",
+                  "description": "The token URI for the GitHub OAuth provider"
+                },
+                "userInfoUri": {
+                  "type": "string",
+                  "default": "https://api.github.com/user",
+                  "description": "The user info URI for the GitHub OAuth provider"
+                },
+                "usernameAttributes": {
+                  "type": "string",
+                  "default": "login",
+                  "description": "The username attributes for the GitHub OAuth provider"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "geoip": {
+      "type": "object",
+      "description": "GeoIP configuration",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "ip-api.com",
+          "description": "How to get GeoIP data (ip-api.com or mmdb)"
+        },
+        "mmdb": {
+          "type": "object",
+          "properties": {
+            "mountType": {
+              "type": "string",
+              "default": "configMap",
+              "description": "The type of mount for the GeoIP database"
+            },
+            "existingPath": {
+              "type": "string",
+              "default": "/path/to/GeoLite2-City.mmdb",
+              "description": "The path to the existing GeoIP database"
+            },
+            "mountPath": {
+              "type": "string",
+              "default": "/geoip",
+              "description": "The path to mount the GeoIP database"
+            },
+            "subPath": {
+              "type": "string",
+              "default": "GeoLite2-City.mmdb",
+              "description": "The subpath to mount the GeoIP database"
+            },
+            "readOnly": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether the GeoIP database is read-only"
+            }
+          }
+        }
+      }
+    },
+    "init": {
+      "type": "object",
+      "description": "Initialization configuration",
+      "properties": {
+        "superadmin": {
+          "type": "object",
+          "properties": {
+            "username": {
+              "type": "string",
+              "default": "superadmin",
+              "description": "The username for the superadmin user"
+            },
+            "displayName": {
+              "type": "string",
+              "default": "Default Superadmin",
+              "description": "The display name for the superadmin user"
+            },
+            "email": {
+              "type": "string",
+              "default": "superadmin@certvault.example",
+              "description": "The email address for the superadmin user"
+            },
+            "password": {
+              "type": "string",
+              "default": "changeme",
+              "description": "The password for the superadmin user"
+            }
+          }
+        }
+      }
+    },
+    "encrypt": {
+      "type": "object",
+      "description": "Encryption configuration",
+      "properties": {
+        "rsa": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "object",
+              "properties": {
+                "publicKey": {
+                  "type": "string",
+                  "default": "changeme",
+                  "description": "The BASE64 encoded pem format public key used for RSA encryption"
+                },
+                "privateKey": {
+                  "type": "string",
+                  "default": "changeme",
+                  "description": "The BASE64 encoded pem format private key used for RSA decryption"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "apiDocs": {
+      "type": "object",
+      "description": "API documentation configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether the API documentation is enabled"
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "description": "Service configuration",
+      "properties": {
+        "ports": {
+          "type": "object",
+          "properties": {
+            "business": {
+              "type": "integer",
+              "default": 1888,
+              "description": "Business port for the application"
+            },
+            "management": {
+              "type": "integer",
+              "default": 1999,
+              "description": "Management port for the application"
+            }
+          }
+        }
+      }
+    },
+    "serviceMonitor": {
+      "type": "object",
+      "description": "Service Monitor configuration for Prometheus",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether the service monitor is enabled"
+        },
+        "path": {
+          "type": "string",
+          "default": "/actuator/prometheus",
+          "description": "Path for Prometheus metrics endpoint"
+        },
+        "port": {
+          "type": "integer",
+          "default": 1999,
+          "description": "Port for Prometheus metrics endpoint"
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "description": "Resource configuration for the application",
+      "properties": {
+        "requests": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "default": "500m",
+              "description": "CPU request for the application container"
+            },
+            "memory": {
+              "type": "string",
+              "default": "512Mi",
+              "description": "Memory request for the application container"
+            }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "default": "1000m",
+              "description": "CPU limit for the application container"
+            },
+            "memory": {
+              "type": "string",
+              "default": "1024Mi",
+              "description": "Memory limit for the application container"
+            }
+          }
+        }
+      }
+    },
+    "redis": {
+      "type": "object",
+      "description": "Redis configuration",
+      "properties": {
+        "internal": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to use an internal Redis instance (true) or an external Redis instance (false)"
+        },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether authentication is enabled for Redis"
+            },
+            "password": {
+              "type": "string",
+              "default": "your-redis-password",
+              "description": "The password used for Redis authentication"
+            }
+          }
+        },
+        "architecture": {
+          "type": "string",
+          "default": "standalone",
+          "description": "The architecture of the Redis deployment (standalone or cluster)"
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether to enable metrics for Redis"
+            },
+            "serviceMonitor": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Whether to enable Service Monitor for Prometheus metrics"
+                }
+              }
+            }
+          }
+        },
+        "external": {
+          "type": "object",
+          "properties": {
+            "host": {
+              "type": "string",
+              "default": "redis-master.example.com",
+              "description": "Hostname or IP address of the external Redis instance"
+            },
+            "port": {
+              "type": "string",
+              "default": "6379",
+              "description": "Port number of the external Redis instance"
+            },
+            "database": {
+              "type": "string",
+              "default": "0",
+              "description": "Database index to use"
+            },
+            "auth": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Whether authentication is enabled for the external Redis instance"
+                },
+                "password": {
+                  "type": "string",
+                  "default": "your-redis-password",
+                  "description": "Password for the external Redis instance"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "database": {
+      "type": "object",
+      "description": "Database configuration",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "postgresql",
+          "description": "The type of database to use (mysql, postgresql)"
+        }
+      }
+    },
+    "mysql": {
+      "type": "object",
+      "description": "MySQL configuration",
+      "properties": {
+        "internal": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to use an internal MySQL instance (true) or an external MySQL instance (false)"
+        },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "rootPassword": {
+              "type": "string",
+              "default": "your-mysql-root-password",
+              "description": "Root user password for internal MySQL deployment"
+            },
+            "database": {
+              "type": "string",
+              "default": "certvault",
+              "description": "Database name to use (both internal and external)"
+            },
+            "username": {
+              "type": "string",
+              "default": "certvault",
+              "description": "Username for MySQL access (used in internal deployment)"
+            },
+            "password": {
+              "type": "string",
+              "default": "your-mysql-password",
+              "description": "Password for the MySQL user (used in internal deployment)"
+            }
+          }
+        },
+        "architecture": {
+          "type": "string",
+          "default": "standalone",
+          "description": "The architecture of the MySQL deployment (standalone or cluster)"
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether to enable metrics for MySQL"
+            },
+            "serviceMonitor": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Whether to enable Service Monitor for Prometheus metrics"
+                }
+              }
+            }
+          }
+        },
+        "external": {
+          "type": "object",
+          "properties": {
+            "host": {
+              "type": "string",
+              "default": "localhost",
+              "description": "Hostname/IP of external MySQL instance"
+            },
+            "port": {
+              "type": "integer",
+              "default": 3306,
+              "description": "Port of external MySQL instance"
+            },
+            "database": {
+              "type": "string",
+              "default": "certvault",
+              "description": "Database name for external MySQL"
+            },
+            "username": {
+              "type": "string",
+              "default": "certvault",
+              "description": "Username for external MySQL access"
+            },
+            "password": {
+              "type": "string",
+              "default": "password",
+              "description": "Password for external MySQL user"
+            }
+          }
+        }
+      }
+    },
+    "postgresql": {
+      "type": "object",
+      "description": "PostgreSQL configuration",
+      "properties": {
+        "internal": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to use an internal PostgreSQL instance (true) or an external PostgreSQL instance (true)"
+        },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "postgresPassword": {
+              "type": "string",
+              "default": "your-postgres-password",
+              "description": "PostgreSQL root user password for internal PostgreSQL deployment"
+            },
+            "database": {
+              "type": "string",
+              "default": "certvault",
+              "description": "Database name to use (both internal and external)"
+            },
+            "username": {
+              "type": "string",
+              "default": "certvault",
+              "description": "Username for PostgreSQL access (used in internal deployment)"
+            },
+            "password": {
+              "type": "string",
+              "default": "your-postgres-password",
+              "description": "Password for the PostgreSQL user (used in internal deployment)"
+            }
+          }
+        },
+        "architecture": {
+          "type": "string",
+          "default": "standalone",
+          "description": "The architecture of the PostgreSQL deployment (standalone or cluster)"
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether to enable metrics for PostgreSQL"
+            },
+            "serviceMonitor": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Whether to enable Service Monitor for Prometheus metrics"
+                }
+              }
+            }
+          }
+        },
+        "external": {
+          "type": "object",
+          "properties": {
+            "host": {
+              "type": "string",
+              "default": "localhost",
+              "description": "Hostname/IP of external PostgreSQL instance"
+            },
+            "port": {
+              "type": "integer",
+              "default": 5432,
+              "description": "Port of external PostgreSQL instance"
+            },
+            "database": {
+              "type": "string",
+              "default": "certvault",
+              "description": "Database name for external PostgreSQL"
+            },
+            "username": {
+              "type": "string",
+              "default": "certvault",
+              "description": "Username for PostgreSQL access (used in internal deployment)"
+            },
+            "password": {
+              "type": "string",
+              "default": "password",
+              "description": "Password for PostgreSQL user (used in internal deployment)"
+            }
+          }
+        }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "description": "Ingress configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether ingress is enabled"
+        },
+        "annotations": {
+          "type": "object",
+          "default": {},
+          "description": "Annotations for the ingress"
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string",
+                "default": "chart-example.local",
+                "description": "Hostname for the ingress"
+              },
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "default": "/",
+                      "description": "Path for the ingress"
+                    },
+                    "pathType": {
+                      "type": "string",
+                      "default": "ImplementationSpecific",
+                      "description": "Path type for the ingress"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ingressClassName": {
+          "type": "string",
+          "default": "nginx",
+          "description": "Ingress class name"
+        }
+      }
+    },
+    "nodeSelector": {
+      "type": "object",
+      "default": {},
+      "description": "A map of key-value pairs to select nodes for pod scheduling. Each entry specifies a node label and its required value to ensure pods are scheduled on specific nodes."
+    },
+    "nodeAffinity": {
+      "type": "object",
+      "default": {},
+      "description": "Defines node affinity rules based on node labels to control where pods are scheduled"
+    },
+    "podAffinity": {
+      "type": "object",
+      "default": {},
+      "description": "Defines pod affinity rules based on other pods' labels to control topological relationships"
+    }
+  }
+}
