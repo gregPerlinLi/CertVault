@@ -425,6 +425,26 @@
           "default": true,
           "description": "Whether to use an internal Redis instance (true) or an external Redis instance (false)"
         },
+        "image": {
+          "type": "object",
+          "properties": {
+            "registry": {
+              "type": "string",
+              "default": "docker.io",
+              "description": "The registry to use for the Redis image"
+            },
+            "repository": {
+              "type": "string",
+              "default": "bitnamilegacy/redis",
+              "description": "The repository to use for the Redis image"
+            },
+            "tag": {
+              "type": "string",
+              "default": "7.4.2-debian-12-r6",
+              "description": "The tag to use for the Redis image"
+            }
+          }
+        },
         "auth": {
           "type": "object",
           "properties": {
@@ -452,6 +472,26 @@
               "type": "boolean",
               "default": true,
               "description": "Whether to enable metrics for Redis"
+            },
+            "image": {
+              "type": "object",
+              "properties": {
+                "registry": {
+                  "type": "string",
+                  "default": "docker.io",
+                  "description": "The registry to use for the Redis metrics image"
+                },
+                "repository": {
+                  "type": "string",
+                  "default": "bitnamilegacy/redis-exporter",
+                  "description": "The repository to use for the Redis metrics image"
+                },
+                "tag": {
+                  "type": "string",
+                  "default": "1.69.0-debian-12-r1",
+                  "description": "The tag to use for the Redis metrics image"
+                }
+              }
             },
             "serviceMonitor": {
               "type": "object",
@@ -522,6 +562,26 @@
           "default": false,
           "description": "Whether to use an internal MySQL instance (true) or an external MySQL instance (false)"
         },
+        "image": {
+          "type": "object",
+          "properties": {
+            "registry": {
+              "type": "string",
+              "default": "docker.io",
+              "description": "The registry to use for the MySQL image"
+            },
+            "repository": {
+              "type": "string",
+              "default": "bitnamilegacy/mysql",
+              "description": "The repository to use for the MySQL image"
+            },
+            "tag": {
+              "type": "string",
+              "default": "8.4.4-debian-12-r7",
+              "description": "Tag to use for the MySQL image"
+            }
+          }
+        },
         "auth": {
           "type": "object",
           "properties": {
@@ -559,6 +619,26 @@
               "type": "boolean",
               "default": true,
               "description": "Whether to enable metrics for MySQL"
+            },
+            "image": {
+              "type": "object",
+              "properties": {
+                "registry": {
+                  "type": "string",
+                  "default": "docker.io",
+                  "description": "The registry to use for the MySQL metrics image"
+                },
+                "repository": {
+                  "type": "string",
+                  "default": "bitnamilegacy/mysqld-exporter",
+                  "description": "The repository to use for the MySQL metrics image"
+                },
+                "tag": {
+                  "type": "string",
+                  "default": "0.17.2-debian-12-r2",
+                  "description": "The tag to use for the MySQL metrics image"
+                }
+              }
             },
             "serviceMonitor": {
               "type": "object",
@@ -613,6 +693,26 @@
           "default": true,
           "description": "Whether to use an internal PostgreSQL instance (true) or an external PostgreSQL instance (true)"
         },
+        "image": {
+          "type": "object",
+          "properties": {
+            "registry": {
+              "type": "string",
+              "default": "docker.io",
+              "description": "Registry for PostgreSQL image"
+            },
+            "repository": {
+              "type": "string",
+              "default": "bitnamilegacy/postgresql",
+              "description": "Repository for PostgreSQL image"
+            },
+            "tag": {
+              "type": "string",
+              "default": "17.4.0-debian-12-r11",
+              "description": "Tag for PostgreSQL image"
+            }
+          }
+        },
         "auth": {
           "type": "object",
           "properties": {
@@ -650,6 +750,26 @@
               "type": "boolean",
               "default": true,
               "description": "Whether to enable metrics for PostgreSQL"
+            },
+            "image": {
+              "type": "object",
+              "properties": {
+                "registry": {
+                  "type": "string",
+                  "default": "docker.io",
+                  "description": "The registry to use for the PostgreSQL metrics image"
+                },
+                "repository": {
+                  "type": "string",
+                  "default": "bitnamilegacy/postgres-exporter",
+                  "description": "The repository to use for the PostgreSQL metrics image"
+                },
+                "tag": {
+                  "type": "string",
+                  "default": "0.17.1-debian-12-r2",
+                  "description": "The tag to use for the PostgreSQL metrics image"
+                }
+              }
             },
             "serviceMonitor": {
               "type": "object",
