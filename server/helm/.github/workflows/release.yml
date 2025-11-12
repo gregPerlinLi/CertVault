@@ -40,12 +40,18 @@ jobs:
           gpg --batch --yes --export > /home/runner/.gnupg/pubring.gpg
           gpg --batch --yes --export-secret-keys > /home/runner/.gnupg/secring.gpg
 
+      - name: Get GPG key UID
+        id: gpg_uid
+        run: |
+          uid=$(gpg --batch --list-secret-keys --with-colons | awk -F: '$1=="uid"{print $10; exit}')
+          echo "uid=$uid" >> "$GITHUB_OUTPUT"
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           CR_SIGN: "true"
-          CR_KEY: "${{ steps.import_gpg.outputs.keyid }}"
+          CR_KEY: "${{ steps.gpg_uid.outputs.uid }}"
           CR_PASSPHRASE: "${{ secrets.HELM_GPG_PASSPHRASE }}"
           CR_KEYRING: "/home/runner/.gnupg/pubring.gpg"
 
