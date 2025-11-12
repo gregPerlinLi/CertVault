@@ -1,4 +1,4 @@
-FROM openjdk:17-oracle
+FROM openjdk:17
 ARG JAR_FILE=target/*.jar
 ENV TIME_ZONE=Asia/Shanghai
 COPY ${JAR_FILE} app.jar
