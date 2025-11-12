@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -27,17 +27,27 @@ jobs:
       - name: Add Helm repos
         run: helm repo add bitnami https://charts.bitnami.com/bitnami
 
+      - name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.HELM_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.HELM_GPG_PASSPHRASE }}
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CR_SIGN: "true"
+          CR_KEY: "${{ steps.import_gpg.outputs.keyid }}"
+          CR_PASSPHRASE: "${{ secrets.HELM_GPG_PASSPHRASE }}"
 
       - name: Backup README.md
         run: |
           cp README.md ..
 
       - name: Checkout gh-pages branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: gh-pages
 

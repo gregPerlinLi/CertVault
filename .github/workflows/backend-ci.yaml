@@ -35,11 +35,11 @@ jobs:
     steps:
       # 检出代码
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # 设置 JDK 环境
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -54,7 +54,7 @@ jobs:
 
       # 设置 Node.js 环境
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/Jod
           cache: pnpm
@@ -117,7 +117,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@v3.8.2
+        uses: sigstore/cosign-installer@v4.0.0
 
       - name: Sign image with a key
         run: |
@@ -153,13 +153,13 @@ jobs:
         run: echo "VERSION=${{ env.VERSION }}" > version.env
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: version
           path: version.env
 
       - name: Upload API Doc Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: openapi-doc
           path: openapi.yaml
@@ -171,7 +171,7 @@ jobs:
       contents: write
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: version
           path: .
@@ -184,11 +184,11 @@ jobs:
 
       # 检出当前代码库
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # 检出目标仓库代码
       - name: Checkout target repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: gregPerlinLi/certvault-charts
           token: ${{ secrets.CERT_VAULT_CHARTS_TOKEN }}
@@ -229,14 +229,14 @@ jobs:
     steps:
       # 下载生成的 OpenAPI 文档
       - name: Download OpenAPI artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: openapi-doc
           path: .
 
       # 检出 CertVaultAPIDoc 仓库
       - name: Checkout CertVaultAPIDoc repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: gregPerlinLi/certvault-api-doc
           token: ${{ secrets.CERT_VAULT_API_DOC_TOKEN }}
