@@ -62,11 +62,8 @@ package-build:dev:
       deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
       deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
-    - apt-get clean
-    - rm -rf /var/lib/apt/lists/* || true
     - apt-get update -qq
-    - apt-get --fix-broken install -y
-    - apt-get upgrade -y
+    - apt remove -y --purge perl-base perl
     - apt install -y curl wget git maven openjdk-17-jdk
     - echo "=========================== CHANGE MAVEN MIRROR ============================"
     - mkdir -p $HOME/.m2 || true
@@ -133,11 +130,8 @@ package-build:main:
       deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
       deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
-    - apt-get clean
-    - rm -rf /var/lib/apt/lists/* || true
     - apt-get update -qq
-    - apt-get --fix-broken install -y
-    - apt-get upgrade -y
+    - apt remove -y --purge perl-base perl
     - apt install -y curl wget git maven openjdk-17-jdk
     - echo "=========================== CHANGE MAVEN MIRROR ============================"
     - mkdir -p $HOME/.m2 || true
