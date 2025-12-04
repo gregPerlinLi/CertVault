@@ -12,7 +12,27 @@ cache:
   paths:
     - cache
 
-sonarqube-check:
+sonarqube-check-frontend:
+  stage: check
+  image:
+    name: registry.gdut.edu.cn/docker/sonarsource/sonar-scanner-cli:5.0
+    entrypoint: [""]
+  tags:
+    - dev
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}"
+  allow_failure: true
+  only:
+    - dev
+
+sonarqube-check-backend:
   stage: check
   image: registry.gdut.edu.cn/docker/library/maven:3-eclipse-temurin-17
   tags:
@@ -195,6 +215,8 @@ docker-build-and-push:
     - echo "============================= LOGIN TO HARBOR =============================="
     - docker login -u ${USERNAME} -p ${PASSWORD} ${HARBORHOST}
     - echo "======================= BUILD AND PUSH DOCKER IMAGES ======================="
+    - mkdir -p server/target/
+    - mv target/*.jar server/target/
     - cd server
     - sed -i "s/FROM eclipse-temurin:17-jre/FROM registry.gdut.edu.cn\/docker\/library\/eclipse-temurin:17-jre/g" Dockerfile
     - |
