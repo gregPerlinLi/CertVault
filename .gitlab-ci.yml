@@ -63,8 +63,15 @@ package-build:dev:
       deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
     - apt-get update -qq
-    - apt remove -y --purge perl-base
-    - apt install -y curl wget git maven openjdk-17-jdk
+    - apt-get install -y --no-install-recommends \
+      ca-certificates \
+      curl \
+      wget \
+      git \
+      gnupg2 \
+      software-properties-common
+    - apt-get install -y --no-install-recommends openjdk-17-jdk
+    - apt-get install -y --no-install-recommends maven
     - echo "=========================== CHANGE MAVEN MIRROR ============================"
     - mkdir -p $HOME/.m2 || true
     - echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
@@ -131,8 +138,15 @@ package-build:main:
       deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
     - apt-get update -qq
-    - apt remove -y --purge perl-base
-    - apt install -y curl wget git maven openjdk-17-jdk
+    - apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        wget \
+        git \
+        gnupg2 \
+        software-properties-common
+    - apt-get install -y --no-install-recommends openjdk-17-jdk
+    - apt-get install -y --no-install-recommends maven
     - echo "=========================== CHANGE MAVEN MIRROR ============================"
     - mkdir -p $HOME/.m2 || true
     - echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
