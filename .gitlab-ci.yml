@@ -50,7 +50,7 @@ package-build:dev:
   image: registry.gdut.edu.cn/docker/library/ubuntu:22.04
   stage: package-build
   tags:
-    - maven
+    - dev
   before_script:
     - echo "============================ CHANGE APT MIRROR ============================="
     - echo 'deb http://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
@@ -60,7 +60,7 @@ package-build:dev:
       deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
       deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
       deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
-      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list || true
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list
     - apt update -y
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
     - apt install -y curl wget git maven openjdk-17-jdk
@@ -114,10 +114,10 @@ package-build:dev:
     - dev
 
 package-build:main:
-  image: registry.gdut.edu.cn/docker/library/maven:3.6-openjdk-17
+  image: registry.gdut.edu.cn/docker/library/ubuntu:22.04
   stage: package-build
   tags:
-    - maven
+    - dev
   before_script:
     - echo "============================ CHANGE APT MIRROR ============================="
     - echo 'deb http://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
@@ -127,7 +127,7 @@ package-build:main:
       deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
       deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
       deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
-      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list || true
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list
     - apt update -qq
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
     - apt-mark unhold perl perl-base
