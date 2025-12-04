@@ -53,7 +53,7 @@ package-build:dev:
     - dev
   before_script:
     - echo "============================ CHANGE APT MIRROR ============================="
-    - sed -i 's/https:\/\/archive.ubuntu.com/http:\/\/mirrors.gdut.edu.cn/g' /etc/apt/sources.list
+    - sed -i 's/http:\/\/archive.ubuntu.com/http:\/\/mirrors.gdut.edu.cn/g' /etc/apt/sources.list.d/ubuntu.sources
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
     - apt update -y
     - apt install -y --no-install-recommends ca-certificates curl wget git gnupg2 software-properties-common
