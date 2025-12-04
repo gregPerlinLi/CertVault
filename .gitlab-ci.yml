@@ -196,6 +196,7 @@ docker-build-and-push:
     - docker login -u ${USERNAME} -p ${PASSWORD} ${HARBORHOST}
     - echo "======================= BUILD AND PUSH DOCKER IMAGES ======================="
     - cd server
+    - sed -i "s/FROM eclipse-temurin:17-jre/FROM registry.gdut.edu.cn\/docker\/library\/eclipse-temurin:17-jre/g" Dockerfile
     - |
       docker buildx build \
       --platform linux/amd64,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x \
@@ -239,7 +240,7 @@ helm-build:
     - echo "============================= LOGIN TO HARBOR =============================="
     - helm registry login ${HARBORHOST} --username ${USERNAME} --password ${PASSWORD}
     - echo "============================== PACKAGE CHART ==============================="
-    - 'sed -i "s/name: cert-vault/name: certvault-chart/g" cert-vault/Chart.yaml'
+    - 'sed -i "s/name: cert-vault/name: certvault-helm/g" cert-vault/Chart.yaml'
     - helm package cert-vault --version ${VERSION}
     - echo "=============================== PUSH CHARTS ================================"
     - helm push certvault-helm-* oci://${HARBORHOST}/certvault
