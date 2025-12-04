@@ -54,6 +54,7 @@ package-build:dev:
   before_script:
     - echo "============================ CHANGE APT MIRROR ============================="
     - sed -i 's/http:\/\/archive.ubuntu.com/http:\/\/mirrors.gdut.edu.cn/g' /etc/apt/sources.list.d/ubuntu.sources
+    - sed -i 's/http:\/\/security.ubuntu.com/http:\/\/mirrors.gdut.edu.cn/g' /etc/apt/sources.list.d/ubuntu.sources
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
     - apt update -y
     - apt install -y --no-install-recommends ca-certificates curl wget git gnupg2 software-properties-common
@@ -83,9 +84,9 @@ package-build:dev:
     - pnpm config set registry https://mirrors.gdut.edu.cn/nexus/repository/npm
   script:
     - echo "=========================== INSTALL DEPENDENCIES ============================"
+    - cd frontend
     - pnpm install
     - echo "============================= BUILD FRONTEND ================================"
-    - cd frontend
     - pnpm run build
     - cd ..
     - echo "========================== COPY FRONTEND RESOURCES =========================="
@@ -117,6 +118,7 @@ package-build:main:
   before_script:
     - echo "============================ CHANGE APT MIRROR ============================="
     - sed -i 's/http:\/\/archive.ubuntu.com/http:\/\/mirrors.gdut.edu.cn/g' /etc/apt/sources.list.d/ubuntu.sources
+    - sed -i 's/http:\/\/security.ubuntu.com/http:\/\/mirrors.gdut.edu.cn/g' /etc/apt/sources.list.d/ubuntu.sources
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
     - apt update -y
     - apt install -y --no-install-recommends ca-certificates curl wget git gnupg2 software-properties-common
@@ -146,9 +148,9 @@ package-build:main:
     - pnpm config set registry https://mirrors.gdut.edu.cn/nexus/repository/npm
   script:
     - echo "=========================== INSTALL DEPENDENCIES ============================"
+    - cd frontend
     - pnpm install
     - echo "============================= BUILD FRONTEND ================================"
-    - cd frontend
     - pnpm run build
     - cd ..
     - echo "========================== COPY FRONTEND RESOURCES =========================="
