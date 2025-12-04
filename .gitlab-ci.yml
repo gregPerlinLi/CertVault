@@ -85,9 +85,12 @@ package-build:dev:
     - echo "=========================== INSTALL DEPENDENCIES ============================"
     - pnpm install
     - echo "============================= BUILD FRONTEND ================================"
+    - cd frontend
     - pnpm run build
+    - cd ..
+    - echo "========================== COPY FRONTEND RESOURCES =========================="
     - mkdir -p server/src/main/resources/static
-    - cp -r dist/* server/src/main/resources/static/
+    - cp -r frontend/dist/* server/src/main/resources/static/
     - echo "========================== GENERATE VERSION TAGS ==========================="
     - export VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)
     # - export VERSION=v$VERSION
@@ -107,25 +110,16 @@ package-build:dev:
     - dev
 
 package-build:main:
-  image: registry.gdut.edu.cn/docker/library/ubuntu:22.04
+  image: registry.gdut.edu.cn/docker/library/maven:3.9-eclipse-temurin-17
   stage: package-build
   tags:
     - dev
   before_script:
     - echo "============================ CHANGE APT MIRROR ============================="
-    - echo 'deb http://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
-      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
-      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
-      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
-      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
-      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list
+    - sed -i 's/http:\/\/archive.ubuntu.com/http:\/\/mirrors.gdut.edu.cn/g' /etc/apt/sources.list.d/ubuntu.sources
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
     - apt update -y
     - apt install -y --no-install-recommends ca-certificates curl wget git gnupg2 software-properties-common
-    - apt install -y --no-install-recommends openjdk-17-jdk
-    - apt install -y --no-install-recommends maven
     - echo "=========================== CHANGE MAVEN MIRROR ============================"
     - mkdir -p $HOME/.m2 || true
     - echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
@@ -154,11 +148,15 @@ package-build:main:
     - echo "=========================== INSTALL DEPENDENCIES ============================"
     - pnpm install
     - echo "============================= BUILD FRONTEND ================================"
+    - cd frontend
     - pnpm run build
+    - cd ..
+    - echo "========================== COPY FRONTEND RESOURCES =========================="
     - mkdir -p server/src/main/resources/static
-    - cp -r dist/* server/src/main/resources/static/
+    - cp -r frontend/dist/* server/src/main/resources/static/
     - echo "========================== GENERATE VERSION TAGS ==========================="
     - export VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)
+    # - export VERSION=v$VERSION
     - echo "Building version $VERSION"
     - echo "=========================== BUILD MAVEN PROJECT ============================"
     - mvn clean package -f server/pom.xml -Dmaven.test.sktip=true -DskipTests -Dmaven.repo.local=cache
@@ -271,14 +269,8 @@ image-sign:
     - dev
   before_script:
     - echo "============================ CHANGE APT MIRROR ============================="
-    - echo 'deb http://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
-      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
-      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
-      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
-      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
-      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list
+    - sed -i 's/http:\/\/archive.ubuntu.com/http:\/\/mirrors.gdut.edu.cn/g' /etc/apt/sources.list
+    - sed -i 's/http:\/\/security.ubuntu.com/http:\/\/mirrors.gdut.edu.cn/g' /etc/apt/sources.list
     - apt update -y
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
     - apt install curl jq skopeo -y
