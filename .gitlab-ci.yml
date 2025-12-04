@@ -73,14 +73,14 @@ package-build:dev:
     - maven
   before_script:
     - echo "============================ CHANGE APT MIRROR ============================="
-    - echo 'deb https://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
-      deb-src https://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
-      deb https://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
-      deb-src https://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
-      deb https://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-      deb-src https://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-      deb https://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
-      deb-src https://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list || true
+    - echo 'deb http://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
+      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list || true
     - apt update -y
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
     - apt install -y curl wget gnupg2 software-properties-common git maven openjdk-17-jdk
@@ -140,14 +140,14 @@ package-build:main:
     - maven
   before_script:
     - echo "============================ CHANGE APT MIRROR ============================="
-    - echo 'deb https://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
-      deb-src https://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
-      deb https://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
-      deb-src https://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
-      deb https://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-      deb-src https://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-      deb https://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
-      deb-src https://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list || true
+    - echo 'deb http://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
+      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list || true
     - apt update -y
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
     - apt install -y curl wget gnupg2 software-properties-common git maven openjdk-17-jdk
@@ -296,14 +296,14 @@ image-sign:
     - dev
   before_script:
     - echo "============================ CHANGE APT MIRROR ============================="
-    - echo 'deb https://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
-      deb-src https://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
-      deb https://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
-      deb-src https://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
-      deb https://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-      deb-src https://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-      deb https://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
-      deb-src https://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list
+    - echo 'deb http://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy main restricted universe multiverse
+      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+      deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
+      deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list
     - apt update -y
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
     - apt install curl jq skopeo -y
