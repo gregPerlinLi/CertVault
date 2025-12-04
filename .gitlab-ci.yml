@@ -124,7 +124,7 @@ package-build:dev:
     - echo "============================= EXPORT JAR FILE =============================="
   artifacts:
     paths:
-      - target/*.jar
+      - server/target/*.jar
     expire_in: 30 min
     reports:
       dotenv: build.env
@@ -216,8 +216,6 @@ docker-build-and-push:
     - echo "============================= LOGIN TO HARBOR =============================="
     - docker login -u ${USERNAME} -p ${PASSWORD} ${HARBORHOST}
     - echo "======================= BUILD AND PUSH DOCKER IMAGES ======================="
-    - mkdir -p server/target/
-    - mv target/*.jar server/target/
     - cd server
     - sed -i "s/FROM eclipse-temurin:17-jre/FROM registry.gdut.edu.cn\/docker\/library\/eclipse-temurin:17-jre/g" Dockerfile
     - |
