@@ -128,8 +128,9 @@ package-build:main:
       deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
       deb http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
       deb-src http://mirrors.gdut.edu.cn/ubuntu/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list || true
-    - apt update -y
+    - apt update -qq
     - echo "======================== INSTALL REQUIRED TOOLS ============================"
+    - apt-mark unhold perl perl-base
     - apt install -y curl wget gnupg2 software-properties-common git maven openjdk-17-jdk
     - echo "=========================== CHANGE MAVEN MIRROR ============================"
     - mkdir -p $HOME/.m2 || true
