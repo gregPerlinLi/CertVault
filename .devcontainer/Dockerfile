@@ -1,10 +1,12 @@
-FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
+FROM registry.gdut.edu.cn/mcr.microsoft.com/devcontainers/base:ubuntu-22.04
 
 # 避免交互式提示
 ENV DEBIAN_FRONTEND=noninteractive
 
 # 安装基础工具
-RUN apt-get update && apt-get install -y \
+RUN sed -i 's/http:\/\/archive.ubuntu.com/http:\/\/mirrors.aliyun.com/g' /etc/apt/sources.list \
+    && sed -i 's/http:\/\/security.ubuntu.com/http:\/\/mirrors.aliyun.com/g' /etc/apt/sources.list \
+    && apt-get update && apt-get install -y \
     curl \
     wget \
     git \
