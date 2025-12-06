@@ -1,0 +1,214 @@
+schemaVersion: 2.2.0
+metadata:
+  name: certvault
+  version: 2.4.0
+  description: CertVault - A Self-Signed SSL Certificate Issuance and Management Platform
+  displayName: CertVault
+  icon: https://raw.githubusercontent.com/gregPerlinLi/CertVault/refs/heads/main/frontend/public/favicon.svg
+  language: Java
+  projectType: SpringBoot
+  tags:
+    - Java
+    - Spring Boot
+    - Vue.js
+    - TypeScript
+    - Certificate Management
+
+components:
+  # PostgreSQL Database
+  - name: postgresql
+    container:
+      image: postgres:14-alpine
+      memoryLimit: 512Mi
+      env:
+        - name: POSTGRES_USER
+          value: certvault
+        - name: POSTGRES_PASSWORD
+          value: certvault
+        - name: POSTGRES_DB
+          value: certvault
+      endpoints:
+        - name: postgres
+          targetPort: 5432
+
+  # Redis Cache
+  - name: redis
+    container:
+      image: redis:7-alpine
+      memoryLimit: 256Mi
+      endpoints:
+        - name: redis
+          targetPort: 6379
+
+  # Backend Development Tools
+  - name: backend-tools
+    container:
+      image: maven:3.9-eclipse-temurin-17
+      memoryLimit: 2Gi
+      memoryRequest: 1Gi
+      cpuLimit: 2000m
+      cpuRequest: 500m
+      mountSources: true
+      sourceMapping: /projects
+      env:
+        - name: MAVEN_OPTS
+          value: "-Xmx1024m"
+        - name: SPRING_PROFILES_ACTIVE
+          value: dev
+      endpoints:
+        - name: backend
+          targetPort: 1888
+          exposure: public
+          protocol: http
+        - name: management
+          targetPort: 1999
+          exposure: internal
+      volumeMounts:
+        - name: m2
+          path: /root/.m2
+
+  # Frontend Development Tools
+  - name: frontend-tools
+    container:
+      image: node:22-alpine
+      memoryLimit: 1Gi
+      memoryRequest: 512Mi
+      cpuLimit: 1000m
+      cpuRequest: 250m
+      mountSources: true
+      sourceMapping: /projects
+      env:
+        - name: PNPM_HOME
+          value: /usr/local/bin
+      endpoints:
+        - name: frontend
+          targetPort: 5173
+          exposure: public
+          protocol: http
+      volumeMounts:
+        - name: pnpm-store
+          path: /root/. local/share/pnpm
+
+  # Maven cache volume
+  - name: m2
+    volume:
+      size: 2Gi
+
+  # PNPM store volume
+  - name: pnpm-store
+    volume:
+      size: 1Gi
+
+commands:
+  # Backend commands
+  - id: backend-install
+    exec:
+      component: backend-tools
+      workingDir: ${PROJECT_SOURCE}/server
+      commandLine: mvn clean install -DskipTests
+      group:
+        kind: build
+        isDefault: false
+
+  - id: backend-build
+    exec:
+      component: backend-tools
+      workingDir: ${PROJECT_SOURCE}/server
+      commandLine: mvn clean package -DskipTests
+      group:
+        kind: build
+        isDefault: true
+
+  - id: backend-run
+    exec:
+      component: backend-tools
+      workingDir: ${PROJECT_SOURCE}/server
+      commandLine: |
+        mvn spring-boot:run \
+        -Dspring-boot.run.profiles=dev \
+        -Dspring-boot.run.jvmArguments="-Xmx512m -Xms256m"
+      group:
+        kind: run
+        isDefault: true
+
+  - id: backend-test
+    exec:
+      component: backend-tools
+      workingDir: ${PROJECT_SOURCE}/server
+      commandLine: mvn test
+      group:
+        kind: test
+        isDefault: true
+
+  # Frontend commands
+  - id: frontend-install
+    exec:
+      component: frontend-tools
+      workingDir: ${PROJECT_SOURCE}/frontend
+      commandLine: |
+        npm install -g pnpm@10.10.0 && \
+        pnpm install
+      group:
+        kind: build
+        isDefault: false
+
+  - id: frontend-dev
+    exec:
+      component: frontend-tools
+      workingDir: ${PROJECT_SOURCE}/frontend
+      commandLine: pnpm run dev
+      group:
+        kind: run
+        isDefault: false
+
+  - id: frontend-build
+    exec:
+      component: frontend-tools
+      workingDir: ${PROJECT_SOURCE}/frontend
+      commandLine: pnpm run build
+      group:
+        kind: build
+        isDefault: false
+
+  - id: frontend-test
+    exec:
+      component: frontend-tools
+      workingDir: ${PROJECT_SOURCE}/frontend
+      commandLine: pnpm run test
+      group:
+        kind: test
+        isDefault: false
+
+  - id: frontend-format
+    exec:
+      component: frontend-tools
+      workingDir: ${PROJECT_SOURCE}/frontend
+      commandLine: pnpm run format
+      group:
+        kind: build
+        isDefault: false
+
+  # Full stack commands
+  - id: install-all
+    composite:
+      commands:
+        - backend-install
+        - frontend-install
+      group:
+        kind: build
+        isDefault: false
+
+  - id: build-all
+    composite:
+      commands:
+        - frontend-build
+        - backend-build
+      parallel: false
+      group:
+        kind: build
+        isDefault: false
+
+events:
+  postStart:
+    - frontend-install
+    - backend-install
