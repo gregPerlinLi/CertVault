@@ -34,6 +34,16 @@
       "type": "object",
       "description": "Global configuration",
       "properties": {
+        "security": {
+          "type": "object",
+          "properties": {
+            "allowInsecureImages": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether Bitnami to allow insecure images"
+            }
+          }
+        },
         "defaultStorageClass": {
           "type": "string",
           "default": "standard",

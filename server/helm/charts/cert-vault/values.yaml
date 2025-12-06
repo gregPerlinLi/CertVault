@@ -11,10 +11,13 @@ image:
   pullPolicy: IfNotPresent
 
 ## Global configuration
+## @param global.security.allowInsecureImages Whether Bitnami to allow insecure images
 ## @param global.defaultStorageClass Global default StorageClass for Persistent Volume(s)
 ## @param global.storageClass DEPRECATED: use global.defaultStorageClass instead
 ##
 global:
+  security:
+    allowInsecureImages: true
   defaultStorageClass: "standard"
   storageClass: ""
 
