@@ -140,28 +140,30 @@ onMounted(() => refUsrTable.value?.refresh());
   <Toolbar class="border-none">
     <template #start>
       <div class="flex gap-4">
-        <Button
-          icon="pi pi-plus"
-          label="Create New"
-          severity="success"
-          size="small"
-          :disabled="usrTbl.loading"
-          @click="dialog.createNewUsrs = true"></Button>
-        <Button
-          icon="pi pi-trash"
-          label="Delete Selected"
-          severity="danger"
-          size="small"
-          :disabled="usrTbl.selection.length === 0"
-          :loading="busy.delSelUsrs"
-          @click="tryDelSelUsrs()"></Button>
-        <Button
-          icon="pi pi-user"
-          label="Update Selected Roles"
-          severity="help"
-          size="small"
-          :disabled="usrTbl.selection.length === 0"
-          @click="dialog.updRols = true"></Button>
+        <template v-if="isSuperadmin">
+          <Button
+            icon="pi pi-plus"
+            label="Create New"
+            severity="success"
+            size="small"
+            :disabled="usrTbl.loading"
+            @click="dialog.createNewUsrs = true"></Button>
+          <Button
+            icon="pi pi-trash"
+            label="Delete Selected"
+            severity="danger"
+            size="small"
+            :disabled="usrTbl.selection.length === 0"
+            :loading="busy.delSelUsrs"
+            @click="tryDelSelUsrs()"></Button>
+          <Button
+            icon="pi pi-user"
+            label="Update Selected Roles"
+            severity="help"
+            size="small"
+            :disabled="usrTbl.selection.length === 0"
+            @click="dialog.updRols = true"></Button>
+        </template>
         <Button
           icon="pi pi-refresh"
           label="Refresh"

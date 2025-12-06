@@ -13,17 +13,17 @@ jobs:
     permissions:
       contents: write
       packages: write
-      attestations: write
+#      attestations: write
       id-token: write
 
     steps:
       # 检出代码
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # 设置 JDK 环境
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -38,7 +38,7 @@ jobs:
 
       # 设置 Node.js 环境
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/Jod
           cache: pnpm
@@ -62,7 +62,7 @@ jobs:
         run: echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f server/pom.xml)" >> $GITHUB_ENV
 
       - name: Rename JAR File
-        run: mv server/target/*.jar server/target/certvault-v${{ env.VERSION }}.jar
+        run: mv server/target/*.jar server/target/certvault.jar
 
       # 新增步骤：获取最后一次合并的 PR 号码
       - name: Find Last Merged PR Number
@@ -92,5 +92,5 @@ jobs:
           name: Release v${{ env.VERSION }}
           draft: false
           prerelease: false
-          files: server/target/certvault-v${{ env.VERSION }}.jar
+          files: server/target/certvault.jar
           body_path: comments.md

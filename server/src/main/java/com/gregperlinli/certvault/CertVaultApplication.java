@@ -16,7 +16,6 @@ import java.util.Map;
  * @className {@code CertVaultApplication}
  * @date 2025/3/3 15:50
  */
-@MapperScan("com.gregperlinli.certvault.mapper")
 @SpringBootApplication
 public class CertVaultApplication {
     public static void main(String[] args) {
