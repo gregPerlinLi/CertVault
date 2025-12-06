@@ -12,6 +12,13 @@ cache:
   paths:
     - cache
 
+.src-changes: &src-changes
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      changes:
+        - server/*
+        - frontend/*
+
 #sonarqube-check-frontend:
 #  stage: check
 #  image:
@@ -64,8 +71,7 @@ sonarqube-check-backend:
   script:
     - mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -DskipTests -Dmaven.repo.local=cache -f server/pom.xml
   allow_failure: true
-  only:
-    - dev
+  <<: *src-changes
 
 package-build:dev:
   image: docker.m.ixdev.cn/library/maven:3.9-eclipse-temurin-17
@@ -128,8 +134,7 @@ package-build:dev:
     expire_in: 30 min
     reports:
       dotenv: build.env
-  only:
-    - dev
+  <<: *src-changes
 
 package-build:main:
   image: docker.m.ixdev.cn/library/maven:3.9-eclipse-temurin-17
@@ -186,7 +191,7 @@ package-build:main:
     - echo "=========================== EXPORT VERSION TAGS ============================"
     - echo "VERSION=$VERSION" >> build.env
     - echo "========================== PUBLISH MAVEN PACKAGE ==========================="
-    - curl --header "PRIVATE-TOKEN:${PACKAGE_PUBLISH_TOKEN}" --upload-file target/*.jar "https://git.gdutnic.com/api/v4/projects/${CI_PROJECT_ID}/packages/generic/CertVault/v${VERSION}/certvault-v${VERSION}.jar"
+    - curl --header "PRIVATE-TOKEN:${PACKAGE_PUBLISH_TOKEN}" --upload-file server/target/*.jar "https://git.gdutnic.com/api/v4/projects/${CI_PROJECT_ID}/packages/generic/CertVault/v${VERSION}/certvault-v${VERSION}.jar"
   artifacts:
     reports:
       dotenv: build.env
@@ -234,8 +239,7 @@ docker-build-and-push:
     reports:
       dotenv: build.env
     expire_in: 30 min
-  only:
-    - dev
+  <<: *src-changes
 
 helm-build:
   image: docker.m.ixdev.cn/dtzar/helm-kubectl:3.8.0
@@ -268,8 +272,7 @@ helm-build:
   artifacts:
     reports:
       dotenv: build.env
-  only:
-    - dev
+  <<: *src-changes
 
 release-new-version:
   image: registry.gitlab.com/gitlab-org/release-cli:latest
@@ -363,8 +366,7 @@ image-sign:
     reports:
       dotenv: build.env
     expire_in: 30 min
-  only:
-    - dev
+  <<: *src-changes
 
 helm-deploy:
   stage: deploy
@@ -389,5 +391,4 @@ helm-deploy:
     - echo ${VALUES_BASE64} | base64 -d > custom.yaml
     - echo "=========================== DEPLOY NEW VERSION ============================="
     - helm -n cert-vault upgrade --install cert-vault oci://${HARBORHOST}/certvault/certvault-helm --version ${VERSION} --values custom.yaml --debug
-  only:
-    - dev
+  <<: *src-changes
