@@ -1,4 +1,4 @@
-image: registry.gdut.edu.cn/docker/library/ubuntu:22.04
+image: docker.m.ixdev.cn/library/ubuntu:22.04
 
 stages:
   - check
@@ -15,7 +15,7 @@ cache:
 #sonarqube-check-frontend:
 #  stage: check
 #  image:
-#    name: registry.gdut.edu.cn/docker/sonarsource/sonar-scanner-cli:5.0
+#    name: docker.m.ixdev.cn/sonarsource/sonar-scanner-cli:5.0
 #    entrypoint: [""]
 #  tags:
 #    - dev
@@ -35,7 +35,7 @@ cache:
 
 sonarqube-check-backend:
   stage: check
-  image: registry.gdut.edu.cn/docker/library/maven:3-eclipse-temurin-17
+  image: docker.m.ixdev.cn/library/maven:3-eclipse-temurin-17
   tags:
     - maven
   before_script:
@@ -68,7 +68,7 @@ sonarqube-check-backend:
     - dev
 
 package-build:dev:
-  image: registry.gdut.edu.cn/docker/library/maven:3.9-eclipse-temurin-17
+  image: docker.m.ixdev.cn/library/maven:3.9-eclipse-temurin-17
   stage: package-build
   tags:
     - dev
@@ -132,7 +132,7 @@ package-build:dev:
     - dev
 
 package-build:main:
-  image: registry.gdut.edu.cn/docker/library/maven:3.9-eclipse-temurin-17
+  image: docker.m.ixdev.cn/library/maven:3.9-eclipse-temurin-17
   stage: package-build
   tags:
     - dev
@@ -194,12 +194,12 @@ package-build:main:
     - main
 
 docker-build-and-push:
-  image: registry.gdut.edu.cn/docker/library/docker:24-cli
+  image: docker.m.ixdev.cn/library/docker:24-cli
   stage: image-build
   tags:
     - Docker
   services:
-    - name: registry.gdut.edu.cn/docker/library/docker:24-cli
+    - name: docker.m.ixdev.cn/library/docker:24-cli
   before_script:
     - echo "======================== SETUP BUILDX ENVIRONMENT =========================="
     - docker info
@@ -238,7 +238,7 @@ docker-build-and-push:
     - dev
 
 helm-build:
-  image: registry.gdut.edu.cn/docker/dtzar/helm-kubectl:3.8.0
+  image: docker.m.ixdev.cn/dtzar/helm-kubectl:3.8.0
   stage: image-build
   tags:
     - dev
@@ -288,7 +288,7 @@ release-new-version:
     - main
 
 image-sign:
-  image: registry.gdut.edu.cn/docker/library/ubuntu:22.04
+  image: docker.m.ixdev.cn/library/ubuntu:22.04
   stage: signing
   tags:
     - dev
@@ -366,29 +366,28 @@ image-sign:
   only:
     - dev
 
-#helm-deploy:
-#  stage: deploy
-#  image: registry.gdut.edu.cn/docker/dtzar/helm-kubectl:3.8.0
-#  tags:
-#    - dev
-#  before_script:
-#    # 配置 Helm 和 Kubernetes
-#    - export KUBECONFIG=$CI_PROJECT_DIR/kubeconfig
-#    - echo "$KUBECONFIG_DATA" | base64 -d > $KUBECONFIG
-#    - helm repo add stable https://charts.helm.sh/stable
-#    - helm repo update
-#  script:
-#    - echo "================================= LOAD ENV ================================="
-#    - env
-#    - echo "VERSION=$VERSION"
-#    - echo "============================= LOGIN TO HARBOR =============================="
-#    - helm registry login -u ${USERNAME} -p ${PASSWORD} ${HARBORHOST}
-#    - echo "============================= PULL NEW IMAGE ==============================="
-#    - helm pull oci://${HARBORHOST}/certvault/certvault-helm --version ${VERSION} --untar
-#    - echo "======================== LOAD HELM CONFIGURATION ==========================="
-#    - rm ./certvault-helm/values.yaml
-#    - echo ${VALUES_BASE64} | base64 -d > ./certvault-helm/values.yaml
-#    - echo "=========================== DEPLOY NEW VERSION ============================="
-#    - helm upgrade --install certvault4 ./certvault-helm --namespace certvault --set image.tag=${VERSION}
-#  only:
-#    - dev
+helm-deploy:
+  stage: deploy
+  image: docker.m.ixdev.cn/dtzar/helm-kubectl:3.8.0
+  tags:
+    - dev
+  before_script:
+    # 配置 Helm 和 Kubernetes
+    - export KUBECONFIG=$CI_PROJECT_DIR/kubeconfig
+    - echo "$KUBECONFIG_DATA" | base64 -d > $KUBECONFIG
+    - helm repo add stable https://charts.helm.sh/stable
+    - helm repo update
+  script:
+    - echo "================================= LOAD ENV ================================="
+    - env
+    - echo "VERSION=$VERSION"
+    - echo "============================= LOGIN TO HARBOR =============================="
+    - helm registry login -u ${USERNAME} -p ${PASSWORD} ${HARBORHOST}
+    - echo "============================= PULL NEW IMAGE ==============================="
+    - helm pull oci://${HARBORHOST}/certvault/certvault-helm --version ${VERSION} --untar
+    - echo "======================== LOAD HELM CONFIGURATION ==========================="
+    - echo ${VALUES_BASE64} | base64 -d > custom.yaml
+    - echo "=========================== DEPLOY NEW VERSION ============================="
+    - helm -n cert-vault upgrade --install cert-vault oci://${HARBORHOST}/certvault/certvault-helm --version ${VERSION} --values custom.yaml --debug
+  only:
+    - dev
