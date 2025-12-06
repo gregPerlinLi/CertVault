@@ -186,7 +186,7 @@ package-build:main:
     - echo "=========================== EXPORT VERSION TAGS ============================"
     - echo "VERSION=$VERSION" >> build.env
     - echo "========================== PUBLISH MAVEN PACKAGE ==========================="
-    - curl --header "PRIVATE-TOKEN:${PACKAGE_PUBLISH_TOKEN}" --upload-file target/*.jar "https://git.gdutnic.com/api/v4/projects/${CI_PROJECT_ID}/packages/generic/CertVault/v${VERSION}/certvault-v${VERSION}.jar"
+    - curl --header "PRIVATE-TOKEN:${PACKAGE_PUBLISH_TOKEN}" --upload-file server/target/*.jar "https://git.gdutnic.com/api/v4/projects/${CI_PROJECT_ID}/packages/generic/CertVault/v${VERSION}/certvault-v${VERSION}.jar"
   artifacts:
     reports:
       dotenv: build.env
