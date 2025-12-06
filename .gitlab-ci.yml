@@ -6,7 +6,7 @@ stages:
   - image-build
   - release
   - signing
-  # - deploy
+  - deploy
 
 cache:
   paths:
