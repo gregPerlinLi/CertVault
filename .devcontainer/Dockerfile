@@ -44,11 +44,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && rm -rf /var/lib/apt/lists/*
 
 # 配置 npm 镜像加速（全局配置）
-RUN npm config set registry https://registry.npmmirror.com/ \
-    && npm config set disturl https://npmmirror.com/dist \
-    && npm config set electron_mirror https://npmmirror.com/mirrors/electron/ \
-    && npm config set sass_binary_site https://npmmirror.com/mirrors/node-sass/ \
-    && npm config set phantomjs_cdnurl https://npmmirror.com/mirrors/phantomjs/
+RUN npm config set registry https://registry.npmmirror.com/
 
 # 安装 pnpm 并配置镜像
 RUN npm install -g pnpm@10.10.0 \
