@@ -1,0 +1,17 @@
+# pnpm 镜像配置文件
+# 使用淘宝镜像（npmmirror.com）
+
+registry=https://registry.npmmirror.com/
+disturl=https://npmmirror.com/dist
+electron-mirror=https://npmmirror.com/mirrors/electron/
+sass-binary-site=https://npmmirror.com/mirrors/node-sass/
+phantomjs-cdnurl=https://npmmirror.com/mirrors/phantomjs/
+chromedriver-cdnurl=https://npmmirror.com/mirrors/chromedriver/
+operadriver-cdnurl=https://npmmirror.com/mirrors/operadriver/
+
+# 其他 pnpm 配置
+shamefully-hoist=true
+strict-peer-dependencies=false
+auto-install-peers=true
+
+# 如果需要使用其他镜像源，可以参考 .npmrc 文件

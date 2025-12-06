@@ -1,0 +1,150 @@
+{
+  "name": "CertVault Development Environment",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "workspace",
+  "workspaceFolder": "/workspace",
+
+  // 配置要使用的功能
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "installMaven": "true",
+      "mavenVersion": "3.9"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22",
+      "nodeGypDependencies": true
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true
+    }
+  },
+
+  // 容器创建后要安装的 VS Code 扩展
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // Java 扩展
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-spring-boot-dashboard",
+        "vmware.vscode-spring-boot",
+        "vscjava.vscode-maven",
+
+        // Vue.js 和前端扩展
+        "vue.volar",
+        "vue.vscode-typescript-vue-plugin",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+
+        // 通用工具
+        "editorconfig.editorconfig",
+        "eamodio.gitlens",
+        "github.copilot",
+        "ms-azuretools.vscode-docker",
+        "redhat.vscode-yaml",
+        "ms-vscode.makefile-tools",
+
+        // 数据库工具
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        "mtxr.sqltools-driver-mysql",
+
+        // API 测试
+        "humao.rest-client"
+      ],
+
+      "settings": {
+        "java.jdt.ls.java.home": "/usr/local/sdkman/candidates/java/current",
+        "java.configuration.maven.userSettings": "/root/.m2/settings.xml",
+        "maven.terminal.useJavaHome": true,
+        "maven.executable.path": "/usr/local/sdkman/candidates/maven/current/bin/mvn",
+
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "explicit"
+        },
+
+        "[java]": {
+          "editor.defaultFormatter": "redhat.java"
+        },
+        "[vue]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+
+        "files.exclude": {
+          "**/.git": true,
+          "**/.DS_Store": true,
+          "**/node_modules": true,
+          "**/target": true
+        },
+
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+
+  // 端口转发配置
+  "forwardPorts": [
+    1888,  // Backend business port
+    1999,  // Backend management port
+    5173,  // Frontend dev server
+    5432,  // PostgreSQL
+    6379   // Redis
+  ],
+
+  "portsAttributes": {
+    "1888": {
+      "label": "Backend API",
+      "onAutoForward": "notify"
+    },
+    "1999": {
+      "label": "Backend Management",
+      "onAutoForward": "silent"
+    },
+    "5173": {
+      "label": "Frontend Dev Server",
+      "onAutoForward": "openBrowser"
+    },
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "silent"
+    },
+    "6379": {
+      "label": "Redis",
+      "onAutoForward": "silent"
+    }
+  },
+
+  // 容器创建后执行的命令
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  // 容器启动后执行的命令
+  "postStartCommand": "bash .devcontainer/post-start.sh",
+
+  // 挂载点
+  "mounts": [
+    "source=certvault-maven-cache,target=/root/.m2,type=volume",
+    "source=certvault-pnpm-store,target=/root/.local/share/pnpm/store,type=volume"
+  ],
+
+  // 容器用户
+  "remoteUser": "root",
+
+  // 环境变量
+  "remoteEnv": {
+    "SPRING_PROFILES_ACTIVE": "dev",
+    "MAVEN_OPTS": "-Xmx1024m",
+    "PNPM_HOME": "/usr/local/bin",
+    "NPM_CONFIG_REGISTRY": "https://registry.npmmirror.com/",
+    "PNPM_REGISTRY": "https://registry.npmmirror.com/"
+  }
+}
