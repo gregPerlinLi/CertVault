@@ -281,7 +281,7 @@ release-new-version:
     - env
     - echo "VERSION=$VERSION"
   release:
-    tag_name: "${VERSION}"
+    tag_name: "v${VERSION}"
     description: "This is a release of version ${VERSION}."
   allow_failure: true
   only:
