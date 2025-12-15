@@ -116,7 +116,7 @@
       "properties": {
         "enabled": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Whether OIDC authentication is enabled"
         },
         "providers": {
