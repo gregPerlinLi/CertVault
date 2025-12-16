@@ -132,7 +132,7 @@ package-build:dev:
     # - export VERSION=v$VERSION
     - echo "Building version $VERSION"
     - echo "=========================== BUILD MAVEN PROJECT ============================"
-    - mvn clean package -f server/pom.xml -Dmaven.test.sktip=true -DskipTests -Dmaven.repo.local=cache
+    - mvn clean package -f server/pom.xml -Dmaven.test.skip=true -DskipTests -Dmaven.repo.local=cache
     - echo "=========================== EXPORT VERSION TAGS ============================"
     - echo "VERSION=$VERSION" >> build.env
     - echo "============================= EXPORT JAR FILE =============================="
@@ -201,11 +201,18 @@ package-build:main:
     # - export VERSION=v$VERSION
     - echo "Building version $VERSION"
     - echo "=========================== BUILD MAVEN PROJECT ============================"
-    - mvn clean package -f server/pom.xml -Dmaven.test.sktip=true -DskipTests -Dmaven.repo.local=cache
+    - mvn clean package -f server/pom.xml -Dmaven.test.skip=true -DskipTests -Dmaven.repo.local=cache
     - echo "=========================== EXPORT VERSION TAGS ============================"
     - echo "VERSION=$VERSION" >> build.env
     - echo "========================== PUBLISH MAVEN PACKAGE ==========================="
-    - curl --header "PRIVATE-TOKEN:${CI_JOB_TOKEN}" --upload-file server/target/*.jar "https://git.gdutnic.com/api/v4/projects/${CI_PROJECT_ID}/packages/generic/CertVault/v${VERSION}/certvault-v${VERSION}.jar"
+    - export PACKAGE_NAME="certvault-v${VERSION}.jar"
+    - export PACKAGE_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CertVault/v${VERSION}/${PACKAGE_NAME}"
+    - echo "Uploading to ${PACKAGE_URL}"
+    - curl --header "PRIVATE-TOKEN:${CI_JOB_TOKEN}" --upload-file server/target/*.jar "${PACKAGE_URL}"
+    - echo "=========================== EXPORT VERSION TAGS ============================"
+    - echo "VERSION=$VERSION" >> build.env
+    - echo "PACKAGE_NAME=$PACKAGE_NAME" >> build.env
+    - echo "PACKAGE_URL=$PACKAGE_URL" >> build.env
   artifacts:
     reports:
       dotenv: build.env
@@ -295,13 +302,22 @@ release-new-version:
   stage: release
   tags:
     - dev
+  needs:
+    - job: package-build:main
+      artifacts: true
   script:
     - echo "================================= LOAD ENV ================================="
     - env
-    - echo "VERSION=$VERSION"
+    - echo "Creating release for $VERSION"
+    - echo "Linking asset $PACKAGE_NAME -> $PACKAGE_URL"
   release:
     tag_name: "v${VERSION}"
     description: "This is a release of version ${VERSION}."
+    assets:
+      links:
+        - name: "${PACKAGE_NAME}"
+          url: "${PACKAGE_URL}"
+          link_type: "package"
   allow_failure: true
   only:
     - main
