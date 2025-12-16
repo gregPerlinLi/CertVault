@@ -90,6 +90,33 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
 
+      # 根据配置或自动检测切换镜像源
+      - name: Switch Docker base image for China network
+        run: |
+          # 优先使用仓库变量配置
+          USE_CHINA_MIRROR="${{ vars.USE_CHINA_MIRROR }}"
+          
+          # 如果没有配置变量，则自动检测
+          if [ -z "$USE_CHINA_MIRROR" ]; then
+            echo "No USE_CHINA_MIRROR variable set, auto-detecting..."
+            if ! curl -s --connect-timeout 2 --max-time 2 http://www.google.com > /dev/null 2>&1; then
+              USE_CHINA_MIRROR="true"
+            else
+              USE_CHINA_MIRROR="false"
+            fi
+          fi
+          
+          if [ "$USE_CHINA_MIRROR" = "true" ]; then
+            echo "🌏 Using China mirror for base image"
+            sed -i 's#eclipse-temurin:17-jre#docker.m.ixdev.cn/library/eclipse-temurin:17-jre#g' server/Dockerfile
+            echo "✅ Dockerfile updated:"
+            grep "FROM" server/Dockerfile
+          else
+            echo "🌍 Using default Docker Hub"
+          fi
+          
+          echo "USE_CHINA_MIRROR=$USE_CHINA_MIRROR" >> $GITHUB_ENV
+
       # 构建 Docker 镜像
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3.6.0
