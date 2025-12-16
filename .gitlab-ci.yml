@@ -242,7 +242,7 @@ docker-build-and-push:
       --platform linux/amd64,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x \
       --tag ${HARBORHOST}/certvault/certvault:${VERSION} \
       --tag ${HARBORHOST}/certvault/certvault:latest \
-      --cache-to type=s3,region=${MINIO_REIGON},bucket${MINIO_BUCKET},name=docker-build-cache,endpoint_url=${MINIO_ENDPOINT_URL},use_path_style=true,access_key_id=${MINIO_ACCESS_KEY},secret_access_key=${MINIO_SECRET_KEY},mode=max \
+      --cache-to type=s3,region=${MINIO_REIGON},bucket=${MINIO_BUCKET},name=docker-build-cache,endpoint_url=${MINIO_ENDPOINT_URL},use_path_style=true,access_key_id=${MINIO_ACCESS_KEY},secret_access_key=${MINIO_SECRET_KEY},mode=max \
       --cache-from type=s3,region=${MINIO_REIGON},bucket=${MINIO_BUCKET},name=docker-build-cache,endpoint_url=${MINIO_ENDPOINT_URL},use_path_style=true,access_key_id=${MINIO_ACCESS_KEY},secret_access_key=${MINIO_SECRET_KEY} \
       --push \
       .
