@@ -191,10 +191,10 @@ jobs:
 
       - name: Upload artifact (GHES)
         if: github.server_url != 'https://github.com'
-        uses: actions/upload-artifact@v3
+        uses: actions/cache/save@v5
         continue-on-error: true
         with:
-          name: version
+          key: version
           path: version.env
 
       - name: Upload API Doc Artifact (GitHub)
@@ -207,10 +207,10 @@ jobs:
 
       - name: Upload API Doc Artifact (GHES)
         if: github.server_url != 'https://github.com'
-        uses: actions/upload-artifact@v3
+        uses: actions/cache/save@v5
         continue-on-error: true
         with:
-          name: openapi-doc
+          key: openapi-doc
           path: openapi.yaml
 
   deploy-helm:
@@ -228,9 +228,9 @@ jobs:
 
       - name: Download artifact (GHES)
         if: github.server_url != 'https://github.com'
-        uses: actions/download-artifact@v3
+        uses: actions/cache/restore@v5
         with:
-          name: version
+          key: version
           path: .
 
       - name: Read environment variable
@@ -294,9 +294,9 @@ jobs:
 
       - name: Download OpenAPI artifact (GHES)
         if: github.server_url != 'https://github.com'
-        uses: actions/download-artifact@v3
+        uses: actions/cache/restore@v5
         with:
-          name: openapi-doc
+          key: openapi-doc
           path: .
 
       # 检出 CertVaultAPIDoc 仓库

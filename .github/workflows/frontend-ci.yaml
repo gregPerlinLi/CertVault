@@ -40,8 +40,8 @@ jobs:
           path: dist
       - name: Upload artifact (GHES)
         if: github.server_url != 'https://github.com'
-        uses: actions/upload-artifact@v3
+        uses: actions/cache/save@v5
         continue-on-error: true
         with:
-          name: frontend
+          key: frontend
           path: dist
