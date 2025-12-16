@@ -68,7 +68,7 @@ sonarqube-check-backend:
   cache:
     key: "${CI_JOB_NAME}"
     paths:
-      - .sonar/cache
+      - cache/
     policy: pull-push
   script:
     - mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -DskipTests -Dmaven.repo.local=cache -f server/pom.xml
@@ -208,7 +208,7 @@ package-build:main:
     - export PACKAGE_NAME="certvault-v${VERSION}.jar"
     - export PACKAGE_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CertVault/v${VERSION}/${PACKAGE_NAME}"
     - echo "Uploading to ${PACKAGE_URL}"
-    - curl --header "PRIVATE-TOKEN:${CI_JOB_TOKEN}" --upload-file server/target/*.jar "${PACKAGE_URL}"
+    - curl --header "JOB-TOKEN:${CI_JOB_TOKEN}" --upload-file server/target/*.jar "${PACKAGE_URL}"
     - echo "=========================== EXPORT VERSION TAGS ============================"
     - echo "VERSION=$VERSION" >> build.env
     - echo "PACKAGE_NAME=$PACKAGE_NAME" >> build.env
