@@ -18,6 +18,7 @@ cache:
       changes:
         - server/*
         - frontend/*
+        - .gitlab-ci.yml
 
 #sonarqube-check-frontend:
 #  stage: check
@@ -67,7 +68,8 @@ sonarqube-check-backend:
   cache:
     key: "${CI_JOB_NAME}"
     paths:
-      - .sonar/cache
+      - cache/
+    policy: pull-push
   script:
     - mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -DskipTests -Dmaven.repo.local=cache -f server/pom.xml
   allow_failure: true
@@ -78,6 +80,12 @@ package-build:dev:
   stage: package-build
   tags:
     - dev
+  cache:
+    key: "maven-pnpm-cache"
+    paths:
+      - cache/
+      - frontend/node_modules/
+    policy: pull-push
   before_script:
     - echo "============================ CHANGE APT MIRROR ============================="
     - sed -i 's/http:\/\/archive.ubuntu.com/http:\/\/mirrors.gdut.edu.cn/g' /etc/apt/sources.list.d/ubuntu.sources
@@ -124,7 +132,7 @@ package-build:dev:
     # - export VERSION=v$VERSION
     - echo "Building version $VERSION"
     - echo "=========================== BUILD MAVEN PROJECT ============================"
-    - mvn clean package -f server/pom.xml -Dmaven.test.sktip=true -DskipTests -Dmaven.repo.local=cache
+    - mvn clean package -f server/pom.xml -Dmaven.test.skip=true -DskipTests -Dmaven.repo.local=cache
     - echo "=========================== EXPORT VERSION TAGS ============================"
     - echo "VERSION=$VERSION" >> build.env
     - echo "============================= EXPORT JAR FILE =============================="
@@ -141,6 +149,12 @@ package-build:main:
   stage: package-build
   tags:
     - dev
+  cache:
+    key: "maven-pnpm-cache"
+    paths:
+      - cache/
+      - frontend/node_modules/
+    policy: pull-push
   before_script:
     - echo "============================ CHANGE APT MIRROR ============================="
     - sed -i 's/http:\/\/archive.ubuntu.com/http:\/\/mirrors.gdut.edu.cn/g' /etc/apt/sources.list.d/ubuntu.sources
@@ -187,11 +201,18 @@ package-build:main:
     # - export VERSION=v$VERSION
     - echo "Building version $VERSION"
     - echo "=========================== BUILD MAVEN PROJECT ============================"
-    - mvn clean package -f server/pom.xml -Dmaven.test.sktip=true -DskipTests -Dmaven.repo.local=cache
+    - mvn clean package -f server/pom.xml -Dmaven.test.skip=true -DskipTests -Dmaven.repo.local=cache
     - echo "=========================== EXPORT VERSION TAGS ============================"
     - echo "VERSION=$VERSION" >> build.env
     - echo "========================== PUBLISH MAVEN PACKAGE ==========================="
-    - curl --header "PRIVATE-TOKEN:${PACKAGE_PUBLISH_TOKEN}" --upload-file server/target/*.jar "https://git.gdutnic.com/api/v4/projects/${CI_PROJECT_ID}/packages/generic/CertVault/v${VERSION}/certvault-v${VERSION}.jar"
+    - export PACKAGE_NAME="certvault-v${VERSION}.jar"
+    - export PACKAGE_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CertVault/v${VERSION}/${PACKAGE_NAME}"
+    - echo "Uploading to ${PACKAGE_URL}"
+    - curl --header "JOB-TOKEN:${CI_JOB_TOKEN}" --upload-file server/target/*.jar "${PACKAGE_URL}"
+    - echo "=========================== EXPORT VERSION TAGS ============================"
+    - echo "VERSION=$VERSION" >> build.env
+    - echo "PACKAGE_NAME=$PACKAGE_NAME" >> build.env
+    - echo "PACKAGE_URL=$PACKAGE_URL" >> build.env
   artifacts:
     reports:
       dotenv: build.env
@@ -228,6 +249,8 @@ docker-build-and-push:
       --platform linux/amd64,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x \
       --tag ${HARBORHOST}/certvault/certvault:${VERSION} \
       --tag ${HARBORHOST}/certvault/certvault:latest \
+      --cache-to type=s3,region=${MINIO_REIGON},bucket=${MINIO_BUCKET},name=docker-build-cache,endpoint_url=${MINIO_ENDPOINT_URL},use_path_style=true,access_key_id=${MINIO_ACCESS_KEY},secret_access_key=${MINIO_SECRET_KEY},mode=max \
+      --cache-from type=s3,region=${MINIO_REIGON},bucket=${MINIO_BUCKET},name=docker-build-cache,endpoint_url=${MINIO_ENDPOINT_URL},use_path_style=true,access_key_id=${MINIO_ACCESS_KEY},secret_access_key=${MINIO_SECRET_KEY} \
       --push \
       .
     - echo "============================ EXPORT IMAGE TAGS ============================="
@@ -279,13 +302,22 @@ release-new-version:
   stage: release
   tags:
     - dev
+  needs:
+    - job: package-build:main
+      artifacts: true
   script:
     - echo "================================= LOAD ENV ================================="
     - env
-    - echo "VERSION=$VERSION"
+    - echo "Creating release for $VERSION"
+    - echo "Linking asset $PACKAGE_NAME -> $PACKAGE_URL"
   release:
     tag_name: "v${VERSION}"
     description: "This is a release of version ${VERSION}."
+    assets:
+      links:
+        - name: "${PACKAGE_NAME}"
+          url: "${PACKAGE_URL}"
+          link_type: "package"
   allow_failure: true
   only:
     - main

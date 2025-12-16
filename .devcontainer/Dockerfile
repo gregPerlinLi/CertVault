@@ -1,10 +1,12 @@
-FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
+FROM registry.gdut.edu.cn/mcr.microsoft.com/devcontainers/base:ubuntu-22.04
 
 # 避免交互式提示
 ENV DEBIAN_FRONTEND=noninteractive
 
 # 安装基础工具
-RUN apt-get update && apt-get install -y \
+RUN sed -i 's/http:\/\/archive.ubuntu.com/http:\/\/mirrors.aliyun.com/g' /etc/apt/sources.list \
+    && sed -i 's/http:\/\/security.ubuntu.com/http:\/\/mirrors.aliyun.com/g' /etc/apt/sources.list \
+    && apt-get update && apt-get install -y \
     curl \
     wget \
     git \
@@ -42,11 +44,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && rm -rf /var/lib/apt/lists/*
 
 # 配置 npm 镜像加速（全局配置）
-RUN npm config set registry https://registry.npmmirror.com/ \
-    && npm config set disturl https://npmmirror.com/dist \
-    && npm config set electron_mirror https://npmmirror.com/mirrors/electron/ \
-    && npm config set sass_binary_site https://npmmirror.com/mirrors/node-sass/ \
-    && npm config set phantomjs_cdnurl https://npmmirror.com/mirrors/phantomjs/
+RUN npm config set registry https://registry.npmmirror.com/
 
 # 安装 pnpm 并配置镜像
 RUN npm install -g pnpm@10.10.0 \
