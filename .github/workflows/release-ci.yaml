@@ -19,7 +19,7 @@ jobs:
     steps:
       # 检出代码
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       # 设置 JDK 环境
       - name: Set up JDK
@@ -66,6 +66,7 @@ jobs:
 
       # 新增步骤：获取最后一次合并的 PR 号码
       - name: Find Last Merged PR Number
+        continue-on-error: true
         id: find_pr
         run: |          # 通过 GitHub API 查询最近合并的 PR（按时间排序）
           response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
@@ -75,6 +76,7 @@ jobs:
 
       # 新增步骤：获取 PR 的评论内容
       - name: Get PR Comments
+        continue-on-error: true
         id: get_comments
         run: |
           comments=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \

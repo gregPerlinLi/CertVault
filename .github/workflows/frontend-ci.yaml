@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           sparse-checkout: |
             frontend
@@ -32,7 +32,8 @@ jobs:
       - name: Build frontend
         run: pnpm run build
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
+        continue-on-error: true
         with:
           name: frontend
           path: dist

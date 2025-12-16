@@ -180,13 +180,15 @@ jobs:
         run: echo "VERSION=${{ env.VERSION }}" > version.env
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
+        continue-on-error: true
         with:
           name: version
           path: version.env
 
       - name: Upload API Doc Artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
+        continue-on-error: true
         with:
           name: openapi-doc
           path: openapi.yaml
@@ -198,7 +200,7 @@ jobs:
       contents: write
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: version
           path: .
@@ -211,11 +213,11 @@ jobs:
 
       # 检出当前代码库
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       # 检出目标仓库代码
       - name: Checkout target repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: gregPerlinLi/certvault-charts
           token: ${{ secrets.CERT_VAULT_CHARTS_TOKEN }}
@@ -256,14 +258,14 @@ jobs:
     steps:
       # 下载生成的 OpenAPI 文档
       - name: Download OpenAPI artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: openapi-doc
           path: .
 
       # 检出 CertVaultAPIDoc 仓库
       - name: Checkout CertVaultAPIDoc repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: gregPerlinLi/certvault-api-doc
           token: ${{ secrets.CERT_VAULT_API_DOC_TOKEN }}
