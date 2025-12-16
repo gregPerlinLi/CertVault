@@ -31,8 +31,16 @@ jobs:
         run: pnpm install
       - name: Build frontend
         run: pnpm run build
-      - name: Upload artifact
+      - name: Upload artifact (GitHub)
+        if: github.server_url == 'https://github.com'
         uses: actions/upload-artifact@v6
+        continue-on-error: true
+        with:
+          name: frontend
+          path: dist
+      - name: Upload artifact (GHES)
+        if: github.server_url != 'https://github.com'
+        uses: actions/upload-artifact@v3
         continue-on-error: true
         with:
           name: frontend

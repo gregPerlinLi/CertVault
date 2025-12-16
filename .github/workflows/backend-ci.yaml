@@ -147,6 +147,7 @@ jobs:
         uses: sigstore/cosign-installer@v4.0.0
 
       - name: Sign image with a key
+        continue-on-error: true
         run: |
           images=""
           for tag in ${TAGS}; do
@@ -160,6 +161,7 @@ jobs:
           TAGS: ${{ steps.meta.outputs.tags }}
 
       - name: Sign the images with GitHub OIDC Token
+        continue-on-error: true
         run: |
           images=""
           for tag in ${TAGS}; do
@@ -179,15 +181,33 @@ jobs:
       - name: Set up environment variable
         run: echo "VERSION=${{ env.VERSION }}" > version.env
 
-      - name: Upload artifact
+      - name: Upload artifact (GitHub)
+        if: github.server_url == 'https://github.com'
         uses: actions/upload-artifact@v6
         continue-on-error: true
         with:
           name: version
           path: version.env
 
-      - name: Upload API Doc Artifact
+      - name: Upload artifact (GHES)
+        if: github.server_url != 'https://github.com'
+        uses: actions/upload-artifact@v3
+        continue-on-error: true
+        with:
+          name: version
+          path: version.env
+
+      - name: Upload API Doc Artifact (GitHub)
+        if: github.server_url == 'https://github.com'
         uses: actions/upload-artifact@v6
+        continue-on-error: true
+        with:
+          name: openapi-doc
+          path: openapi.yaml
+
+      - name: Upload API Doc Artifact (GHES)
+        if: github.server_url != 'https://github.com'
+        uses: actions/upload-artifact@v3
         continue-on-error: true
         with:
           name: openapi-doc
@@ -199,8 +219,16 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download artifact
+      - name: Download artifact (GitHub)
+        if: github.server_url == 'https://github.com'
         uses: actions/download-artifact@v7
+        with:
+          name: version
+          path: .
+
+      - name: Download artifact (GHES)
+        if: github.server_url != 'https://github.com'
+        uses: actions/download-artifact@v3
         with:
           name: version
           path: .
@@ -257,8 +285,16 @@ jobs:
       contents: write
     steps:
       # 下载生成的 OpenAPI 文档
-      - name: Download OpenAPI artifact
+      - name: Download OpenAPI artifact (GitHub)
+        if: github.server_url == 'https://github.com'
         uses: actions/download-artifact@v7
+        with:
+          name: openapi-doc
+          path: .
+
+      - name: Download OpenAPI artifact (GHES)
+        if: github.server_url != 'https://github.com'
+        uses: actions/download-artifact@v3
         with:
           name: openapi-doc
           path: .
