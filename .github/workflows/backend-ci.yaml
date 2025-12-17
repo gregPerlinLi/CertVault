@@ -147,11 +147,24 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: annotation-index.org.opencontainers.image.description=🔒⚙️CertVault —— A Self-Signed SSL Certificate Issuance and Management Platform
           build-args: |
             IMAGE_CREATED=${{ env.IMAGE_CREATED }}
             IMAGE_VERSION=${{ env.VERSION }}
             IMAGE_REVISION=${{ github.sha }}
+
+      # 为多架构镜像的 manifest 添加描述信息
+      - name: Add description to manifest
+        run: |
+          docker buildx imagetools create \
+            --annotation "index:org.opencontainers.image.description=🔒⚙️CertVault —— A Self-Signed SSL Certificate Issuance and Management Platform" \
+            --annotation "index:org.opencontainers.image.title=A Self-Signed SSL Certificate Issuance and Management Platform" \
+            --annotation "index:org.opencontainers.image.url=https://github.com/gregPerlinLi/CertVault" \
+            --annotation "index:org.opencontainers.image.source=https://github.com/gregPerlinLi/CertVault" \
+            --annotation "index:org.opencontainers.image.version=${{ env.VERSION }}" \
+            --annotation "index:org.opencontainers.image.created=${{ env.IMAGE_CREATED }}" \
+            --annotation "index:org.opencontainers.image.revision=${{ github.sha }}" \
+            --annotation "index:org.opencontainers.image.licenses=Apache License 2.0" \
+            $(echo "${{ steps.meta.outputs.tags }}" | tr '\n' ' ')
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.0.0
