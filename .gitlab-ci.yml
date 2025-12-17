@@ -239,6 +239,12 @@ docker-build-and-push:
     - echo "================================= LOAD ENV ================================="
     - env
     - echo "VERSION=$VERSION"
+    - echo "============================= SET BUILD METADATA ==========================="
+    - export IMAGE_CREATED=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+    - export IMAGE_REVISION=${CI_COMMIT_SHA}
+    - echo "IMAGE_CREATED=$IMAGE_CREATED"
+    - echo "IMAGE_VERSION=$VERSION"
+    - echo "IMAGE_REVISION=$IMAGE_REVISION"
     - echo "============================= LOGIN TO HARBOR =============================="
     - docker login -u ${USERNAME} -p ${PASSWORD} ${HARBORHOST}
     - echo "======================= BUILD AND PUSH DOCKER IMAGES ======================="
@@ -247,6 +253,9 @@ docker-build-and-push:
     - |
       docker buildx build \
       --platform linux/amd64,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x \
+      --build-arg IMAGE_CREATED=${IMAGE_CREATED} \
+      --build-arg IMAGE_VERSION=${VERSION} \
+      --build-arg IMAGE_REVISION=${IMAGE_REVISION} \
       --tag ${HARBORHOST}/certvault/certvault:${VERSION} \
       --tag ${HARBORHOST}/certvault/certvault:latest \
       --cache-to type=s3,region=${MINIO_REIGON},bucket=${MINIO_BUCKET},name=docker-build-cache,endpoint_url=${MINIO_ENDPOINT_URL},use_path_style=true,access_key_id=${MINIO_ACCESS_KEY},secret_access_key=${MINIO_SECRET_KEY},mode=max \

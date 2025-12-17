@@ -117,6 +117,11 @@ jobs:
           
           echo "USE_CHINA_MIRROR=$USE_CHINA_MIRROR" >> $GITHUB_ENV
 
+      # 设置镜像创建时间
+      - name: Set image created time
+        run: |
+          echo "IMAGE_CREATED=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+
       # 构建 Docker 镜像
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3.6.0
@@ -142,6 +147,10 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            IMAGE_CREATED=${{ env.IMAGE_CREATED }}
+            IMAGE_VERSION=${{ env.VERSION }}
+            IMAGE_REVISION=${{ github.sha }}
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v4.0.0
