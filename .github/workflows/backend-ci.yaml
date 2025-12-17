@@ -147,6 +147,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          outputs: annotation-index.org.opencontainers.image.title="A Self-Signed SSL Certificate Issuance and Management Platform",annotation-index.org.opencontainers.image.description="🔒⚙️CertVault —— A Self-Signed SSL Certificate Issuance and Management Platform"
           build-args: |
             IMAGE_CREATED=${{ env.IMAGE_CREATED }}
             IMAGE_VERSION=${{ env.VERSION }}
