@@ -20,4 +20,4 @@ LABEL org.opencontainers.image.created="${IMAGE_CREATED}" \
   org.opencontainers.image.vendor="gregPerlinLi" \
   org.opencontainers.image.licenses="Apache License 2.0" \
   org.opencontainers.image.title="A Self-Signed SSL Certificate Issuance and Management Platform" \
-  org.opencontainers.image.description="🔒⚙️CertVault —— A Self-Signed SSL Certificate Issuance and Management Platforme"
+  org.opencontainers.image.description="🔒⚙️CertVault —— A Self-Signed SSL Certificate Issuance and Management Platform"
