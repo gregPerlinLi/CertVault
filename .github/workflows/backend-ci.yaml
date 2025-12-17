@@ -154,6 +154,7 @@ jobs:
 
       # 为多架构镜像的 manifest 添加描述信息
       - name: Add description to manifest
+        continue-on-error: true
         run: |
           TAGS="${{ steps.meta.outputs.tags }}"
           for tag in ${TAGS}; do
