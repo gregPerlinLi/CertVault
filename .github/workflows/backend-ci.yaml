@@ -251,6 +251,18 @@ jobs:
           token: ${{ secrets.CERT_VAULT_CHARTS_TOKEN }}
           path: certvault-charts
           ref: main
+        continue-on-error: true
+        id: checkout-main
+
+      # 如果主分支检出失败，尝试备用仓库
+      - name: Checkout alternative repository
+        if: steps.checkout-main.outcome == 'failure'
+        uses: actions/checkout@v6
+        with:
+          repository: gregperlinli/certvault-charts
+          token: ${{ secrets.CERT_VAULT_CHARTS_TOKEN }}
+          path: certvault-charts
+          ref: main
 
       # 配置 Git 用户信息
       - name: Configure Git user
@@ -305,6 +317,18 @@ jobs:
         with:
           repository: gregPerlinLi/certvault-api-doc
           token: ${{ secrets.CERT_VAULT_API_DOC_TOKEN }}
+          path: certvault-api-doc
+          ref: main
+        continue-on-error: true
+        id: checkout-main
+
+      # 如果主分支检出失败，尝试备用仓库
+      - name: Checkout alternative CertVaultAPIDoc repo
+        if: steps.checkout-main.outcome == 'failure'
+        uses: actions/checkout@v6
+        with:
+          repository: gregperlinli/certvault-api-doc
+          token: ${{ secrets.CERT_VAULT_CHARTS_TOKEN }}
           path: certvault-api-doc
           ref: main
 
