@@ -262,6 +262,21 @@ docker-build-and-push:
       --cache-from type=s3,region=${MINIO_REIGON},bucket=${MINIO_BUCKET},name=docker-build-cache,endpoint_url=${MINIO_ENDPOINT_URL},use_path_style=true,access_key_id=${MINIO_ACCESS_KEY},secret_access_key=${MINIO_SECRET_KEY} \
       --push \
       .
+    - echo "=================== ADD ANNOTATIONS TO MANIFEST LIST ======================"
+    - |
+      for tag in ${VERSION} latest; do
+        echo "Adding annotations to ${HARBORHOST}/certvault/certvault:${tag}"
+        docker buildx imagetools create --tag ${HARBORHOST}/certvault/certvault:${tag} \
+          --annotation "index:org.opencontainers.image.description=🔒⚙️CertVault —— A Self-Signed SSL Certificate Issuance and Management Platform" \
+          --annotation "index:org.opencontainers.image.title=A Self-Signed SSL Certificate Issuance and Management Platform" \
+          --annotation "index:org.opencontainers.image.url=https://github.com/gregPerlinLi/CertVault" \
+          --annotation "index:org.opencontainers.image.source=https://github.com/gregPerlinLi/CertVault" \
+          --annotation "index:org.opencontainers.image.version=${VERSION}" \
+          --annotation "index:org.opencontainers.image.created=${IMAGE_CREATED}" \
+          --annotation "index:org.opencontainers.image.revision=${IMAGE_REVISION}" \
+          --annotation "index:org.opencontainers.image.licenses=Apache License 2.0" \
+          ${HARBORHOST}/certvault/certvault:${tag}
+      done
     - echo "============================ EXPORT IMAGE TAGS ============================="
     - echo "VERSION=$VERSION" >> build.env
   after_script:
