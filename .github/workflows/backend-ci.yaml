@@ -35,7 +35,7 @@ jobs:
     steps:
       # 检出代码
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       # 设置 JDK 环境
       - name: Set up JDK
@@ -191,10 +191,10 @@ jobs:
 
       - name: Upload artifact (GHES)
         if: github.server_url != 'https://github.com'
-        uses: actions/cache/save@v5
+        uses: christopherhx/gitea-upload-artifact@v4
         continue-on-error: true
         with:
-          key: version
+          name: version
           path: version.env
 
       - name: Upload API Doc Artifact (GitHub)
@@ -207,10 +207,10 @@ jobs:
 
       - name: Upload API Doc Artifact (GHES)
         if: github.server_url != 'https://github.com'
-        uses: actions/cache/save@v5
+        uses: christopherhx/gitea-upload-artifact@v4
         continue-on-error: true
         with:
-          key: openapi-doc
+          name: openapi-doc
           path: openapi.yaml
 
   deploy-helm:
@@ -228,9 +228,9 @@ jobs:
 
       - name: Download artifact (GHES)
         if: github.server_url != 'https://github.com'
-        uses: actions/cache/restore@v5
+        uses: christopherhx/gitea-download-artifact@v4
         with:
-          key: version
+          name: version
           path: .
 
       - name: Read environment variable
@@ -294,9 +294,9 @@ jobs:
 
       - name: Download OpenAPI artifact (GHES)
         if: github.server_url != 'https://github.com'
-        uses: actions/cache/restore@v5
+        uses: christopherhx/gitea-download-artifact@v4
         with:
-          key: openapi-doc
+          name: openapi-doc
           path: .
 
       # 检出 CertVaultAPIDoc 仓库

@@ -308,11 +308,19 @@ release-new-version:
   script:
     - echo "================================= LOAD ENV ================================="
     - env
+    - echo "Getting Release info from GitHub ..."
+    - |
+      comments=$(curl -s \
+        -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+        -H "Accept: application/vnd.github+json" \
+        "https://api.github.com/repos/gregPerlinLi/CertVault/releases/latest" | jq '.body')
+    - formatted_comments=$(echo -e $comments | sed 's/^"//; s/"$//')
     - echo "Creating release for $VERSION"
+    - echo "Comments:\n $formatted_comments"
     - echo "Linking asset $PACKAGE_NAME -> $PACKAGE_URL"
   release:
     tag_name: "v${VERSION}"
-    description: "This is a release of version ${VERSION}."
+    description: "$formatted_comments"
     assets:
       links:
         - name: "${PACKAGE_NAME}"
