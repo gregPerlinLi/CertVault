@@ -20,26 +20,27 @@ cache:
         - frontend/*
         - .gitlab-ci.yml
 
-#sonarqube-check-frontend:
-#  stage: check
-#  image:
-#    name: docker.m.ixdev.cn/sonarsource/sonar-scanner-cli:5.0
-#    entrypoint: [""]
-#  tags:
-#    - dev
-#  variables:
-#    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
-#    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
-#  cache:
-#    key: "${CI_JOB_NAME}"
-#    paths:
-#      - .sonar/cache
-#  script:
-#    - cd frontend
-#    - sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}"
-#  allow_failure: true
-#  only:
-#    - dev
+sonarqube-check-frontend:
+  stage: check
+  image:
+    name: docker.m.ixdev.cn/sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  tags:
+    - dev
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - "${SONAR_USER_HOME}/cache"
+      - sonar-scanner/
+  script:
+    - cd frontend
+    - sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}"
+  allow_failure: true
+  only:
+    - dev
 
 sonarqube-check-backend:
   stage: check
@@ -69,6 +70,7 @@ sonarqube-check-backend:
     key: "${CI_JOB_NAME}"
     paths:
       - cache/
+      - sonar-scanner/
     policy: pull-push
   script:
     - mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -DskipTests -Dmaven.repo.local=cache -f server/pom.xml
