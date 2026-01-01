@@ -376,7 +376,7 @@ image-sign:
     - env
     - echo "VERSION=$VERSION"
     - echo "============================== INSTALL COSIGN =============================="
-    - curl -fL -o cosign_1.6.0_amd64.deb --insecure "https://cn-gz-1.minio.gdutnic.com/gdutnic/public/cosign_1.6.0_amd64.deb"
+    - curl -fL -o cosign_1.6.0_amd64.deb --insecure "https://cn-gz-1.oss.gdutnic.com/gdutnic/public/cosign_1.6.0_amd64.deb"
     - dpkg -i cosign_1.6.0_amd64.deb
     - mv /usr/local/bin/cosign-linux-amd64 /usr/local/bin/cosign
     - echo "=============================== KEY GENERATE ==============================="
