@@ -4,6 +4,7 @@
     <p style="font-size: large"><strong>A Self-Signed SSL Certificate Issuance and Management Platform </strong></p>
     <a href="https://github.com/gregPerlinLi/CertVault/releases"><img src="https://img.shields.io/github/v/release/gregPerlinLi/CertVault" alt="Latest release" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/actions/workflows/backend-ci.yaml"><img src="https://img.shields.io/github/actions/workflow/status/gregPerlinLi/CertVault/backend-ci.yaml?branch=dev" alt="CI status" /></a>
+<a href="https://app.fossa.com/projects/git%2Bgithub.com%2FgregPerlinLi%2FCertVault?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FgregPerlinLi%2FCertVault.svg?type=shield"/></a>
     <a href="https://github.com/gregPerlinLi/CertVault/blob/main/LICENSE"><img src="https://img.shields.io/github/license/gregPerlinLi/CertVault" alt="License" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/issues"><img src="https://img.shields.io/github/issues/gregPerlinLi/CertVault?color=f85149" alt="Issues" /></a>
     <a href="https://github.com/gregPerlinLi/CertVault/issues?q=is%3Aissue%20state%3Aclosed"><img src="https://img.shields.io/github/issues-closed/gregPerlinLi/CertVault?color=ab7df8" alt="Closed issues" /></a>
@@ -17,6 +18,9 @@
 ---
 
 > **[中文](README_CN.md) | English**
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FgregPerlinLi%2FCertVault.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FgregPerlinLi%2FCertVault?ref=badge_large)
 
 ## 🌍 What is CertVault
 
