@@ -325,13 +325,21 @@ public class OidcAuthController {
 
         String userAgent = request.getHeader("User-Agent");
         UserAgent ua = UserAgentUtil.parse(userAgent);
+
+        // 检查是否为 CertVaultCLI 客户端
+        String browserName = ua.getBrowser().getName();
+        if ("Unknown".equals(browserName) && userAgent.contains("CertVaultCLI/")) {
+            browserName = "CertVaultCLI";
+            log.info("Detected CertVaultCLI client: {}", userAgent);
+        }
+
         log.info("User-Agent: {}", userAgent);
         log.info("User: [{}|{}], Session ID: {} login with IP: {}, Browser: {}, OS: {}, Platform: {}",
                 userProfileDTO.getUsername(),
                 AuthUtils.roleIdToRoleName(userProfileDTO.getRole()),
                 request.getSession().getId(),
                 IpUtils.getIpAddress(),
-                ua.getBrowser().getName(),
+                browserName,
                 ua.getOs().getName(),
                 ua.getPlatform().getName());
         Map<String, String> location = IpUtils.getLocation(IpUtils.getIpAddress());
@@ -343,7 +351,7 @@ public class OidcAuthController {
                         location.get("region"),
                         location.get("province"),
                         location.get("city"),
-                        ua.getBrowser().getName(),
+                        browserName,
                         ua.getOs().getName(),
                         ua.getPlatform().getName(),
                         LocalDateTime.now(),
