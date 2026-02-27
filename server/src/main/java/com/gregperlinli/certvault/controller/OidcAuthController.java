@@ -326,11 +326,16 @@ public class OidcAuthController {
         String userAgent = request.getHeader("User-Agent");
         UserAgent ua = UserAgentUtil.parse(userAgent);
 
-        // 检查是否为 CertVaultCLI 客户端
+        // 检查是否为 CertVaultCLI(X) 客户端
         String browserName = ua.getBrowser().getName();
-        if ("Unknown".equals(browserName) && userAgent.contains("CertVaultCLI/")) {
-            browserName = "CertVaultCLI";
-            log.info("Detected CertVaultCLI client: {}", userAgent);
+        if ("Unknown".equals(browserName)) {
+            if (userAgent.contains("CertVaultCLI/")) {
+                browserName = "CertVaultCLI";
+                log.info("Detected CertVaultCLI client: {}", userAgent);
+            } else if (userAgent.contains("CertVaultCLIX/")) {
+                browserName = "CertVaultCLIX";
+                log.info("Detected CertVaultCLIX client: {}", userAgent);
+            }
         }
 
         log.info("User-Agent: {}", userAgent);
