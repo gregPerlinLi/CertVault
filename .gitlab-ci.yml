@@ -39,8 +39,6 @@ sonarqube-check-frontend:
     - cd frontend
     - sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}"
   allow_failure: true
-  only:
-    - dev
   <<: *src-changes
 
 sonarqube-check-backend:
