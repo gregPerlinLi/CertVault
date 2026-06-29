@@ -18,7 +18,7 @@ cache:
       changes:
         - server/*
         - frontend/*
-        - .gitlab-ci.yml
+        # - .gitlab-ci.yml
 
 sonarqube-check-frontend:
   stage: check
@@ -41,6 +41,7 @@ sonarqube-check-frontend:
   allow_failure: true
   only:
     - dev
+  <<: *src-changes
 
 sonarqube-check-backend:
   stage: check
