@@ -1,4 +1,4 @@
-image: docker.m.ixdev.cn/library/ubuntu:22.04
+image: docker.sparkcr.cn/library/ubuntu:22.04
 
 stages:
   - check
@@ -23,7 +23,7 @@ cache:
 sonarqube-check-frontend:
   stage: check
   image:
-    name: docker.m.ixdev.cn/sonarsource/sonar-scanner-cli:latest
+    name: docker.sparkcr.cn/sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
   tags:
     - dev
@@ -43,7 +43,7 @@ sonarqube-check-frontend:
 
 sonarqube-check-backend:
   stage: check
-  image: docker.m.ixdev.cn/library/maven:3-eclipse-temurin-17
+  image: docker.sparkcr.cn/library/maven:3-eclipse-temurin-17
   tags:
     - maven
   before_script:
@@ -77,7 +77,7 @@ sonarqube-check-backend:
   <<: *src-changes
 
 package-build:dev:
-  image: docker.m.ixdev.cn/library/maven:3.9-eclipse-temurin-17
+  image: docker.sparkcr.cn/library/maven:3.9-eclipse-temurin-17
   stage: package-build
   tags:
     - dev
@@ -146,7 +146,7 @@ package-build:dev:
   <<: *src-changes
 
 package-build:main:
-  image: docker.m.ixdev.cn/library/maven:3.9-eclipse-temurin-17
+  image: docker.sparkcr.cn/library/maven:3.9-eclipse-temurin-17
   stage: package-build
   tags:
     - dev
@@ -221,12 +221,12 @@ package-build:main:
     - main
 
 docker-build-and-push:
-  image: docker.m.ixdev.cn/library/docker:24-cli
+  image: docker.sparkcr.cn/library/docker:24-cli
   stage: image-build
   tags:
     - Docker
   services:
-    - name: docker.m.ixdev.cn/library/docker:24-cli
+    - name: docker.sparkcr.cn/library/docker:24-cli
   before_script:
     - echo "======================== SETUP BUILDX ENVIRONMENT =========================="
     - docker info
@@ -293,7 +293,7 @@ docker-build-and-push:
   <<: *src-changes
 
 helm-build:
-  image: docker.m.ixdev.cn/dtzar/helm-kubectl:3.8.0
+  image: docker.sparkcr.cn/dtzar/helm-kubectl:3.8.0
   stage: image-build
   tags:
     - dev
@@ -359,7 +359,7 @@ release-new-version:
     - main
 
 image-sign:
-  image: docker.m.ixdev.cn/library/ubuntu:22.04
+  image: docker.sparkcr.cn/library/ubuntu:22.04
   stage: signing
   tags:
     - dev
@@ -439,7 +439,7 @@ image-sign:
 
 helm-deploy:
   stage: deploy
-  image: docker.m.ixdev.cn/dtzar/helm-kubectl:3.8.0
+  image: docker.sparkcr.cn/dtzar/helm-kubectl:3.8.0
   tags:
     - dev
   before_script:

@@ -108,7 +108,7 @@ jobs:
           
           if [ "$USE_CHINA_MIRROR" = "true" ]; then
             echo "🌏 Using China mirror for base image"
-            sed -i 's#eclipse-temurin:17-jre#docker.m.ixdev.cn/library/eclipse-temurin:17-jre#g' server/Dockerfile
+            sed -i 's#eclipse-temurin:17-jre#docker.sparkcr.cn/library/eclipse-temurin:17-jre#g' server/Dockerfile
             echo "✅ Dockerfile updated:"
             grep "FROM" server/Dockerfile
           else
