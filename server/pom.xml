@@ -270,7 +270,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.3.2</version>
                 <configuration>
                     <delimiters>
                         <delimiter>@</delimiter> <!-- 使用@作为分隔符 -->
