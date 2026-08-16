@@ -1,0 +1,6 @@
+[registry."docker.io"]
+mirrors = ["docker.registry.gdut.edu.cn"]
+
+[registry."docker.registry.gdut.edu.cn"]
+http = false
+insecure = false
