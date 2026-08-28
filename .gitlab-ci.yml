@@ -55,10 +55,10 @@ sonarqube-check-backend:
       <localRepository>/cache/.m2</localRepository>
       <mirrors>
       <mirror>
-      <id>nexus-aliyun</id>
+      <id>nexus-gdut</id>
       <mirrorOf>*</mirrorOf>
-      <name>Nexus aliyun</name>
-      <url>https://mirrors.gdut.edu.cn/nexus/repository/maven-public/</url>
+      <name>Nexus GDUT</name>
+      <url>https://repo.gdut.edu.cn/repository/maven/</url>
       </mirror>
       </mirrors>
       </settings>' > $HOME/.m2/settings.xml || true
@@ -102,10 +102,10 @@ package-build:dev:
       <localRepository>/cache/.m2</localRepository>
       <mirrors>
       <mirror>
-      <id>nexus-aliyun</id>
+      <id>nexus-gdut</id>
       <mirrorOf>*</mirrorOf>
-      <name>Nexus aliyun</name>
-      <url>https://mirrors.gdut.edu.cn/nexus/repository/maven-public/</url>
+      <name>Nexus GDUT</name>
+      <url>https://repo.gdut.edu.cn/repository/maven/</url>
       </mirror>
       </mirrors>
       </settings>' > $HOME/.m2/settings.xml || true
@@ -113,11 +113,11 @@ package-build:dev:
     - curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
     - apt-get install -y nodejs
     - echo "========================= CONFIGURE NPM REGISTRY ==========================="
-    - npm config set registry https://mirrors.gdut.edu.cn/nexus/repository/npm
+    - npm config set registry https://repo.gdut.edu.cn/repository/npm
     - echo "============================== INSTALL PNPM ================================"
     - npm install -g pnpm
     - echo "========================= CONFIGURE PNPM REGISTRY =========================="
-    - pnpm config set registry https://mirrors.gdut.edu.cn/nexus/repository/npm
+    - pnpm config set registry https://repo.gdut.edu.cn/repository/npm
   script:
     - echo "=========================== INSTALL DEPENDENCIES ============================"
     - cd frontend
@@ -171,10 +171,10 @@ package-build:main:
       <localRepository>/cache/.m2</localRepository>
       <mirrors>
       <mirror>
-      <id>nexus-aliyun</id>
+      <id>nexus-gdut</id>
       <mirrorOf>*</mirrorOf>
-      <name>Nexus aliyun</name>
-      <url>https://mirrors.gdut.edu.cn/nexus/repository/maven-public/</url>
+      <name>Nexus GDUT</name>
+      <url>https://repo.gdut.edu.cn/repository/maven/</url>
       </mirror>
       </mirrors>
       </settings>' > $HOME/.m2/settings.xml || true
@@ -182,11 +182,11 @@ package-build:main:
     - curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
     - apt-get install -y nodejs
     - echo "========================= CONFIGURE NPM REGISTRY ==========================="
-    - npm config set registry https://mirrors.gdut.edu.cn/nexus/repository/npm
+    - npm config set registry https://repo.gdut.edu.cn/repository/npm
     - echo "============================== INSTALL PNPM ================================"
     - npm install -g pnpm
     - echo "========================= CONFIGURE PNPM REGISTRY =========================="
-    - pnpm config set registry https://mirrors.gdut.edu.cn/nexus/repository/npm
+    - pnpm config set registry https://repo.gdut.edu.cn/repository/npm
   script:
     - echo "=========================== INSTALL DEPENDENCIES ============================"
     - cd frontend
